@@ -1,0 +1,41 @@
+{
+    "name": "verbb/knock-knock",
+    "description": "Password protect your public facing Craft website with a single password",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "knock-knock"
+    ],
+    "support": {
+        "email": "support@verbb.io",
+        "issues": "https://github.com/verbb/knock-knock/issues?state=open",
+        "source": "https://github.com/verbb/knock-knock",
+        "docs": "https://github.com/verbb/knock-knock",
+        "rss": "https://github.com/verbb/knock-knock/commits/v2.atom"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Verbb",
+            "homepage": "https://verbb.io"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "verbb\\knockknock\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Knock Knock",
+        "handle": "knock-knock",
+        "changelogUrl": "https://raw.githubusercontent.com/verbb/knock-knock/craft-3/CHANGELOG.md",
+        "class": "verbb\\knockknock\\KnockKnock"
+    }
+}

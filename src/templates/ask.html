@@ -1,0 +1,39 @@
+{% extends '_layouts/base' %}
+{% import '_includes/forms' as forms %}
+
+{% set title = 'Site Locked' | t('knock-knock') %}
+{% set bodyClass = 'login' %}
+
+{% do view.registerAssetBundle('craft\\web\\assets\\login\\LoginAsset') %}
+
+{% block body %}
+
+<form method="post" accept-charset="UTF-8">
+    <div id="login-form">
+        <div class="message-container">
+            <div id="message">
+                <h1>{{ 'Site locked' | t('knock-knock') }}</h1>
+
+                <input type="hidden" name="action" value="knock-knock/default/answer">
+                <input type="hidden" name="redir" value="{{ redir }}">
+                {{ csrfInput() }}
+
+                <div>
+                    {{ forms.passwordField({
+                        id: 'password',
+                        placeholder: 'Password' | t('knock-knock'),
+                        name: 'password',
+                        autofocus: true,
+                        errors: (errors is defined ? errors : null),
+                    }) }}
+                </div>
+
+                <div class="buttons">
+                    <input class="btn submit" type="submit" value="{{ 'Unlock' | t('knock-knock') }}">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
