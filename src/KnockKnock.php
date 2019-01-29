@@ -42,13 +42,14 @@ class KnockKnock extends Plugin
         $this->_registerCpRoutes();
 
         $request = Craft::$app->getRequest();
+        $settings = KnockKnock::$plugin->getSettings();
 
         $url = $request->getUrl();
         $token = $request->getCookies()->get('siteAccessToken');
         $user = Craft::$app->getUser()->getIdentity();
 
         // Force challenge for non authenticated site visitors
-        if ($request->getIsSiteRequest() && (!$user) && ($token == '') && (stripos($url, 'knock-knock') === false) ) {
+        if ($settings->enabled && $request->getIsSiteRequest() && (!$user) && ($token == '') && (stripos($url, 'knock-knock') === false) ) {
             Craft::$app->getSession()->setFlash('redir', $url);
 
             Craft::$app->getResponse()->redirect(UrlHelper::siteUrl('knock-knock/who-is-there'));

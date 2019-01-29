@@ -24,6 +24,29 @@ You can also add the package to your project using Composer.
 ### Usage
 In the Control Panel, go to Settings → Knock Knock, and enter a password. Anyone visiting your website will need to enter the password to see the website.
 
+## Configuration
+
+Create an `knock-knock.php` file under your `/config` directory with the following options available to you. You can also use multi-environment options to change these per environment.
+
+```php
+<?php
+
+return [
+    '*' => [
+        'enabled' => false,
+        'password' => 'superSecretPassword',
+    ],
+    'staging' => [
+        'enabled' => true,
+    ],
+];
+```
+
+### Configuration options
+
+- `enabled` - Whether password protection should be enabled. Useful in multi-environment scenarios.
+- `password` - The password users will need to enter to access the site.
+
 ### Credits
 Based on [KnockKock](https://github.com/dgrigg/knockknock) for Craft 2.
 

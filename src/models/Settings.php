@@ -11,6 +11,7 @@ class Settings extends Model
     // Public Properties
     // =========================================================================
 
+    public $enabled = false;
     public $password;
 
 }
