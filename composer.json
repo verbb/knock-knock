@@ -1,8 +1,8 @@
 {
     "name": "verbb/knock-knock",
-    "description": "Password protect your public facing Craft website with a single password",
+    "description": "Password protect your public facing Craft website with a single password.",
     "type": "craft-plugin",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "keywords": [
         "craft",
         "cms",
