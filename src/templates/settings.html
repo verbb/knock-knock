@@ -16,12 +16,15 @@
 <h2>{{ 'Knock, knock ... who\'s there?' | t('knock-knock') }}</h2>
 <p>{{ 'Share this password with anyone you want to access your website.' | t('knock-knock') }}</p>
 
+{% namespace 'settings' %}
+
 {{ forms.lightswitchField({
     label: 'Enabled' | t('knock-knock'),
     instructions: 'Whether the plugin should be enabled.' | t('knock-knock'),
     id: 'enabled',
     name: 'enabled',
-    value: settings.enabled,
+    value: 1,
+    on: settings.enabled,
     errors: settings.getErrors('enabled'),
 }) }}
 
@@ -33,5 +36,7 @@
     value: settings.password,
     errors: settings.getErrors('password'),
 }) }}
+
+{% endnamespace %}
 
 {% endblock %}
