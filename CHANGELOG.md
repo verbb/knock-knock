@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3 - 2019-02-09
+
+### Fixed
+- Fix console requests throwing an error.
+
 ## 1.0.2 - 2019-02-02
 
 ### Changed
