@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0 - 2019-06-05
+
+### Added
+- Add lock-out and security behaviour.
+- Add multi-site settings.
+- Add custom template setting.
+- New icon.
+- Add override notice for settings fields.
+
 ## 1.0.3 - 2019-02-09
 
 ### Fixed
