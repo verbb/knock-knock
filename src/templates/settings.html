@@ -1,5 +1,6 @@
 {% extends 'knock-knock/_layouts' %}
 {% import '_includes/forms' as forms %}
+{% import 'knock-knock/_macros' as macros %}
 
 {% set crumbs = [
     { label: 'Knock Knock' | t('knock-knock'), url: url('knock-knock') },
@@ -26,6 +27,7 @@
     value: 1,
     on: settings.enabled,
     errors: settings.getErrors('enabled'),
+    warning: macros.configWarning('enabled', 'knock-knock'),
 }) }}
 
 {{ forms.textField({
@@ -35,6 +37,7 @@
     name: 'password',
     value: settings.password,
     errors: settings.getErrors('password'),
+    warning: macros.configWarning('password', 'knock-knock'),
 }) }}
 
 {% endnamespace %}
