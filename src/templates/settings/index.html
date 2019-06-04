@@ -1,0 +1,55 @@
+{% extends 'knock-knock/_layouts' %}
+{% import '_includes/forms' as forms %}
+
+{% set crumbs = [
+    { label: 'Knock Knock' | t('knock-knock'), url: url('knock-knock/settings') },
+    { label: 'Settings' | t('knock-knock'), url: url('knock-knock/settings') },
+] %}
+
+{% set selectedTab = 'settings' %}
+
+{% set fullPageForm = true %}
+
+{% set navItems = {
+    'general': { title: 'General Settings' | t('knock-knock') },
+    'security': { title: 'Security' | t('knock-knock') },
+} %}
+
+{% set selectedItem = 'general' %}
+
+{% block sidebar %}
+    <nav class="knock-settings-tabs" id="tabs">
+        <ul>
+            {% for id, item in navItems %}
+                {% if item.heading is defined %}
+                    <li class="heading"><span>{{ item.heading }}</span></li>
+                {% else %}
+                    <li>
+                        <a id="tab-{{ loop.index }}" href="#tab-{{ id }}" class="tab {% if id == selectedItem %}sel{% endif %}">
+                            {{ item.title }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+{% endblock %}
+
+{% block blockContent %}
+
+<input type="hidden" name="action" value="plugins/save-plugin-settings">
+<input type="hidden" name="pluginHandle" value="knock-knock">
+
+{% for id, item in navItems %}
+    {% if item.title is defined %}
+        <div id="tab-{{ id }}" {% if not loop.first %}class="hidden"{% endif %}>
+            <h2>{{ item.title }}</h2>
+
+            {% namespace 'settings' %}
+                {% include 'knock-knock/settings/_panes/' ~ id ignore missing %}
+            {% endnamespace %}
+        </div>
+    {% endif %}
+{% endfor %}
+
+{% endblock %}

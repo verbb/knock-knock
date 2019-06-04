@@ -2,6 +2,7 @@
 namespace verbb\knockknock\base;
 
 use verbb\knockknock\KnockKnock;
+use verbb\knockknock\services\Logins;
 
 use Craft;
 use craft\log\FileTarget;
@@ -21,6 +22,11 @@ trait PluginTrait
     // Public Methods
     // =========================================================================
 
+    public function getLogins()
+    {
+        return $this->get('logins');
+    }
+
     public static function log($message)
     {
         Craft::getLogger()->log($message, Logger::LEVEL_INFO, 'knock-knock');
@@ -38,6 +44,7 @@ trait PluginTrait
     private function _setPluginComponents()
     {
         $this->setComponents([
+            'logins' => Logins::class,
         ]);
     }
 

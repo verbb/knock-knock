@@ -1,0 +1,55 @@
+{% import '_includes/forms' as forms %}
+{% import 'knock-knock/_macros' as macros %}
+
+{{ forms.lightswitchField({
+    label: 'Check Invalid Logins' | t('knock-knock'),
+    instructions: 'Whether to check and log invalid logins. This will lock IP addresses out of the system in certain circumstances, but can help against brute-force logins.' | t('knock-knock'),
+    id: 'checkInvalidLogins',
+    name: 'checkInvalidLogins',
+    value: 1,
+    on: settings.checkInvalidLogins,
+    errors: settings.getErrors('checkInvalidLogins'),
+    warning: macros.configWarning('checkInvalidLogins', 'knock-knock'),
+}) }}
+
+{{ forms.textField({
+    label: 'invalidLoginWindowDuration' | t('knock-knock'),
+    instructions: 'The amount of time to track invalid login attempts for an IP, for determining if Knock Knock should lock the IP out.' | t('knock-knock'),
+    id: 'invalidLoginWindowDuration',
+    name: 'invalidLoginWindowDuration',
+    value: settings.invalidLoginWindowDuration,
+    errors: settings.getErrors('invalidLoginWindowDuration'),
+    warning: macros.configWarning('invalidLoginWindowDuration', 'knock-knock'),
+}) }}
+
+{{ forms.textField({
+    label: 'Max Invalid Logins' | t('knock-knock'),
+    instructions: 'The number of invalid login attempts Knock Knock will allow within the specified duration before the IP gets locked.' | t('knock-knock'),
+    id: 'maxInvalidLogins',
+    name: 'maxInvalidLogins',
+    value: settings.maxInvalidLogins,
+    errors: settings.getErrors('maxInvalidLogins'),
+    warning: macros.configWarning('maxInvalidLogins', 'knock-knock'),
+}) }}
+
+{{ forms.textAreaField({
+    label: 'Whitelist IPs' | t('knock-knock'),
+    instructions: 'Provide IP Addresses that should be exempt from lockouts out automatically. One IP Address per line.' | t('knock-knock'),
+    rows: 10,
+    id: 'whitelistIps',
+    name: 'whitelistIps',
+    value: settings.whitelistIps,
+    errors: settings.getErrors('whitelistIps'),
+    warning: macros.configWarning('whitelistIps', 'knock-knock'),
+}) }}
+
+{{ forms.textAreaField({
+    label: 'Blacklist IPs' | t('knock-knock'),
+    instructions: 'Provide IP Addresses that should be locked out automatically. One IP Address per line.' | t('knock-knock'),
+    rows: 10,
+    id: 'blacklistIps',
+    name: 'blacklistIps',
+    value: settings.blacklistIps,
+    errors: settings.getErrors('blacklistIps'),
+    warning: macros.configWarning('blacklistIps', 'knock-knock'),
+}) }}

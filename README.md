@@ -36,6 +36,12 @@ return [
         'enabled' => false,
         'password' => 'superSecretPassword',
         'siteSettings' => [],
+
+        'checkInvalidLogins' => false,
+        'invalidLoginWindowDuration' => '3600',
+        'maxInvalidLogins' => 10,
+        'whitelistIps' => '',
+        'blacklistIps' => '',
     ],
     'staging' => [
         'enabled' => true,
@@ -49,6 +55,11 @@ return [
 - `password` - The password users will need to enter to access the site.
 - `template` - Provide a custom template to be shown instead of the default one.
 - `siteSettings` - See below on how to configure.
+- `checkInvalidLogins` - Whether to check and log invalid logins. This will lock IP addresses out of the system in certain circumstances, but can help against brute-force logins..
+- `invalidLoginWindowDuration` - The amount of time to track invalid login attempts for an IP, for determining if Knock Knock should lock the IP out.
+- `maxInvalidLogins` - The number of invalid login attempts Knock Knock will allow within the specified duration before the IP gets locked.
+- `whitelistIps` - Provide IP Addresses that should be exempt from lockouts out automatically.
+- `blacklistIps` - Provide IP Addresses that should be locked out automatically.
 
 ### Multi-site configuration
 
@@ -79,6 +90,11 @@ return [
 ```
 
 If you keep the top level `enabled`, `password`, etc settings, they'll override your settings for each site.
+
+### Security
+You can opt to log users' attempts to login to Craft to prevent brute-force attempts. Use the config settings to manage this.
+
+**Important:** You must also enable [storeUserIps](https://docs.craftcms.com/v3/config/config-settings.html#storeuserips) in your `general.php` file.
 
 ### Credits
 Based on [KnockKock](https://github.com/dgrigg/knockknock) for Craft 2.

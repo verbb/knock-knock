@@ -16,6 +16,12 @@ class Settings extends Model
     public $template;
     public $siteSettings = [];
 
+    public $checkInvalidLogins = false;
+    public $invalidLoginWindowDuration = '3600';
+    public $maxInvalidLogins = 10;
+    public $whitelistIps;
+    public $blacklistIps;
+
 
     // Public Methods
     // =========================================================================
@@ -33,6 +39,16 @@ class Settings extends Model
     public function getPassword()
     {
         return $this->_getSettingValue('password') ?? '';
+    }
+
+    public function getWhitelistIps()
+    {
+        return explode("\n", $this->whitelistIps) ?? [];
+    }
+
+    public function getBlacklistIps()
+    {
+        return explode("\n", $this->blacklistIps) ?? [];
     }
 
 
