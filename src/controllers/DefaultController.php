@@ -37,9 +37,9 @@ class DefaultController extends Controller
         $view->setTemplateMode($view::TEMPLATE_MODE_CP);
         $template = 'knock-knock/ask';
 
-        if ($settings->template) {
+        if ($settings->getTemplate()) {
             $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
-            $template = $settings->template;
+            $template = $settings->getTemplate();
         }
 
         $data['redirect'] = Craft::$app->getSession()->getFlash('redirect');
@@ -60,13 +60,13 @@ class DefaultController extends Controller
         $view->setTemplateMode($view::TEMPLATE_MODE_CP);
         $template = 'knock-knock/ask';
 
-        if ($settings->template) {
+        if ($settings->getTemplate()) {
             $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
-            $template = $settings->template;
+            $template = $settings->getTemplate();
         }
 
         $password = $request->getParam('password');
-        $accessPassword = KnockKnock::$plugin->getSettings()->password;
+        $accessPassword = $settings->getPassword();
         
         if ($accessPassword == $password) {
             $cookie = new Cookie();

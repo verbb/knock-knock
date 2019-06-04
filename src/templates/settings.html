@@ -14,7 +14,7 @@
 <input type="hidden" name="action" value="plugins/save-plugin-settings">
 <input type="hidden" name="pluginHandle" value="knock-knock">
 
-<h2>{{ 'Knock, knock ... who\'s there?' | t('knock-knock') }}</h2>
+<h2>{{ 'Knock, knock ... who’s there?' | t('knock-knock') }}</h2>
 <p>{{ 'Share this password with anyone you want to access your website.' | t('knock-knock') }}</p>
 
 {% namespace 'settings' %}
@@ -49,6 +49,62 @@
     value: settings.template,
     errors: settings.getErrors('template'),
     warning: macros.configWarning('template', 'knock-knock'),
+}) }}
+
+{% set siteRows = [] %}
+
+{% for site in craft.app.sites.getAllSites() %}
+    {% set siteSettings = settings.siteSettings[site.handle] ?? null %}
+
+    {% set siteRows = siteRows | merge({
+        (site.handle): {
+            heading: site.name | t('site'),
+            enabled: include('_includes/forms/lightswitch', {
+                name: 'siteSettings[' ~ site.handle ~ '][enabled]',
+                on: siteSettings.enabled ?? false,
+                value: '1',
+                small: true,
+            }),
+            password: {
+                value: siteSettings.password ?? '',
+            },
+            template: {
+                value: siteSettings.template ?? '',
+            },
+        }
+    }) %}
+{% endfor %}
+
+{{ forms.editableTableField({
+    label: 'Site Settings' | t('app'),
+    instructions: 'Enter options to password-protect your site.' | t('app'),
+    id: 'siteSettings',
+    name: 'siteSettings',
+    cols: {
+        heading: {
+            type: 'heading',
+            heading: 'Enabled' | t('knock-knock'),
+            class: 'thin',
+            info: 'Whether to show the password protect screen for this site.' | t('knock-knock'),
+        },
+        enabled: {
+            type: 'heading',
+            class: 'thin' ~ (not craft.app.getIsMultiSite() ? ' hidden')
+        },
+        password: {
+            type: 'singleline',
+            heading: 'Password' | t('knock-knock'),
+            info: 'Minimum 8 characters, don’t make it easy.' | t('knock-knock'),
+        },
+        template: {
+            type: 'template',
+            heading: 'Template' | t('knock-knock'),
+            info: 'Select a custom template to be shown as the password protected page. Leave empty for the default.' | t('knock-knock'),
+            code: true,
+        },
+    },
+    rows: siteRows,
+    staticRows: true,
 }) }}
 
 {% endnamespace %}

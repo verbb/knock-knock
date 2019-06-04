@@ -76,7 +76,7 @@ class KnockKnock extends Plugin
         $user = Craft::$app->getUser()->getIdentity();
 
         // Force challenge for non authenticated site visitors
-        if ($settings->enabled && $request->getIsSiteRequest() && (!$user) && ($token == '') && (stripos($url, 'knock-knock') === false) ) {
+        if ($settings->getEnabled() && $request->getIsSiteRequest() && (!$user) && ($token == '') && (stripos($url, 'knock-knock') === false) ) {
             Craft::$app->getSession()->setFlash('redir', $url);
 
             Craft::$app->getResponse()->redirect(UrlHelper::siteUrl('knock-knock/who-is-there'));

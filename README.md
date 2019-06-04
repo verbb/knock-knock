@@ -35,6 +35,7 @@ return [
     '*' => [
         'enabled' => false,
         'password' => 'superSecretPassword',
+        'siteSettings' => [],
     ],
     'staging' => [
         'enabled' => true,
@@ -47,6 +48,37 @@ return [
 - `enabled` - Whether password protection should be enabled. Useful in multi-environment scenarios.
 - `password` - The password users will need to enter to access the site.
 - `template` - Provide a custom template to be shown instead of the default one.
+- `siteSettings` - See below on how to configure.
+
+### Multi-site configuration
+
+The above will set the values globally, for all sites. These global values will override each setting for each site, so they'll always be the same. If you want to set these values per-site, do not include them at the top level. For example:
+
+```php
+<?php
+
+return [
+    '*' => [
+        // Don't do this for multi-site specific settings
+        'enabled' => true,
+        'password' => 'superSecretPassword',
+
+        // Instead, do this:
+        'siteSettings' => [
+            'siteHandle' => [
+                'enabled' => true,
+                'password' => 'superSecretPassword',
+            ],
+            'anotherSiteHandle' => [
+                'enabled' => true,
+                'password' => 'anotherSecretPassword',
+            ],
+        ]
+    ],
+];
+```
+
+If you keep the top level `enabled`, `password`, etc settings, they'll override your settings for each site.
 
 ### Credits
 Based on [KnockKock](https://github.com/dgrigg/knockknock) for Craft 2.
