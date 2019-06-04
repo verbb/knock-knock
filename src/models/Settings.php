@@ -13,5 +13,6 @@ class Settings extends Model
 
     public $enabled = false;
     public $password;
+    public $template;
 
 }

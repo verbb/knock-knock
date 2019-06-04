@@ -31,21 +31,39 @@ class DefaultController extends Controller
 
     public function actionAsk()
     {
+        $settings = KnockKnock::$plugin->getSettings();
+        
         $view = $this->getView();
         $view->setTemplateMode($view::TEMPLATE_MODE_CP);
+        $template = 'knock-knock/ask';
 
-        $data['redir'] = Craft::$app->getSession()->getFlash('redir');
-        
-        if ($data['redir'] == '') {
-            $data['redir'] = '/';
+        if ($settings->template) {
+            $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+            $template = $settings->template;
         }
 
-        return $this->renderTemplate('knock-knock/ask', $data);
+        $data['redirect'] = Craft::$app->getSession()->getFlash('redirect');
+        
+        if ($data['redirect'] == '') {
+            $data['redirect'] = '/';
+        }
+
+        return $this->renderTemplate($template, $data);
     }
 
     public function actionAnswer()
     {
         $request = Craft::$app->getRequest();
+        $settings = KnockKnock::$plugin->getSettings();
+
+        $view = $this->getView();
+        $view->setTemplateMode($view::TEMPLATE_MODE_CP);
+        $template = 'knock-knock/ask';
+
+        if ($settings->template) {
+            $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+            $template = $settings->template;
+        }
 
         $password = $request->getParam('password');
         $accessPassword = KnockKnock::$plugin->getSettings()->password;
@@ -57,15 +75,12 @@ class DefaultController extends Controller
             $cookie->expire = time() + 3600;
             
             Craft::$app->getResponse()->getCookies()->add($cookie);
-            return $this->redirect($request->getParam('redir'));
+            return $this->redirect($request->getParam('redirect'));
         } else {
-            $data['redir'] = $request->getParam('redir');
+            $data['redirect'] = $request->getParam('redirect');
             $data['errors']['password'] = Craft::t('knock-knock', 'Invalid password');
             
-            $view = $this->getView();
-            $view->setTemplateMode($view::TEMPLATE_MODE_CP);
-
-            return $this->renderTemplate('knock-knock/ask', $data);
+            return $this->renderTemplate($template, $data);
         }
     }
 }

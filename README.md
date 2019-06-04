@@ -46,6 +46,7 @@ return [
 
 - `enabled` - Whether password protection should be enabled. Useful in multi-environment scenarios.
 - `password` - The password users will need to enter to access the site.
+- `template` - Provide a custom template to be shown instead of the default one.
 
 ### Credits
 Based on [KnockKock](https://github.com/dgrigg/knockknock) for Craft 2.
