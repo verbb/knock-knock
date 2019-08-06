@@ -26,7 +26,7 @@ In the Control Panel, go to Settings → Knock Knock, and enter a password. Anyo
 
 ## Configuration
 
-Create an `knock-knock.php` file under your `/config` directory with the following options available to you. You can also use multi-environment options to change these per environment.
+Create a `knock-knock.php` file under your `/config` directory with the following options available to you. You can also use multi-environment options to change these per environment.
 
 ```php
 <?php
