@@ -13,6 +13,7 @@ class Settings extends Model
     
     public $enabled = false;
     public $password;
+    public $loginPath;
     public $template;
     public $siteSettings = [];
 
@@ -39,6 +40,11 @@ class Settings extends Model
     public function getPassword()
     {
         return $this->_getSettingValue('password') ?? '';
+    }
+
+    public function getLoginPath()
+    {
+        return $this->_getSettingValue('loginPath') ?? 'knock-knock/who-is-there';
     }
 
     public function getWhitelistIps()
