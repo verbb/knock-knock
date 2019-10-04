@@ -22,6 +22,17 @@
     warning: macros.configWarning('password', 'knock-knock'),
 }) }}
 
+{{ forms.textField({
+    label: 'Custom login path' | t('knock-knock'),
+    instructions: 'The path you get redirected to when not logged in' | t('knock-knock'),
+    id: 'loginPath',
+    name: 'loginPath',
+    placeholder: 'knock-knock/who-is-there',
+    value: settings.loginPath,
+    errors: settings.getErrors('loginPath'),
+    warning: macros.configWarning('loginPath', 'knock-knock'),
+}) }}
+
 {{ forms.autosuggestField({
     label: 'Template' | t('knock-knock'),
     instructions: 'Select a custom template to be shown as the password protected page. Leave empty for the default.' | t('knock-knock'),
