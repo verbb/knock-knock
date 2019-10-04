@@ -71,7 +71,7 @@ class Settings extends Model
             return $this->$value;
         }
 
-        if (Craft::$app->getIsMultiSite() && $siteSettings) {
+        if (Craft::$app->getIsMultiSite() && $siteSettings && isset($siteSettings[$value])) {
             return $siteSettings[$value];
         }
 
