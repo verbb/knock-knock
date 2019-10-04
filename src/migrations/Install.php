@@ -26,6 +26,7 @@ class Install extends Migration
             'id' => $this->primaryKey(),
             'ipAddress' => $this->string(),
             'password' => $this->string(),
+            'loginPath' => $this->string(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
