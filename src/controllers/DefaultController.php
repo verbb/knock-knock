@@ -43,12 +43,10 @@ class DefaultController extends Controller
             $template = $settings->getTemplate();
         }
 
-        $data['redirect'] = Craft::$app->getSession()->getFlash('redirect');
-        
-        if ($data['redirect'] == '') {
-            $data['redirect'] = '/';
-        }
+        $redirect = Craft::$app->getSession()->get('redirect');
 
+        $data['redirect'] = $redirect ?? '/';
+        
         return $this->renderTemplate($template, $data);
     }
 

@@ -71,7 +71,7 @@ class KnockKnock extends Plugin
             return;
         }
 
-        $url = $request->getUrl();
+        $url = $request->getAbsoluteUrl();
         $token = $request->getCookies()->get('siteAccessToken');
         $user = Craft::$app->getUser()->getIdentity();
         $loginPath = $settings->getLoginPath();
@@ -84,7 +84,7 @@ class KnockKnock extends Plugin
                 return;
             }
 
-            Craft::$app->getSession()->setFlash('redir', $url);
+            Craft::$app->getSession()->set('redirect', $url);
 
             Craft::$app->getResponse()->redirect(UrlHelper::siteUrl($loginPath));
             Craft::$app->end();
