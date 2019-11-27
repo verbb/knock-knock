@@ -1,0 +1,13 @@
+{% import '_includes/forms' as forms %}
+{% import 'knock-knock/_macros' as macros %}
+
+{{ forms.textAreaField({
+    label: 'Protected URLs' | t('knock-knock'),
+    instructions: 'Provide a list of URLs to protect with a password. By default, this will be the entire site. You can use absolute or relative URLs and aliases. One URL per line.' | t('knock-knock'),
+    rows: 10,
+    id: 'protectedUrls',
+    name: 'protectedUrls',
+    value: settings.protectedUrls,
+    errors: settings.getErrors('protectedUrls'),
+    warning: macros.configWarning('protectedUrls', 'knock-knock'),
+}) }}

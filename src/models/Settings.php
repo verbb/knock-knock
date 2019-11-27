@@ -5,6 +5,7 @@ use verbb\knockknock\KnockKnock;
 
 use Craft;
 use craft\base\Model;
+use craft\helpers\UrlHelper;
 
 class Settings extends Model
 {
@@ -22,6 +23,8 @@ class Settings extends Model
     public $maxInvalidLogins = 10;
     public $whitelistIps;
     public $blacklistIps;
+
+    public $protectedUrls;
 
 
     // Public Methods
@@ -55,6 +58,21 @@ class Settings extends Model
     public function getBlacklistIps()
     {
         return explode("\n", $this->blacklistIps) ?? [];
+    }
+
+    public function getProtectedUrls()
+    {
+        $urls = [];
+
+        foreach (explode("\n", $this->protectedUrls) as $url) {
+            $url = trim($url);
+
+            if ($url) {
+                $urls[] = UrlHelper::siteUrl(Craft::getAlias($url));
+            }
+        }
+
+        return $urls;
     }
 
 

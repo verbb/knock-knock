@@ -84,6 +84,13 @@ class KnockKnock extends Plugin
                 return;
             }
 
+            // Check to see if we're watching only specific URLs. By default, protect everything though
+            if ($settings->getProtectedUrls()) {
+                if (!in_array($url, $settings->getProtectedUrls())) {
+                    return;
+                }
+            }
+
             Craft::$app->getSession()->set('redirect', $url);
 
             Craft::$app->getResponse()->redirect(UrlHelper::siteUrl($loginPath));
