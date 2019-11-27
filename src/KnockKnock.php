@@ -75,9 +75,15 @@ class KnockKnock extends Plugin
         $token = $request->getCookies()->get('siteAccessToken');
         $user = Craft::$app->getUser()->getIdentity();
         $loginPath = $settings->getLoginPath();
+        $ipAddress = $request->getUserIP();
 
         // Force challenge for non authenticated site visitors
         if ($settings->getEnabled() && $request->getIsSiteRequest() && (!$user) && ($token == '') && (stripos($url, $loginPath) === false) ) {
+            // Check if this IP is in the exclusion list
+            if (in_array($ipAddress, $settings->getWhitelistIps())) {
+                return;
+            }
+
             Craft::$app->getSession()->setFlash('redir', $url);
 
             Craft::$app->getResponse()->redirect(UrlHelper::siteUrl($loginPath));
