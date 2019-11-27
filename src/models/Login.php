@@ -11,5 +11,6 @@ class Login extends Model
     public $id;
     public $ipAddress;
     public $password;
+    public $loginPath;
 
 }

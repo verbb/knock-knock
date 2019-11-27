@@ -74,12 +74,13 @@ class KnockKnock extends Plugin
         $url = $request->getUrl();
         $token = $request->getCookies()->get('siteAccessToken');
         $user = Craft::$app->getUser()->getIdentity();
+        $loginPath = $settings->getLoginPath();
 
         // Force challenge for non authenticated site visitors
-        if ($settings->getEnabled() && $request->getIsSiteRequest() && (!$user) && ($token == '') && (stripos($url, 'knock-knock') === false) ) {
+        if ($settings->getEnabled() && $request->getIsSiteRequest() && (!$user) && ($token == '') && (stripos($url, $loginPath) === false) ) {
             Craft::$app->getSession()->setFlash('redir', $url);
 
-            Craft::$app->getResponse()->redirect(UrlHelper::siteUrl('knock-knock/who-is-there'));
+            Craft::$app->getResponse()->redirect(UrlHelper::siteUrl($loginPath));
             Craft::$app->end();
         }
     }
@@ -95,9 +96,12 @@ class KnockKnock extends Plugin
 
     private function _registerSiteRoutes()
     {
-        Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_SITE_URL_RULES, function(RegisterUrlRulesEvent $event) {
+        $settings = KnockKnock::$plugin->getSettings();
+        $loginPath = $settings->getLoginPath();
+
+        Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_SITE_URL_RULES, function(RegisterUrlRulesEvent $event) use ($loginPath) {
             $event->rules = array_merge($event->rules, [
-                'knock-knock/who-is-there' => 'knock-knock/default/ask',
+                $loginPath => 'knock-knock/default/ask',
             ]);
         });
     }

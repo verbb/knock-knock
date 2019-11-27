@@ -13,6 +13,7 @@ class Settings extends Model
     
     public $enabled = false;
     public $password;
+    public $loginPath;
     public $template;
     public $siteSettings = [];
 
@@ -41,6 +42,11 @@ class Settings extends Model
         return $this->_getSettingValue('password') ?? '';
     }
 
+    public function getLoginPath()
+    {
+        return $this->_getSettingValue('loginPath') ?? 'knock-knock/who-is-there';
+    }
+
     public function getWhitelistIps()
     {
         return explode("\n", $this->whitelistIps) ?? [];
@@ -65,7 +71,7 @@ class Settings extends Model
             return $this->$value;
         }
 
-        if (Craft::$app->getIsMultiSite() && $siteSettings) {
+        if (Craft::$app->getIsMultiSite() && $siteSettings && isset($siteSettings[$value])) {
             return $siteSettings[$value];
         }
 
