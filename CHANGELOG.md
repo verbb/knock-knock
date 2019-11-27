@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.1 - 2019-11-27
+
+### Added
+- Added Custom login path. Thanks @X-Tender.
+- Allow IPs to be whitelisted from login protection.
+- Add Protected URLs to set specific URLs (and only those) for password protection.
+
+### Fixed
+- Update redirect input.
+= Fix redirection after login.
+
 ## 1.1.0 - 2019-06-05
 
 ### Added
