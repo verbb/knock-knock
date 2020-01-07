@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.2 - 2020-01-07
+
+### Fixed
+- Fix `yii\base\InvalidConfigException` error thrown in some instances.
+
 ## 1.1.1 - 2019-11-27
 
 ### Added

@@ -8,6 +8,7 @@ use Craft;
 use craft\base\Plugin;
 use craft\events\RegisterUrlRulesEvent;
 use craft\helpers\UrlHelper;
+use craft\services\Plugins;
 use craft\web\UrlManager;
 
 use yii\base\Event;
@@ -64,38 +65,40 @@ class KnockKnock extends Plugin
 
     private function _testAccess()
     {
-        $request = Craft::$app->getRequest();
-        $settings = KnockKnock::$plugin->getSettings();
+        Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS, function(Event $event) {
+            $request = Craft::$app->getRequest();
+            $settings = KnockKnock::$plugin->getSettings();
 
-        if ($request->getIsConsoleRequest()) {
-            return;
-        }
-
-        $url = $request->getAbsoluteUrl();
-        $token = $request->getCookies()->get('siteAccessToken');
-        $user = Craft::$app->getUser()->getIdentity();
-        $loginPath = $settings->getLoginPath();
-        $ipAddress = $request->getUserIP();
-
-        // Force challenge for non authenticated site visitors
-        if ($settings->getEnabled() && $request->getIsSiteRequest() && (!$user) && ($token == '') && (stripos($url, $loginPath) === false) ) {
-            // Check if this IP is in the exclusion list
-            if (in_array($ipAddress, $settings->getWhitelistIps())) {
+            if ($request->getIsConsoleRequest()) {
                 return;
             }
 
-            // Check to see if we're watching only specific URLs. By default, protect everything though
-            if ($settings->getProtectedUrls()) {
-                if (!in_array($url, $settings->getProtectedUrls())) {
+            $url = $request->getAbsoluteUrl();
+            $token = $request->getCookies()->get('siteAccessToken');
+            $user = Craft::$app->getUser()->getIdentity();
+            $loginPath = $settings->getLoginPath();
+            $ipAddress = $request->getUserIP();
+
+            // Force challenge for non authenticated site visitors
+            if ($settings->getEnabled() && $request->getIsSiteRequest() && (!$user) && ($token == '') && (stripos($url, $loginPath) === false) ) {
+                // Check if this IP is in the exclusion list
+                if (in_array($ipAddress, $settings->getWhitelistIps())) {
                     return;
                 }
+
+                // Check to see if we're watching only specific URLs. By default, protect everything though
+                if ($settings->getProtectedUrls()) {
+                    if (!in_array($url, $settings->getProtectedUrls())) {
+                        return;
+                    }
+                }
+
+                Craft::$app->getSession()->set('redirect', $url);
+
+                Craft::$app->getResponse()->redirect(UrlHelper::siteUrl($loginPath));
+                Craft::$app->end();
             }
-
-            Craft::$app->getSession()->set('redirect', $url);
-
-            Craft::$app->getResponse()->redirect(UrlHelper::siteUrl($loginPath));
-            Craft::$app->end();
-        }
+        });
     }
 
     private function _registerCpRoutes()
