@@ -4,35 +4,30 @@
 {% set title = 'Site Locked' | t('knock-knock') %}
 {% set bodyClass = 'login' %}
 
-{% do view.registerAssetBundle('craft\\web\\assets\\login\\LoginAsset') %}
+{% do view.registerAssetBundle('verbb\\knockknock\\assetbundles\\AdminAsset') %}
 
 {% block body %}
 
-<form method="post" accept-charset="UTF-8">
-    <div id="login-form">
-        <div class="message-container">
-            <div id="message">
-                <h1>{{ 'Site locked' | t('knock-knock') }}</h1>
+<form class="login-form" method="post" accept-charset="UTF-8">
+    <h1>{{ 'Site locked' | t('knock-knock') }}</h1>
 
-                <input type="hidden" name="action" value="knock-knock/default/answer">
-                <input type="hidden" name="redirect" value="{{ redirect }}">
-                {{ csrfInput() }}
+    <input type="hidden" name="action" value="knock-knock/default/answer">
+    <input type="hidden" name="redirect" value="{{ redirect }}">
+    {{ csrfInput() }}
 
-                <div>
-                    {{ forms.passwordField({
-                        id: 'password',
-                        placeholder: 'Password' | t('knock-knock'),
-                        name: 'password',
-                        autofocus: true,
-                        errors: (errors is defined ? errors : null),
-                    }) }}
-                </div>
+    <div id="login-fields">
+        {{ forms.passwordField({
+            id: 'password',
+            placeholder: 'Password' | t('knock-knock'),
+            name: 'password',
+            autofocus: true,
+            errors: (errors is defined ? errors : null),
+        }) }}
+    </div>
 
-                <div class="buttons">
-                    <input class="btn submit" type="submit" value="{{ 'Unlock' | t('knock-knock') }}">
-                </div>
-            </div>
-        </div>
+    <div class="buttons">
+        <input class="btn submit" type="submit" value="{{ 'Unlock' | t('knock-knock') }}">
+        <div id="spinner" class="spinner hidden"></div>
     </div>
 </form>
 

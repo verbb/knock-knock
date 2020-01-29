@@ -11,6 +11,8 @@ use craft\web\View;
 use yii\base\Event;
 use yii\log\Logger;
 
+use verbb\base\BaseHelper;
+
 trait PluginTrait
 {
     // Static Properties
@@ -46,6 +48,8 @@ trait PluginTrait
         $this->setComponents([
             'logins' => Logins::class,
         ]);
+
+        BaseHelper::registerModule();
     }
 
     private function _setLogging()

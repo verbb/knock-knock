@@ -1,7 +1,8 @@
 {% import '_includes/forms' as forms %}
-{% import 'knock-knock/_macros' as macros %}
+{% import 'verbb-base/_macros' as macros %}
 
 {{ forms.lightswitchField({
+    first: true,
     label: 'Check Invalid Logins' | t('knock-knock'),
     instructions: 'Whether to check and log invalid logins. This will lock IP addresses out of the system in certain circumstances, but can help against brute-force logins.' | t('knock-knock'),
     id: 'checkInvalidLogins',

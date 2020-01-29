@@ -1,14 +1,11 @@
 {% extends 'knock-knock/_layouts' %}
 {% import '_includes/forms' as forms %}
+{% import 'verbb-base/_macros' as macros %}
 
 {% set crumbs = [
     { label: 'Knock Knock' | t('knock-knock'), url: url('knock-knock/settings') },
-    { label: 'Settings' | t('knock-knock'), url: url('knock-knock/settings') },
+    { label: 'Settings' | t('app'), url: url('knock-knock/settings') },
 ] %}
-
-{% set selectedTab = 'settings' %}
-
-{% set fullPageForm = true %}
 
 {% set navItems = {
     'general': { title: 'General Settings' | t('knock-knock') },
@@ -17,9 +14,10 @@
 } %}
 
 {% set selectedItem = 'general' %}
+{% set fullPageForm = true %}
 
 {% block sidebar %}
-    <nav class="knock-settings-tabs" id="tabs">
+    <nav class="knock-settings-tabs" data-vui-tabs>
         <ul>
             {% for id, item in navItems %}
                 {% if item.heading is defined %}

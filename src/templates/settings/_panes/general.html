@@ -1,7 +1,8 @@
 {% import '_includes/forms' as forms %}
-{% import 'knock-knock/_macros' as macros %}
+{% import 'verbb-base/_macros' as macros %}
 
 {{ forms.lightswitchField({
+    first: true,
     label: 'Enabled' | t('knock-knock'),
     instructions: 'Whether the plugin should be enabled.' | t('knock-knock'),
     id: 'enabled',
