@@ -4,7 +4,7 @@
 {{ forms.textAreaField({
     first: true,
     label: 'Protected URLs' | t('knock-knock'),
-    instructions: 'Provide a list of URLs to protect with a password. By default, this will be the entire site. You can use absolute or relative URLs and aliases. One URL per line.' | t('knock-knock'),
+    instructions: 'Provide a list of URLs to protect with a password. By default, this will be the entire site. You can use absolute or relative URLs and aliases. Regex is also supported (for example `/some-channel/(.*)`). One URL per line.' | t('knock-knock'),
     rows: 10,
     id: 'protectedUrls',
     name: 'protectedUrls',

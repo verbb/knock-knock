@@ -97,8 +97,17 @@ class KnockKnock extends Plugin
 
                             break;
                         }
+
+                        try {
+                            if (preg_match('`' . $protectedUrl . '`i', $currentUrl) === 1) {
+                                $noMatch = false;
+
+                                break;
+                            }
+                        } catch (\Throwable $e) {
+                            continue;
+                        }
                     }
-                    
 
                     if ($noMatch) {
                         return;
