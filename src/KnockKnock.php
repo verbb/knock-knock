@@ -88,7 +88,19 @@ class KnockKnock extends Plugin
 
                 // Check to see if we're watching only specific URLs. By default, protect everything though
                 if ($settings->getProtectedUrls()) {
-                    if (!in_array($url, $settings->getProtectedUrls())) {
+                    $noMatch = true;
+                    $currentUrl = UrlHelper::stripQueryString($url);
+
+                    foreach ($settings->getProtectedUrls() as $protectedUrl) {
+                        if ($currentUrl === $protectedUrl) {
+                            $noMatch = false;
+
+                            break;
+                        }
+                    }
+                    
+
+                    if ($noMatch) {
                         return;
                     }
                 }
