@@ -92,12 +92,14 @@ class KnockKnock extends Plugin
                     $currentUrl = UrlHelper::stripQueryString($url);
 
                     foreach ($settings->getProtectedUrls() as $protectedUrl) {
+                        // See if the URL matches exactly (without query string)
                         if ($currentUrl === $protectedUrl) {
                             $noMatch = false;
 
                             break;
                         }
 
+                        // See if it matches a Regex patten
                         try {
                             if (preg_match('`' . $protectedUrl . '`i', $currentUrl) === 1) {
                                 $noMatch = false;
