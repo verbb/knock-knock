@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.2 - 2020-03-14
+
+### Fixed
+- Fix asset bundles causing style issues in the CP.
+
 ## 1.2.1 - 2020-02-25
 
 ### Added
