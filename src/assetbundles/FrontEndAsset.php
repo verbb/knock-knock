@@ -7,7 +7,7 @@ use craft\web\assets\cp\CpAsset;
 
 use verbb\base\assetbundles\CpAsset as VerbbCpAsset;
 
-class AdminAsset extends AssetBundle
+class FrontEndAsset extends AssetBundle
 {
     // Public Methods
     // =========================================================================
@@ -16,11 +16,9 @@ class AdminAsset extends AssetBundle
     {
         $this->sourcePath = "@verbb/knockknock/resources/dist";
 
-        $this->depends = [
-            VerbbCpAsset::class,
-            CpAsset::class,
+        $this->css = [
+            'css/knock-knock.css',
         ];
-
 
         parent::init();
     }
