@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.3 - 2020-03-30
+
+### Fixed
+- Exclude live preview requests from blocking access.
+
 ## 1.2.2 - 2020-03-14
 
 ### Fixed
