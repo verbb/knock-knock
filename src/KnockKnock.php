@@ -69,7 +69,8 @@ class KnockKnock extends Plugin
             $request = Craft::$app->getRequest();
             $settings = KnockKnock::$plugin->getSettings();
 
-            if ($request->getIsConsoleRequest()) {
+            // Console and Live Preview requests are fine
+            if ($request->getIsConsoleRequest() || $request->getIsLivePreview()) {
                 return;
             }
 
