@@ -68,12 +68,7 @@ class KnockKnock extends Plugin
         Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS, function(Event $event) {
             $request = Craft::$app->getRequest();
             $settings = KnockKnock::$plugin->getSettings();
-
-            $url = $request->getAbsoluteUrl();
-            $cookie = $request->getCookies()->get('siteAccessToken');
             $user = Craft::$app->getUser()->getIdentity();
-            $loginPath = $settings->getLoginPath();
-            $ipAddress = $request->getUserIP();
             $token = $request->getToken();
 
             // Only care if the plugin is enabled
@@ -91,10 +86,16 @@ class KnockKnock extends Plugin
                 return;
             }
 
+            $url = $request->getAbsoluteUrl();
+            $cookie = $request->getCookies()->get('siteAccessToken');
+            $loginPath = $settings->getLoginPath();
+
             // Check for the site access cookie, and check we're not causing a loop
             if ($cookie != '' || stripos($url, $loginPath) !== false) {
                 return;
             }
+            
+            $ipAddress = $request->getUserIP();
 
             // Check if this IP is in the exclusion list
             if (in_array($ipAddress, $settings->getWhitelistIps())) {
