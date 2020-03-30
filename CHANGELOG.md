@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.4 - 2020-03-31
+
+### Fixed
+- Re-organise access testing code, and support cross-domain live preview (properly, through tokens).
+
 ## 1.2.3 - 2020-03-30
 
 ### Fixed
