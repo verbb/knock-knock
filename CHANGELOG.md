@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.4.1 - 2020-03-31
+
+### Fixed
+- Fix error thrown for console requests.
+
 ## 1.2.4 - 2020-03-31
 
 ### Fixed
