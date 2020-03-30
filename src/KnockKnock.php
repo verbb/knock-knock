@@ -69,59 +69,72 @@ class KnockKnock extends Plugin
             $request = Craft::$app->getRequest();
             $settings = KnockKnock::$plugin->getSettings();
 
-            // Console and Live Preview requests are fine
-            if ($request->getIsConsoleRequest() || $request->getIsLivePreview()) {
-                return;
-            }
-
             $url = $request->getAbsoluteUrl();
-            $token = $request->getCookies()->get('siteAccessToken');
+            $cookie = $request->getCookies()->get('siteAccessToken');
             $user = Craft::$app->getUser()->getIdentity();
             $loginPath = $settings->getLoginPath();
             $ipAddress = $request->getUserIP();
+            $token = $request->getToken();
 
-            // Force challenge for non authenticated site visitors
-            if ($settings->getEnabled() && $request->getIsSiteRequest() && (!$user) && ($token == '') && (stripos($url, $loginPath) === false) ) {
-                // Check if this IP is in the exclusion list
-                if (in_array($ipAddress, $settings->getWhitelistIps())) {
-                    return;
-                }
+            // Only care if the plugin is enabled
+            if (!$settings->getEnabled()) {
+                return;
+            }
 
-                // Check to see if we're watching only specific URLs. By default, protect everything though
-                if ($settings->getProtectedUrls()) {
-                    $noMatch = true;
-                    $currentUrl = UrlHelper::stripQueryString($url);
+            // Console and Live Preview requests are fine. Also check for cross-site preview tokens
+            if ($request->getIsConsoleRequest() || ($request->getIsLivePreview() || $token !== null)) {
+                return;
+            }
 
-                    foreach ($settings->getProtectedUrls() as $protectedUrl) {
-                        // See if the URL matches exactly (without query string)
-                        if ($currentUrl === $protectedUrl) {
+            // Only site requests are blocked and for guests
+            if (!$request->getIsSiteRequest() || $user) {
+                return;
+            }
+
+            // Check for the site access cookie, and check we're not causing a loop
+            if ($cookie != '' || stripos($url, $loginPath) !== false) {
+                return;
+            }
+
+            // Check if this IP is in the exclusion list
+            if (in_array($ipAddress, $settings->getWhitelistIps())) {
+                return;
+            }
+
+            // Check to see if we're watching only specific URLs. By default, protect everything though
+            if ($settings->getProtectedUrls()) {
+                $noMatch = true;
+                $currentUrl = UrlHelper::stripQueryString($url);
+
+                foreach ($settings->getProtectedUrls() as $protectedUrl) {
+                    // See if the URL matches exactly (without query string)
+                    if ($currentUrl === $protectedUrl) {
+                        $noMatch = false;
+
+                        break;
+                    }
+
+                    // See if it matches a Regex patten
+                    try {
+                        if (preg_match('`' . $protectedUrl . '`i', $currentUrl) === 1) {
                             $noMatch = false;
 
                             break;
                         }
-
-                        // See if it matches a Regex patten
-                        try {
-                            if (preg_match('`' . $protectedUrl . '`i', $currentUrl) === 1) {
-                                $noMatch = false;
-
-                                break;
-                            }
-                        } catch (\Throwable $e) {
-                            continue;
-                        }
-                    }
-
-                    if ($noMatch) {
-                        return;
+                    } catch (\Throwable $e) {
+                        continue;
                     }
                 }
 
-                Craft::$app->getSession()->set('redirect', $url);
-
-                Craft::$app->getResponse()->redirect(UrlHelper::siteUrl($loginPath));
-                Craft::$app->end();
+                if ($noMatch) {
+                    return;
+                }
             }
+
+            Craft::$app->getSession()->set('redirect', $url);
+
+            Craft::$app->getResponse()->redirect(UrlHelper::siteUrl($loginPath));
+            Craft::$app->end();
         });
     }
 
