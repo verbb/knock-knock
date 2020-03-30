@@ -34,6 +34,8 @@ Create a `knock-knock.php` file under your `/config` directory with the followin
 return [
     '*' => [
         'enabled' => false,
+        'loginPath' => 'knock-knock/who-is-there',
+        'template' => '',
         'password' => 'superSecretPassword',
         'siteSettings' => [],
 
@@ -42,6 +44,8 @@ return [
         'maxInvalidLogins' => 10,
         'whitelistIps' => '',
         'blacklistIps' => '',
+        
+        'protectedUrls' = '',
     ],
     'staging' => [
         'enabled' => true,
@@ -53,13 +57,21 @@ return [
 
 - `enabled` - Whether password protection should be enabled. Useful in multi-environment scenarios.
 - `password` - The password users will need to enter to access the site.
-- `template` - Provide a custom template to be shown instead of the default one.
+- `loginPath` - The path to be used when to challenge is shown to the user.
+- `template` - Provide a path to a custom template to be shown instead of the default one.
 - `siteSettings` - See below on how to configure.
 - `checkInvalidLogins` - Whether to check and log invalid logins. This will lock IP addresses out of the system in certain circumstances, but can help against brute-force logins..
 - `invalidLoginWindowDuration` - The amount of time to track invalid login attempts for an IP, for determining if Knock Knock should lock the IP out.
 - `maxInvalidLogins` - The number of invalid login attempts Knock Knock will allow within the specified duration before the IP gets locked.
 - `whitelistIps` - Provide IP Addresses that should be exempt from lockouts out automatically.
 - `blacklistIps` - Provide IP Addresses that should be locked out automatically.
+- `protectedUrls` - A line-break delimited list of specific URLs to only protect.
+
+### Protected URLs
+
+If you define your protected URLs in the config file, you'll need to provide them as line-break-delimited values. For example: `/test\r\n/another-test`.
+
+Regex is also supported (for example `/some-channel/(.*)`).
 
 ### Multi-site configuration
 
