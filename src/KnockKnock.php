@@ -77,7 +77,7 @@ class KnockKnock extends Plugin
             }
 
             // Console and Live Preview requests are fine. Also check for cross-site preview tokens
-            if ($request->getIsConsoleRequest() || ($request->getIsLivePreview() || $token !== null)) {
+            if ($request->getIsConsoleRequest() || ($request->getIsLivePreview() || $token !== null || $request->getIsPreview())) {
                 return;
             }
 
