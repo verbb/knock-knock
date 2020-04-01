@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.4.2 - 2020-04-01
+
+### Fixed
+- Realllly fix live preview from cross-domains.
+
 ## 1.2.4.1 - 2020-03-31
 
 ### Fixed
