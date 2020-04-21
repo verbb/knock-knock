@@ -36,6 +36,7 @@ return [
         'enabled' => false,
         'loginPath' => 'knock-knock/who-is-there',
         'template' => '',
+        'forcedRedirect' => '',
         'password' => 'superSecretPassword',
         'siteSettings' => [],
 
@@ -59,6 +60,7 @@ return [
 - `password` - The password users will need to enter to access the site.
 - `loginPath` - The path to be used when to challenge is shown to the user.
 - `template` - Provide a path to a custom template to be shown instead of the default one.
+- `forcedRedirect` - Provide a URL to be redirected to when logging in. Knock Knock will try and redirect to the referring URL, but you may want to enforce a specific URL to always go to.
 - `siteSettings` - See below on how to configure.
 - `checkInvalidLogins` - Whether to check and log invalid logins. This will lock IP addresses out of the system in certain circumstances, but can help against brute-force logins..
 - `invalidLoginWindowDuration` - The amount of time to track invalid login attempts for an IP, for determining if Knock Knock should lock the IP out.

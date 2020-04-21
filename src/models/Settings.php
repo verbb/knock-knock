@@ -16,6 +16,7 @@ class Settings extends Model
     public $password;
     public $loginPath;
     public $template;
+    public $forcedRedirect;
     public $siteSettings = [];
 
     public $checkInvalidLogins = false;

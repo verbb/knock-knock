@@ -46,6 +46,11 @@ class DefaultController extends Controller
         $redirect = Craft::$app->getSession()->get('redirect');
 
         $data['redirect'] = $redirect ?? '/';
+
+        // Allow config to override everything
+        if ($settings->forcedRedirect) {
+            $data['redirect'] = $settings->forcedRedirect;
+        }
         
         return $this->renderTemplate($template, $data);
     }
