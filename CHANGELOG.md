@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.7 - 2020-04-21
+
+### Added
+- Add `forcedRedirect` to force a redirected URL once logging in.
+
 ## 1.2.6 - 2020-04-16
 
 ### Fixed
