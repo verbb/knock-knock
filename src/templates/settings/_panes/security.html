@@ -13,6 +13,17 @@
     warning: macros.configWarning('checkInvalidLogins', 'knock-knock'),
 }) }}
 
+{{ forms.lightswitchField({
+    label: 'Bypass If In "dev" Environment' | t('knock-knock'),
+    instructions: 'Whether to bypass Knock Knock if the current environment is set to "dev" in your .env file' | t('knock-knock'),
+    id: 'bypassInDevEnvironment',
+    name: 'bypassInDevEnvironment',
+    value: 1,
+    on: settings.bypassInDevEnvironment,
+    errors: settings.getErrors('bypassInDevEnvironment'),
+    warning: macros.configWarning('bypassInDevEnvironment', 'knock-knock'),
+}) }}
+
 {{ forms.textField({
     label: 'Invalid Login Window Duration' | t('knock-knock'),
     instructions: 'The amount of time to track invalid login attempts for an IP, for determining if Knock Knock should lock the IP out.' | t('knock-knock'),

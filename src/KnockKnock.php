@@ -86,6 +86,11 @@ class KnockKnock extends Plugin
                 return;
             }
 
+            // Don't block access if we're in dev mode and dev bypass is on
+            if (CRAFT_ENVIRONMENT == 'dev' && $settings->getBypassInDevEnvironment() == true) {
+              return;
+            }
+
             $url = $request->getAbsoluteUrl();
             $cookie = $request->getCookies()->get('siteAccessToken');
             $loginPath = $settings->getLoginPath();
@@ -94,7 +99,7 @@ class KnockKnock extends Plugin
             if ($cookie != '' || stripos($url, $loginPath) !== false) {
                 return;
             }
-            
+
             $ipAddress = $request->getUserIP();
 
             // Check if this IP is in the exclusion list

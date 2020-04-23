@@ -11,7 +11,7 @@ class Settings extends Model
 {
     // Public Properties
     // =========================================================================
-    
+
     public $enabled = false;
     public $password;
     public $loginPath;
@@ -20,6 +20,7 @@ class Settings extends Model
     public $siteSettings = [];
 
     public $checkInvalidLogins = false;
+    public $bypassInDevEnvironment = false;
     public $invalidLoginWindowDuration = '3600';
     public $maxInvalidLogins = 10;
     public $whitelistIps;
@@ -59,6 +60,11 @@ class Settings extends Model
     public function getBlacklistIps()
     {
         return explode("\n", $this->blacklistIps) ?? [];
+    }
+
+    public function getBypassInDevEnvironment()
+    {
+        return $this->_getSettingValue('bypassInDevEnvironment') ?? false;
     }
 
     public function getProtectedUrls()
