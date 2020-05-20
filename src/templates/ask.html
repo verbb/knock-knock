@@ -12,7 +12,7 @@
     <h1>{{ 'Site locked' | t('knock-knock') }}</h1>
 
     <input type="hidden" name="action" value="knock-knock/default/answer">
-    <input type="hidden" name="redirect" value="{{ redirect }}">
+    <input type="hidden" name="redirect" value="{{ redirect | hash }}">
     {{ csrfInput() }}
 
     <div id="login-fields">

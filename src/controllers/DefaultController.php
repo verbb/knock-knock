@@ -79,7 +79,7 @@ class DefaultController extends Controller
             $hasLockout = KnockKnock::$plugin->getLogins()->checkLockout($ipAddress);
 
             if ($hasLockout) {
-                $data['redirect'] = $request->getParam('redirect');
+                $data['redirect'] = $request->getValidatedBodyParam('redirect');
                 $data['errors']['password'] = Craft::t('knock-knock', 'Too many invalid attempts');
                 
                 return $this->renderTemplate($template, $data);
@@ -93,9 +93,9 @@ class DefaultController extends Controller
             $cookie->expire = time() + 3600;
             
             Craft::$app->getResponse()->getCookies()->add($cookie);
-            return $this->redirect($request->getParam('redirect'));
+            return $this->redirect($request->getValidatedBodyParam('redirect'));
         } else {
-            $data['redirect'] = $request->getParam('redirect');
+            $data['redirect'] = $request->getValidatedBodyParam('redirect');
             $data['errors']['password'] = Craft::t('knock-knock', 'Invalid password');
 
             // Log this login to the database
