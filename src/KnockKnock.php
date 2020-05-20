@@ -95,7 +95,7 @@ class KnockKnock extends Plugin
                 return;
             }
             
-            $ipAddress = $request->getUserIP();
+            $ipAddress = $request->getRemoteIP();
 
             // Check if this IP is in the exclusion list
             if (in_array($ipAddress, $settings->getWhitelistIps())) {

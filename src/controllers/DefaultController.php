@@ -69,7 +69,7 @@ class DefaultController extends Controller
             $template = $settings->getTemplate();
         }
 
-        $ipAddress = Craft::$app->getRequest()->getUserIP();
+        $ipAddress = Craft::$app->getRequest()->getRemoteIP();
 
         $password = $request->getParam('password');
         $accessPassword = $settings->getPassword();
