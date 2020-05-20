@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.8 - 2020-05-20 [CRITICAL]
+
+### Fixed
+- Fix security vulnerability with whitelisting mechanism. Vulnerability `IP Whitelist bypass` reported by Paweł Hałdrzyński.
+- Ensure redirect param is validated to prevent malicious redirection. For custom forms, please update the redirect input to use `{{ redirect | hash }}` otherwise logins will not work. Vulnerability `Open-redirect` reported by Paweł Hałdrzyński.
+
 ## 1.2.7 - 2020-04-21
 
 ### Added
