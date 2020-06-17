@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.2.9.1 - 2020-06-18
+
+### Fixed
+- Fix error introduced in 1.2.9.
+
 ## 1.2.9 - 2020-06-17
 
 ### Deprecated

@@ -104,8 +104,8 @@ class DefaultController extends Controller
                 $login->ipAddress = $ipAddress;
                 $login->password = $password;
 
-                // No need to log whitelist
-                if (!in_array($ipAddress, $settings->getWhitelistIps())) {
+                // No need to log allow list
+                if (!in_array($ipAddress, $settings->getAllowIps())) {
                     KnockKnock::$plugin->getLogins()->saveLogin($login);
                 }
             }
