@@ -65,12 +65,12 @@ class Logins extends Component
     {
         $settings = KnockKnock::$plugin->getSettings();
 
-        // Check for whitelist/blacklist
-        if (in_array($ipAddress, $settings->getWhitelistIps())) {
+        // Check for allow/deny
+        if (in_array($ipAddress, $settings->getAllowIps())) {
             return false;
         }
         
-        if (in_array($ipAddress, $settings->getBlacklistIps())) {
+        if (in_array($ipAddress, $settings->getDenyIps())) {
             return true;
         }
 

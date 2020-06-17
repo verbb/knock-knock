@@ -22,8 +22,8 @@ class Settings extends Model
     public $checkInvalidLogins = false;
     public $invalidLoginWindowDuration = '3600';
     public $maxInvalidLogins = 10;
-    public $whitelistIps;
-    public $blacklistIps;
+    public $allowIps;
+    public $denyIps;
 
     public $protectedUrls;
 
@@ -51,14 +51,14 @@ class Settings extends Model
         return $this->_getSettingValue('loginPath') ?? 'knock-knock/who-is-there';
     }
 
-    public function getWhitelistIps()
+    public function getAllowIps()
     {
-        return explode("\n", $this->whitelistIps) ?? [];
+        return explode("\n", $this->allowIps) ?? [];
     }
 
-    public function getBlacklistIps()
+    public function getDenyIps()
     {
-        return explode("\n", $this->blacklistIps) ?? [];
+        return explode("\n", $this->denyIps) ?? [];
     }
 
     public function getProtectedUrls()

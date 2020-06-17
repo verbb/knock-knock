@@ -34,23 +34,23 @@
 }) }}
 
 {{ forms.textAreaField({
-    label: 'Whitelist IPs' | t('knock-knock'),
+    label: 'Allow IPs' | t('knock-knock'),
     instructions: 'Provide IP Addresses that won\'t be prompted to enter a password. These will also be exempt from lockouts out automatically. One IP Address per line.' | t('knock-knock'),
     rows: 10,
-    id: 'whitelistIps',
-    name: 'whitelistIps',
-    value: settings.whitelistIps,
-    errors: settings.getErrors('whitelistIps'),
-    warning: macros.configWarning('whitelistIps', 'knock-knock'),
+    id: 'allowIps',
+    name: 'allowIps',
+    value: settings.allowIps,
+    errors: settings.getErrors('allowIps'),
+    warning: macros.configWarning('allowIps', 'knock-knock'),
 }) }}
 
 {{ forms.textAreaField({
-    label: 'Blacklist IPs' | t('knock-knock'),
+    label: 'Deny IPs' | t('knock-knock'),
     instructions: 'Provide IP Addresses that should be locked out automatically. One IP Address per line.' | t('knock-knock'),
     rows: 10,
-    id: 'blacklistIps',
-    name: 'blacklistIps',
-    value: settings.blacklistIps,
-    errors: settings.getErrors('blacklistIps'),
-    warning: macros.configWarning('blacklistIps', 'knock-knock'),
+    id: 'denyIps',
+    name: 'denyIps',
+    value: settings.denyIps,
+    errors: settings.getErrors('denyIps'),
+    warning: macros.configWarning('denyIps', 'knock-knock'),
 }) }}

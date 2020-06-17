@@ -41,6 +41,7 @@ class KnockKnock extends Plugin
         $this->_setLogging();
         $this->_registerSiteRoutes();
         $this->_registerCpRoutes();
+        $this->_checkDeprecations();
 
         $this->_testAccess();
     }
@@ -158,5 +159,24 @@ class KnockKnock extends Plugin
                 $loginPath => 'knock-knock/default/ask',
             ]);
         });
+    }
+
+    private function _checkDeprecations()
+    {
+        $settings = $this->getSettings();
+
+        // Check for renamed settings
+        $renamedSettings = [
+            'whitelistIps' => 'allowIps',
+            'blacklistIps' => 'denyIps',
+        ];
+
+        foreach ($renamedSettings as $old => $new) {
+            if (property_exists($settings, $old) && isset($settings->$old)) {
+                Craft::$app->getDeprecator()->log($old, "The {$old} config setting has been renamed to {$new}.");
+                $settings[$new] = $settings[$old];
+                unset($settings[$old]);
+            }
+        }
     }
 }
