@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.9 - 2020-06-17
+
+### Deprecated
+- Deprecate `whitelistIps`. Use `allowIps` instead.
+- Deprecate `blacklistIps`. Use `denyIps` instead.
+
 ## 1.2.8 - 2020-05-20 [CRITICAL]
 
 ### Fixed
