@@ -53,19 +53,19 @@ class Settings extends Model
 
     public function getAllowIps()
     {
-        return explode("\n", $this->allowIps) ?? [];
+        return $this->_getArrayFromMultiline($this->allowIps);
     }
 
     public function getDenyIps()
     {
-        return explode("\n", $this->denyIps) ?? [];
+        return $this->_getArrayFromMultiline($this->denyIps);
     }
 
     public function getProtectedUrls()
     {
         $urls = [];
 
-        foreach (explode("\n", $this->protectedUrls) as $url) {
+        foreach ($this->_getArrayFromMultiline($this->protectedUrls) as $url) {
             $url = trim($url);
 
             if ($url) {
@@ -79,6 +79,17 @@ class Settings extends Model
 
     // Private Methods
     // =========================================================================
+
+    private function _getArrayFromMultiline($string)
+    {
+        $array = [];
+
+        if ($string) {
+            $array = array_map('trim', explode(PHP_EOL, $string));
+        }
+
+        return $array;
+    }
 
     private function _getSettingValue($value)
     {
