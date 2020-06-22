@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.2.9.2 - 2020-06-22
+
+### Fixed
+- Fix potential issue splitting multi-line settings (allowIps, denyIps, protectedUrls).
+
 ### 1.2.9.1 - 2020-06-18
 
 ### Fixed
