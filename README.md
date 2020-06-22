@@ -43,8 +43,8 @@ return [
         'checkInvalidLogins' => false,
         'invalidLoginWindowDuration' => '3600',
         'maxInvalidLogins' => 10,
-        'whitelistIps' => '',
-        'blacklistIps' => '',
+        'allowIps' => '',
+        'denyIps' => '',
         
         'protectedUrls' = '',
     ],
