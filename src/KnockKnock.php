@@ -103,6 +103,36 @@ class KnockKnock extends Plugin
                 return;
             }
 
+            // Check if the requested URL is explicitly unprotected. If yes, allow the request.
+            if ($settings->getUnprotectedUrls()) {
+                $match = false;
+                $currentUrl = UrlHelper::stripQueryString($url);
+
+                foreach ($settings->getUnprotectedUrls() as $unprotectedUrl) {
+                    // See if the URL matches exactly (without query string)
+                    if ($currentUrl === $unprotectedUrl) {
+                        $match = true;
+
+                        break;
+                    }
+
+                    // See if it matches a Regex patten
+                    try {
+                        if (preg_match('`' . $unprotectedUrl . '`i', $currentUrl) === 1) {
+                            $match = true;
+
+                            break;
+                        }
+                    } catch (\Throwable $e) {
+                        continue;
+                    }
+                }
+
+                if ($match) {
+                    return;
+                }
+            }
+
             // Check to see if we're watching only specific URLs. By default, protect everything though
             if ($settings->getProtectedUrls()) {
                 $noMatch = true;
