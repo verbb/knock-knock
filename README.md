@@ -47,6 +47,7 @@ return [
         'denyIps' => '',
         
         'protectedUrls' = '',
+        'unprotectedUrls' => '',
     ],
     'staging' => [
         'enabled' => true,
@@ -68,10 +69,11 @@ return [
 - `allowIps` - Provide IP Addresses that should be exempt from lockouts out automatically.
 - `denyIps` - Provide IP Addresses that should be locked out automatically.
 - `protectedUrls` - A line-break delimited list of specific URLs to only protect.
+- `unprotectedUrls` - A line-break delimited list of specific URLs to not protect.
 
-### Protected URLs
+### Protected & unprotected URLs
 
-If you define your protected URLs in the config file, you'll need to provide them as line-break-delimited values. For example: `/test\r\n/another-test`.
+If you define your (un)protected URLs in the config file, you'll need to provide them as line-break-delimited values. For example: `/test\r\n/another-test`.
 
 Regex is also supported (for example `/some-channel/(.*)`).
 

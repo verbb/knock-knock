@@ -26,6 +26,7 @@ class Settings extends Model
     public $denyIps;
 
     public $protectedUrls;
+    public $unprotectedUrls;
 
 
     // Public Methods
@@ -66,6 +67,21 @@ class Settings extends Model
         $urls = [];
 
         foreach ($this->_getArrayFromMultiline($this->protectedUrls) as $url) {
+            $url = trim($url);
+
+            if ($url) {
+                $urls[] = UrlHelper::siteUrl(Craft::getAlias($url));
+            }
+        }
+
+        return $urls;
+    }
+
+    public function getUnprotectedUrls()
+    {
+        $urls = [];
+
+        foreach ($this->_getArrayFromMultiline($this->unprotectedUrls) as $url) {
             $url = trim($url);
 
             if ($url) {
