@@ -1,5 +1,13 @@
 # Changelog
 
+### 1.2.10 - 2020-07-13
+
+### Added
+- Add `useRemoteIp` to opt-in to more stricter IP checks if security is your concern.
+
+### Fixed
+- Revert behaviour of using remote IP for checking user IP. Too many issues and edge-cases.
+
 ### 1.2.9.2 - 2020-06-22
 
 ### Fixed
