@@ -24,6 +24,7 @@ class Settings extends Model
     public $maxInvalidLogins = 10;
     public $allowIps;
     public $denyIps;
+    public $useRemoteIp = false;
 
     public $protectedUrls;
     public $unprotectedUrls;

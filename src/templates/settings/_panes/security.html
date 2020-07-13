@@ -54,3 +54,14 @@
     errors: settings.getErrors('denyIps'),
     warning: macros.configWarning('denyIps', 'knock-knock'),
 }) }}
+
+{{ forms.lightswitchField({
+    label: 'Use Remote IP' | t('knock-knock'),
+    instructions: 'Whether to use the Remote IP address of the user to compare their IP against. If security if your primary concern, consider turning this on. This may not accurately report users behind proxies, so use with caution.' | t('knock-knock'),
+    id: 'useRemoteIp',
+    name: 'useRemoteIp',
+    value: 1,
+    on: settings.useRemoteIp,
+    errors: settings.getErrors('useRemoteIp'),
+    warning: macros.configWarning('useRemoteIp', 'knock-knock'),
+}) }}

@@ -95,8 +95,12 @@ class KnockKnock extends Plugin
             if ($cookie != '' || stripos($url, $loginPath) !== false) {
                 return;
             }
-            
-            $ipAddress = $request->getRemoteIP();
+
+            $ipAddress = $request->getUserIP();
+
+            if ($settings->useRemoteIp) {
+                $ipAddress = $request->getRemoteIP();
+            }
 
             // Check if this IP is in the exclusion list
             if (in_array($ipAddress, $settings->getAllowIps())) {
@@ -165,7 +169,7 @@ class KnockKnock extends Plugin
 
             Craft::$app->getSession()->set('redirect', $url);
 
-            Craft::$app->getResponse()->redirect(UrlHelper::siteUrl($loginPath));
+            Craft::$app->getResponse()->redirect($loginPath);
             Craft::$app->end();
         });
     }

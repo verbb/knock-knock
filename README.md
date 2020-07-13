@@ -45,6 +45,7 @@ return [
         'maxInvalidLogins' => 10,
         'allowIps' => '',
         'denyIps' => '',
+        'useRemoteIp' => false,
         
         'protectedUrls' = '',
         'unprotectedUrls' => '',
@@ -68,6 +69,7 @@ return [
 - `maxInvalidLogins` - The number of invalid login attempts Knock Knock will allow within the specified duration before the IP gets locked.
 - `allowIps` - Provide IP Addresses that should be exempt from lockouts out automatically.
 - `denyIps` - Provide IP Addresses that should be locked out automatically.
+- `useRemoteIp` - Whether to use the Remote IP address of the user to compare their IP against. If security if your primary concern, consider turning this on. This may not accurately report users behind proxies, so use with caution.
 - `protectedUrls` - A line-break delimited list of specific URLs to only protect.
 - `unprotectedUrls` - A line-break delimited list of specific URLs to not protect.
 
