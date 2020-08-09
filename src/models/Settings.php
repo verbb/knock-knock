@@ -50,7 +50,7 @@ class Settings extends Model
 
     public function getLoginPath()
     {
-        return $this->_getSettingValue('loginPath') ?? 'knock-knock/who-is-there';
+        return $this->_getSettingValue('loginPath') ?? UrlHelper::siteUrl('knock-knock/who-is-there');
     }
 
     public function getAllowIps()
