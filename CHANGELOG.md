@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.2.11 - 2020-08-10
+
+### Fixed
+- Fix challenge URL not being correct for nested URLs.
+
 ### 1.2.10 - 2020-07-13
 
 ### Added
