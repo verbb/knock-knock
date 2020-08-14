@@ -50,9 +50,11 @@ class Settings extends Model
 
     public function getLoginPath()
     {
-        $primarySiteId = Craft::$app->getSites()->getPrimarySite()->id ?? null;
+        $cpUrl = UrlHelper::cpUrl('knock-knock/who-is-there');
+        $cpTrigger = Craft::$app->getConfig()->getGeneral()->cpTrigger;
+        $url = str_replace($cpTrigger . '/', '', $cpUrl);
 
-        return $this->_getSettingValue('loginPath') ?? UrlHelper::siteUrl('knock-knock/who-is-there', null, null, $primarySiteId);
+        return $this->_getSettingValue('loginPath') ?? $url;
     }
 
     public function getAllowIps()
