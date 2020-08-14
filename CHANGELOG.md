@@ -1,6 +1,6 @@
 # Changelog
 
-### 1.2.12 - 2020-08-14
+## 1.2.12 - 2020-08-14
 
 ### Added
 - Allow env variables to be used in allow/deny IPs.
@@ -8,12 +8,12 @@
 ### Fixed
 - Fix login path not resolving correctly for some multi-site installs.
 
-### 1.2.11 - 2020-08-10
+## 1.2.11 - 2020-08-10
 
 ### Fixed
 - Fix challenge URL not being correct for nested URLs.
 
-### 1.2.10 - 2020-07-13
+## 1.2.10 - 2020-07-13
 
 ### Added
 - Add `useRemoteIp` to opt-in to more stricter IP checks if security is your concern.
@@ -21,12 +21,12 @@
 ### Fixed
 - Revert behaviour of using remote IP for checking user IP. Too many issues and edge-cases.
 
-### 1.2.9.2 - 2020-06-22
+## 1.2.9.2 - 2020-06-22
 
 ### Fixed
 - Fix potential issue splitting multi-line settings (allowIps, denyIps, protectedUrls).
 
-### 1.2.9.1 - 2020-06-18
+## 1.2.9.1 - 2020-06-18
 
 ### Fixed
 - Fix error introduced in 1.2.9.
