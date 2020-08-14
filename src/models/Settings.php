@@ -73,7 +73,7 @@ class Settings extends Model
             $url = trim($url);
 
             if ($url) {
-                $urls[] = UrlHelper::siteUrl(Craft::getAlias($url));
+                $urls[] = UrlHelper::siteUrl(Craft::parseEnv($url));
             }
         }
 
@@ -88,7 +88,7 @@ class Settings extends Model
             $url = trim($url);
 
             if ($url) {
-                $urls[] = UrlHelper::siteUrl(Craft::getAlias($url));
+                $urls[] = UrlHelper::siteUrl(Craft::parseEnv($url));
             }
         }
 
