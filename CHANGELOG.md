@@ -1,5 +1,13 @@
 # Changelog
 
+### 1.2.12 - 2020-08-14
+
+### Added
+- Allow env variables to be used in allow/deny IPs.
+
+### Fixed
+- Fix login path not resolving correctly for some multi-site installs.
+
 ### 1.2.11 - 2020-08-10
 
 ### Fixed
