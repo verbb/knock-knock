@@ -145,9 +145,8 @@ You can also look at the template Knock Knock itself uses [here](https://github.
 Based on [KnockKock](https://github.com/dgrigg/knockknock) for Craft 2.
 
 ## Show your Support
-Knock Knock is licensed under the MIT license, meaning it will always be free and open source – we love free stuff! If you'd like to show your support to the plugin regardless, buy us a :beers:. Please note that this does not entitle you to any form of support, and is completely optional.
 
-[![Beerpay](https://beerpay.io/verbb/knock-knock/badge.svg?style=beer-square)](https://beerpay.io/verbb/knock-knock)
+Knock Knock is licensed under the MIT license, meaning it will always be free and open source – we love free stuff! If you'd like to show your support to the plugin regardless, [Sponsor](https://github.com/sponsors/verbb) development.
 
 <h2></h2>
 
