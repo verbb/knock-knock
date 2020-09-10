@@ -89,7 +89,7 @@ class KnockKnock extends Plugin
 
             $url = $request->getAbsoluteUrl();
             $cookie = $request->getCookies()->get('siteAccessToken');
-            $loginPath = $settings->getLoginPath();
+            $loginPath = UrlHelper::siteUrl($settings->getLoginPath());
 
             // Check for the site access cookie, and check we're not causing a loop
             if ($cookie != '' || stripos($url, $loginPath) !== false) {
