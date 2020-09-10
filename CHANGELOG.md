@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.13 - 2020-09-10
+
+### Fixed
+- Fix incorrect `loginUrl` route, causing issues on some site setups (subdirectory installs).
+
 ## 1.2.12 - 2020-08-14
 
 ### Added
