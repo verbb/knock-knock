@@ -43,7 +43,7 @@ class DefaultController extends Controller
             $template = $settings->getTemplate();
         }
 
-        $redirect = Craft::$app->getSession()->get('redirect');
+        $redirect = Craft::$app->getSession()->get('knockknock-redirect');
 
         $data['redirect'] = $redirect ?? '/';
 

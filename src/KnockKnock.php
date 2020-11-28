@@ -167,7 +167,9 @@ class KnockKnock extends Plugin
                 }
             }
 
-            Craft::$app->getSession()->set('redirect', $url);
+            if ($request->getIsSiteRequest()) {
+                Craft::$app->getSession()->set('knockknock-redirect', $url);
+            }
 
             Craft::$app->getResponse()->redirect($loginPath);
             Craft::$app->end();
