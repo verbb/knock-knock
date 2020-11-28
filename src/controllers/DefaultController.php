@@ -73,6 +73,8 @@ class DefaultController extends Controller
 
         $password = $request->getParam('password');
         $accessPassword = $settings->getPassword();
+        
+        Craft::$app->getSession()->remove('knockknock-redirect');
 
         // Check for lockout
         if (Craft::$app->getConfig()->getGeneral()->storeUserIps && $settings->checkInvalidLogins) {
@@ -87,10 +89,11 @@ class DefaultController extends Controller
         }
 
         if ($accessPassword == $password) {
-            $cookie = new Cookie();
-            $cookie->name = 'siteAccessToken';
-            $cookie->value = $request->csrfToken;
-            $cookie->expire = time() + 3600;
+            $cookie = new Cookie(Craft::cookieConfig([
+                'name' => 'siteAccessToken',
+                'value' => $request->csrfToken,
+                'expire' => time() + 3600,
+            ]));
             
             Craft::$app->getResponse()->getCookies()->add($cookie);
             return $this->redirect($request->getValidatedBodyParam('redirect'));
