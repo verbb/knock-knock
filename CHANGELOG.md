@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.14 - 2020-11-29
+
+### Fixed
+- Fix potential error redirecting to non-site URLs after login. In some cases, this caused redirecting to a cpresources asset.
+- Fix cookie not respecting the Craft `defaultCookieDomain` config setting.
+
 ## 1.2.13 - 2020-09-10
 
 ### Fixed
