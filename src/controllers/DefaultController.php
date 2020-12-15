@@ -70,7 +70,7 @@ class DefaultController extends Controller
         $accessPassword = $settings->getPassword();
 
         // Check for lockout
-        if (Craft::$app->getConfig()->getGeneral()->storeUserIps && $settings->checkInvalidLogins) {
+        if ($settings->checkInvalidLogins) {
             $hasLockout = KnockKnock::$plugin->getLogins()->checkLockout($ipAddress);
 
             if ($hasLockout) {
@@ -94,7 +94,7 @@ class DefaultController extends Controller
             $data['errors']['password'] = Craft::t('knock-knock', 'Invalid password');
 
             // Log this login to the database
-            if (Craft::$app->getConfig()->getGeneral()->storeUserIps && $settings->checkInvalidLogins) {
+            if ($settings->checkInvalidLogins) {
                 $login = new Login();
                 $login->ipAddress = $ipAddress;
                 $login->password = $password;

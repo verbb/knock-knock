@@ -33,12 +33,11 @@
     warning: macros.configWarning('loginPath', 'knock-knock'),
 }) }}
 
-{{ forms.autosuggestField({
+{{ forms.textField({
     label: 'Template' | t('knock-knock'),
     instructions: 'Select a custom template to be shown as the password protected page. Leave empty for the default.' | t('knock-knock'),
     id: 'template',
     name: 'template',
-    suggestions: craft.cp.getTemplateSuggestions(),
     value: settings.template,
     errors: settings.getErrors('template'),
     warning: macros.configWarning('template', 'knock-knock'),
