@@ -47,7 +47,7 @@ return [
         'denyIps' => '',
         'useRemoteIp' => false,
         
-        'protectedUrls' = '',
+        'protectedUrls' => '',
         'unprotectedUrls' => '',
     ],
     'staging' => [
