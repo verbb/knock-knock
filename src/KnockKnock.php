@@ -2,6 +2,7 @@
 namespace verbb\knockknock;
 
 use verbb\knockknock\base\PluginTrait;
+use verbb\knockknock\helpers\IpHelper;
 use verbb\knockknock\models\Settings;
 
 use Craft;
@@ -10,7 +11,6 @@ use craft\events\RegisterUrlRulesEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Plugins;
 use craft\web\UrlManager;
-
 use yii\base\Event;
 
 class KnockKnock extends Plugin
@@ -103,7 +103,7 @@ class KnockKnock extends Plugin
             }
 
             // Check if this IP is in the exclusion list
-            if (in_array($ipAddress, $settings->getAllowIps())) {
+            if (IpHelper::ipInCidrList($ipAddress, $settings->getAllowIps())) {
                 return;
             }
 

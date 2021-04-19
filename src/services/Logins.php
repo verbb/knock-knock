@@ -2,6 +2,7 @@
 namespace verbb\knockknock\services;
 
 use verbb\knockknock\KnockKnock;
+use verbb\knockknock\helpers\IpHelper;
 use verbb\knockknock\models\Login;
 use verbb\knockknock\records\Login as LoginRecord;
 
@@ -9,7 +10,6 @@ use Craft;
 use craft\db\Query;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
-
 use yii\base\Component;
 use yii\base\Exception;
 
@@ -66,11 +66,11 @@ class Logins extends Component
         $settings = KnockKnock::$plugin->getSettings();
 
         // Check for allow/deny
-        if (in_array($ipAddress, $settings->getAllowIps())) {
+        if (IpHelper::ipInCidrList($ipAddress, $settings->getAllowIps())) {
             return false;
         }
         
-        if (in_array($ipAddress, $settings->getDenyIps())) {
+        if (IpHelper::ipInCidrList($ipAddress, $settings->getDenyIps())) {
             return true;
         }
 
