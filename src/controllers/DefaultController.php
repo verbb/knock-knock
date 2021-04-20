@@ -2,11 +2,11 @@
 namespace verbb\knockknock\controllers;
 
 use verbb\knockknock\KnockKnock;
+use verbb\knockknock\helpers\IpHelper;
 use verbb\knockknock\models\Login;
 
 use Craft;
 use craft\web\Controller;
-
 use yii\web\Cookie;
 use yii\web\Response;
 
@@ -108,7 +108,7 @@ class DefaultController extends Controller
                 $login->password = $password;
 
                 // No need to log allow list
-                if (!in_array($ipAddress, $settings->getAllowIps())) {
+                if (!IpHelper::ipInCidrList($ipAddress, $settings->getAllowIps())) {
                     KnockKnock::$plugin->getLogins()->saveLogin($login);
                 }
             }
