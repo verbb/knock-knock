@@ -39,8 +39,14 @@ class DefaultController extends Controller
         $template = 'knock-knock/ask';
 
         if ($settings->getTemplate()) {
-            $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+            // try CP template first
             $template = $settings->getTemplate();
+            
+            if (!$template) {
+                // try site template if cp template does not exist
+                $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+                $template = $settings->getTemplate();
+            }
         }
 
         $redirect = Craft::$app->getSession()->get('knockknock-redirect');
@@ -65,8 +71,14 @@ class DefaultController extends Controller
         $template = 'knock-knock/ask';
 
         if ($settings->getTemplate()) {
-            $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+            // try CP template first
             $template = $settings->getTemplate();
+            
+            if (!$template) {
+                // try site template if cp template does not exist
+                $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+                $template = $settings->getTemplate();
+            }
         }
 
         $ipAddress = Craft::$app->getRequest()->getRemoteIP();
