@@ -43,7 +43,7 @@ class DefaultController extends Controller
             $template = $settings->getTemplate();
         }
 
-        $redirect = Craft::$app->getSession()->get('knockknock-redirect');
+        $redirect = Craft::$app->getCache()->get('knockknock-redirect');
 
         $data['redirect'] = $redirect ?? '/';
 
@@ -74,7 +74,7 @@ class DefaultController extends Controller
         $password = $request->getParam('password');
         $accessPassword = $settings->getPassword();
         
-        Craft::$app->getSession()->remove('knockknock-redirect');
+        Craft::$app->getCache()->set('knockknock-redirect', null);
 
         // Check for lockout
         if (Craft::$app->getConfig()->getGeneral()->storeUserIps && $settings->checkInvalidLogins) {
