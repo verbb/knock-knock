@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.15 - 2021-06-30
+
+### Added
+- Add support for custom CP-based templates. (thanks @seibert-io).
+- Add support for IPv4 and IPv6 CIDR blocks in allowIps and denyIps config. (thanks @onstuimig).
+
+### Changed
+- Deny access to settings for non-admins.
+
+### Fixed
+- Fix redirect URL not using the referrer URL after logging in.
+
 ## 1.2.14 - 2020-11-29
 
 ### Fixed
