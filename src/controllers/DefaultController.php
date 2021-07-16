@@ -34,20 +34,7 @@ class DefaultController extends Controller
     {
         $settings = KnockKnock::$plugin->getSettings();
         
-        $view = $this->getView();
-        $view->setTemplateMode($view::TEMPLATE_MODE_CP);
-        $template = 'knock-knock/ask';
-
-        if ($settings->getTemplate()) {
-            // try CP template first
-            $template = $settings->getTemplate();
-            
-            if (!$template) {
-                // try site template if cp template does not exist
-                $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
-                $template = $settings->getTemplate();
-            }
-        }
+        $template = $this->_getTemplate('knock-knock/ask', $settings->getTemplate());
 
         $redirect = Craft::$app->getCache()->get('knockknock-redirect');
 
@@ -66,21 +53,7 @@ class DefaultController extends Controller
         $request = Craft::$app->getRequest();
         $settings = KnockKnock::$plugin->getSettings();
 
-        $view = $this->getView();
-        $view->setTemplateMode($view::TEMPLATE_MODE_CP);
-        $template = 'knock-knock/ask';
-
-        if ($settings->getTemplate()) {
-            // try CP template first
-            $template = $settings->getTemplate();
-            
-            if (!$template) {
-                // try site template if cp template does not exist
-                $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
-                $template = $settings->getTemplate();
-            }
-        }
-
+        $template = $this->_getTemplate('knock-knock/ask', $settings->getTemplate());
         $ipAddress = Craft::$app->getRequest()->getRemoteIP();
 
         $password = $request->getParam('password');
@@ -127,5 +100,34 @@ class DefaultController extends Controller
             
             return $this->renderTemplate($template, $data);
         }
+    }
+
+
+    // Private Methods
+    // =========================================================================
+
+    private function _getTemplate($defaultTemplate, $template = '')
+    {
+        $template = $template ?: $defaultTemplate;
+
+        $view = $this->getView();
+        $view->setTemplateMode($view::TEMPLATE_MODE_CP);
+
+        // Try CP template first
+        if ($view->doesTemplateExist($template)) {
+            return $template;
+        } else {
+            // Try site template if cp template does not exist
+            $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+
+            if ($view->doesTemplateExist($template)) {
+                return $template;
+            }
+        }
+
+        // Reset back to CP just in case to return the default template
+        $view->setTemplateMode($view::TEMPLATE_MODE_CP);
+
+        return $defaultTemplate;
     }
 }
