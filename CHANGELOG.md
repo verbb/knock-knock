@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.16 - 2021-09-17
+
+### Fixed
+- Fix site-based custom templates not working correctly.
+
 ## 1.2.15 - 2021-06-30
 
 ### Added
