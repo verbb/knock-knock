@@ -5,10 +5,7 @@ use verbb\knockknock\KnockKnock;
 use verbb\knockknock\services\Logins;
 
 use Craft;
-use craft\log\FileTarget;
-use craft\web\View;
 
-use yii\base\Event;
 use yii\log\Logger;
 
 use verbb\base\BaseHelper;
@@ -18,23 +15,23 @@ trait PluginTrait
     // Static Properties
     // =========================================================================
 
-    public static $plugin;
+    public static KnockKnock $plugin;
 
 
     // Public Methods
     // =========================================================================
 
-    public function getLogins()
+    public function getLogins(): Logins
     {
         return $this->get('logins');
     }
 
-    public static function log($message)
+    public static function log($message): void
     {
         Craft::getLogger()->log($message, Logger::LEVEL_INFO, 'knock-knock');
     }
 
-    public static function error($message)
+    public static function error($message): void
     {
         Craft::getLogger()->log($message, Logger::LEVEL_ERROR, 'knock-knock');
     }
@@ -43,7 +40,7 @@ trait PluginTrait
     // Private Methods
     // =========================================================================
 
-    private function _setPluginComponents()
+    private function _setPluginComponents(): void
     {
         $this->setComponents([
             'logins' => Logins::class,
@@ -52,7 +49,7 @@ trait PluginTrait
         BaseHelper::registerModule();
     }
 
-    private function _setLogging()
+    private function _setLogging(): void
     {
         BaseHelper::setFileLogging('knock-knock');
     }

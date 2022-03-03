@@ -10,6 +10,7 @@ use Craft;
 use craft\db\Query;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
+
 use yii\base\Component;
 use yii\base\Exception;
 
@@ -18,6 +19,9 @@ class Logins extends Component
     // Public Methods
     // =========================================================================
 
+    /**
+     * @return \verbb\knockknock\models\Login[]
+     */
     public function getAllLogins(): array
     {
         $logins = [];
@@ -30,7 +34,7 @@ class Logins extends Component
         return $logins;
     }
 
-    public function getLoginsByIp($ipAddress)
+    public function getLoginsByIp($ipAddress): ?Login
     {
         $result = $this->_createLoginQuery()
             ->where(['ipAddress' => $ipAddress])
@@ -41,8 +45,6 @@ class Logins extends Component
 
     public function saveLogin(Login $login, bool $runValidation = true): bool
     {
-        $isNewLogin = !$login->id;
-
         if ($runValidation && !$login->validate()) {
             Craft::info('Login not saved due to validation error.', __METHOD__);
             return false;
@@ -61,7 +63,7 @@ class Logins extends Component
         return true;
     }
 
-    public function checkLockout($ipAddress)
+    public function checkLockout($ipAddress): bool
     {
         $settings = KnockKnock::$plugin->getSettings();
 
@@ -83,12 +85,7 @@ class Logins extends Component
             ->where(['ipAddress' => $ipAddress])
             ->andWhere(['between', 'dateCreated', Db::prepareDateForDb($start), Db::prepareDateForDb($end)])
             ->count();
-
-        if ($loginAttempts >= $settings->maxInvalidLogins) {
-            return true;
-        }
-
-        return false;
+        return $loginAttempts >= $settings->maxInvalidLogins;
     }
 
 
@@ -113,7 +110,7 @@ class Logins extends Component
         if ($loginId !== null) {
             $loginRecord = LoginRecord::findOne(['id' => $loginId]);
 
-            if (!$loginRecord) {
+            if ($loginRecord === null) {
                 throw new Exception(Craft::t('knock-knock', 'No login exists with the ID “{id}”.', ['id' => $loginId]));
             }
         } else {

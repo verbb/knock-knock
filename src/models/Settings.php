@@ -11,66 +11,75 @@ class Settings extends Model
 {
     // Public Properties
     // =========================================================================
+
+    public bool $enabled = false;
+    public string $password = '';
+    public string $loginPath = '';
+    public string $template = '';
+    public string $forcedRedirect = '';
+    public array $siteSettings = [];
+
+    public bool $checkInvalidLogins = false;
+    public string $invalidLoginWindowDuration = '3600';
+    public int $maxInvalidLogins = 10;
+    public string $allowIps = '';
+    public string $denyIps = '';
+    public bool $useRemoteIp = false;
     
-    public $enabled = false;
-    public $password;
-    public $loginPath;
-    public $template;
-    public $forcedRedirect;
-    public $siteSettings = [];
-
-    public $checkInvalidLogins = false;
-    public $invalidLoginWindowDuration = '3600';
-    public $maxInvalidLogins = 10;
-    public $allowIps;
-    public $denyIps;
-    public $useRemoteIp = false;
-
-    public $protectedUrls;
-    public $unprotectedUrls;
+    public string $protectedUrls = '';
+    public string $unprotectedUrls = '';
 
 
     // Public Methods
     // =========================================================================
 
-    public function getEnabled()
+    public function getEnabled(): bool
     {
         return $this->_getSettingValue('enabled') ?? false;
     }
 
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return $this->_getSettingValue('template') ?? '';
     }
 
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->_getSettingValue('password') ?? '';
     }
 
-    public function getLoginPath()
+    public function getLoginPath(): string
     {
         return $this->_getSettingValue('loginPath') ?? 'knock-knock/who-is-there';
     }
 
-    public function getAllowIps()
+    /**
+     * @return string[]
+     */
+    public function getAllowIps(): array
     {
         return $this->_getArrayFromMultiline($this->allowIps);
     }
 
-    public function getDenyIps()
+    /**
+     * @return string[]
+     */
+    public function getDenyIps(): array
     {
         return $this->_getArrayFromMultiline($this->denyIps);
     }
 
-    public function getProtectedUrls()
+    /**
+     * @return string[]
+     */
+    public function getProtectedUrls(): array
     {
         $urls = [];
 
         foreach ($this->_getArrayFromMultiline($this->protectedUrls) as $url) {
             $url = trim($url);
 
-            if ($url) {
+            if ($url !== '' && $url !== '0') {
                 $urls[] = UrlHelper::siteUrl(Craft::parseEnv($url));
             }
         }
@@ -78,14 +87,17 @@ class Settings extends Model
         return $urls;
     }
 
-    public function getUnprotectedUrls()
+    /**
+     * @return string[]
+     */
+    public function getUnprotectedUrls(): array
     {
         $urls = [];
 
         foreach ($this->_getArrayFromMultiline($this->unprotectedUrls) as $url) {
             $url = trim($url);
 
-            if ($url) {
+            if ($url !== '' && $url !== '0') {
                 $urls[] = UrlHelper::siteUrl(Craft::parseEnv($url));
             }
         }
@@ -96,8 +108,10 @@ class Settings extends Model
 
     // Private Methods
     // =========================================================================
-
-    private function _getArrayFromMultiline($string)
+    /**
+     * @return string[]
+     */
+    private function _getArrayFromMultiline($string): array
     {
         $array = [];
 

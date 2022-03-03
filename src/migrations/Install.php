@@ -10,17 +10,21 @@ class Install extends Migration
     // Public Methods
     // =========================================================================
 
-    public function safeUp()
+    public function safeUp(): bool
     {
         $this->createTables();
+        
+        return true;
     }
 
-    public function safeDown()
+    public function safeDown(): bool
     {
         $this->dropTables();
+        
+        return true;
     }
 
-    public function createTables()
+    public function createTables(): bool
     {
         $this->createTable('{{%knockknock_logins}}', [
             'id' => $this->primaryKey(),
@@ -31,10 +35,14 @@ class Install extends Migration
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
+        
+        return true;
     }
     
-    public function dropTables()
+    public function dropTables(): bool
     {
         $this->dropTable('{{%knockknock_logins}}');
+        
+        return true;
     }
 }

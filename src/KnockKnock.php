@@ -6,6 +6,7 @@ use verbb\knockknock\helpers\IpHelper;
 use verbb\knockknock\models\Settings;
 
 use Craft;
+use craft\base\Model;
 use craft\base\Plugin;
 use craft\events\RegisterUrlRulesEvent;
 use craft\helpers\UrlHelper;
@@ -18,8 +19,8 @@ class KnockKnock extends Plugin
     // Public Properties
     // =========================================================================
 
-    public $schemaVersion = '1.1.1';
-    public $hasCpSettings = true;
+    public string $schemaVersion = '1.1.1';
+    public bool $hasCpSettings = true;
 
 
     // Traits
@@ -31,7 +32,7 @@ class KnockKnock extends Plugin
     // Public Methods
     // =========================================================================
 
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -46,16 +47,16 @@ class KnockKnock extends Plugin
         $this->_testAccess();
     }
 
-    public function getSettingsResponse()
+    public function getSettingsResponse(): mixed
     {
-        Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('knock-knock/settings'));
+        return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('knock-knock/settings'));
     }
 
 
     // Protected Methods
     // =========================================================================
 
-    protected function createSettingsModel(): Settings
+    protected function createSettingsModel(): ?Model
     {
         return new Settings();
     }
@@ -64,7 +65,7 @@ class KnockKnock extends Plugin
     // Private Methods
     // =========================================================================
 
-    private function _testAccess()
+    private function _testAccess(): void
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS, function(Event $event) {
             $request = Craft::$app->getRequest();
@@ -127,7 +128,7 @@ class KnockKnock extends Plugin
 
                             break;
                         }
-                    } catch (\Throwable $e) {
+                    } catch (\Throwable) {
                         continue;
                     }
                 }
@@ -157,7 +158,7 @@ class KnockKnock extends Plugin
 
                             break;
                         }
-                    } catch (\Throwable $e) {
+                    } catch (\Throwable) {
                         continue;
                     }
                 }
@@ -176,7 +177,7 @@ class KnockKnock extends Plugin
         });
     }
 
-    private function _registerCpRoutes()
+    private function _registerCpRoutes(): void
     {
         Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES, function(RegisterUrlRulesEvent $event) {
             $event->rules = array_merge($event->rules, [
@@ -185,7 +186,7 @@ class KnockKnock extends Plugin
         });
     }
 
-    private function _registerSiteRoutes()
+    private function _registerSiteRoutes(): void
     {
         $settings = KnockKnock::$plugin->getSettings();
         $loginPath = $settings->getLoginPath();
@@ -197,7 +198,7 @@ class KnockKnock extends Plugin
         });
     }
 
-    private function _checkDeprecations()
+    private function _checkDeprecations(): void
     {
         $settings = $this->getSettings();
 
@@ -209,7 +210,7 @@ class KnockKnock extends Plugin
 
         foreach ($renamedSettings as $old => $new) {
             if (property_exists($settings, $old) && isset($settings->$old)) {
-                Craft::$app->getDeprecator()->log($old, "The {$old} config setting has been renamed to {$new}.");
+                Craft::$app->getDeprecator()->log($old, sprintf('The %s config setting has been renamed to %s.', $old, $new));
                 $settings[$new] = $settings[$old];
                 unset($settings[$old]);
             }

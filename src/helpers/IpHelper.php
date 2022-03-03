@@ -4,15 +4,14 @@ namespace verbb\knockknock\helpers;
 class IpHelper
 {
 	// Public Methods
-    // =========================================================================
-	
+	// =========================================================================
+
 	/**
 	 * Check if IP exists in list of IP addresses and CIDR blocks
 	 *
-	 * @param string $ip
-	 * @param array $cidrList
+	 * @param mixed[] $cidrList
 	 */
-	public static function ipInCidrList($ip, $cidrList)
+	public static function ipInCidrList(string $ip, array $cidrList): bool
 	{
 		$ipBits = self::_ipToBits($ip);
 
@@ -24,10 +23,10 @@ class IpHelper
 			$maskbits = false;
 			$ipNetBits = $ipBits;
 
-			if (strpos($cidrnet, '/') === false) {
+			if (!str_contains($cidrnet, '/')) {
 				$net = $cidrnet;
 			} else {
-				list($net, $maskbits) = explode('/', $cidrnet);
+				[$net, $maskbits] = explode('/', $cidrnet);
 			}
 
 			$netBits = self::_ipToBits($net);
@@ -47,16 +46,10 @@ class IpHelper
 
 	/**
 	 * Validate IP or CIDR block
-	 *
-	 * @param string $cidr
 	 */
-	public static function validIpOrCidr($cidr)
+	public static function validIpOrCidr(string $cidr): bool
 	{
-		if (!preg_match("/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}(\/[0-9]{1,2})?$/", $cidr)) {
-			$return = false;
-		} else {
-			$return = true;
-		}
+		$return = (bool) preg_match("#^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(\/\d{1,2})?$#", $cidr);
 		
         if ($return == true) {
 			$parts = explode("/", $cidr);
@@ -78,7 +71,7 @@ class IpHelper
 			if (($netmask != "") && ($netmask > 32)) {
 				$return = false;
 			}
-		} elseif (preg_match("/^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(\/[0-9]{1,2})?$/", $cidr)) {
+		} else if (preg_match("#^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}\d){0,1}\d)\.){3,3}(25[0-5]|(2[0-4]|1{0,1}\d){0,1}\d)|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}\d){0,1}\d)\.){3,3}(25[0-5]|(2[0-4]|1{0,1}\d){0,1}\d))(\/\d{1,2})?$#", $cidr)) {
 			// Seems invalid, check if valid ipv6
             $return = true;
 		}
@@ -87,28 +80,20 @@ class IpHelper
 	}
 	
 	// Private methods
-    // =========================================================================
-	
+	// =========================================================================
 	/**
 	 * Converts inet_pton output to string with bits
-	 *
-	 * @param string $ip
 	 */
-	private static function _ipToBits($ip)
+	private static function _ipToBits(string $ip): bool|string
 	{
 		$inet = @inet_pton($ip);
 
-		if($inet === false)
-			return false;
+		if ($inet === false) {
+            return false;
+        }
 
-		if (strpos($ip, ":") === false) {
-			$unpacked = unpack('a4', $inet);
-		} else {
-			$unpacked = unpack('a16', $inet);
-		}
-
+		$unpacked = str_contains($ip, ":") ? unpack('a16', $inet) : unpack('a4', $inet);
 		$unpacked = str_split($unpacked[1]);
-
 		$binaryip = '';
 
 		foreach ($unpacked as $char) {
@@ -117,5 +102,4 @@ class IpHelper
 
 		return $binaryip;
 	}
-	
 }

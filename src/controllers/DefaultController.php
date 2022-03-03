@@ -7,6 +7,7 @@ use verbb\knockknock\models\Login;
 
 use Craft;
 use craft\web\Controller;
+
 use yii\web\Cookie;
 use yii\web\Response;
 
@@ -15,13 +16,13 @@ class DefaultController extends Controller
     // Properties
     // =========================================================================
 
-    protected $allowAnonymous = true;
+    protected array|int|bool $allowAnonymous = true;
 
     
     // Public Methods
     // =========================================================================
 
-    public function actionSettings()
+    public function actionSettings(): Response
     {
         $settings = KnockKnock::$plugin->getSettings();
 
@@ -30,8 +31,9 @@ class DefaultController extends Controller
         ]);
     }
 
-    public function actionAsk()
+    public function actionAsk(): Response
     {
+        $data = [];
         $settings = KnockKnock::$plugin->getSettings();
         
         $template = $this->_getTemplate('knock-knock/ask', $settings->getTemplate());
@@ -48,8 +50,9 @@ class DefaultController extends Controller
         return $this->renderTemplate($template, $data);
     }
 
-    public function actionAnswer()
+    public function actionAnswer(): Response
     {
+        $data = [];
         $request = Craft::$app->getRequest();
         $settings = KnockKnock::$plugin->getSettings();
 
@@ -106,7 +109,7 @@ class DefaultController extends Controller
     // Private Methods
     // =========================================================================
 
-    private function _getTemplate($defaultTemplate, $template = '')
+    private function _getTemplate($defaultTemplate, $template = ''): string
     {
         $template = $template ?: $defaultTemplate;
 

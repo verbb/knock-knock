@@ -8,9 +8,9 @@ class Login extends Model
     // Properties
     // =========================================================================
 
-    public $id;
-    public $ipAddress;
-    public $password;
-    public $loginPath;
+    public string $id;
+    public string $ipAddress;
+    public string $password;
+    public string $loginPath;
 
 }
