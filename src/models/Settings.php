@@ -4,6 +4,7 @@ namespace verbb\knockknock\models;
 use Craft;
 use craft\base\Model;
 use craft\helpers\UrlHelper;
+use yii\base\Exception;
 
 class Settings extends Model
 {
@@ -69,8 +70,8 @@ class Settings extends Model
 
     /**
      * @return string[]
-     * @throws \yii\base\Exception
-     * @throws \yii\base\Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function getProtectedUrls(): array
     {
@@ -89,8 +90,8 @@ class Settings extends Model
 
     /**
      * @return string[]
-     * @throws \yii\base\Exception
-     * @throws \yii\base\Exception
+     * @throws Exception
+     * @throws Exception
      */
     public function getUnprotectedUrls(): array
     {

@@ -14,7 +14,7 @@ class m190605_000000_add_db extends Migration
             $install = new Install();
             $install->safeUp();
         }
-        
+
         return true;
     }
 

@@ -20,8 +20,8 @@ class KnockKnock extends Plugin
     // Public Properties
     // =========================================================================
 
-    public string $schemaVersion = '1.1.1';
     public bool $hasCpSettings = true;
+    public string $schemaVersion = '1.1.1';
 
 
     // Traits

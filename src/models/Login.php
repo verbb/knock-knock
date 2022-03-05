@@ -10,7 +10,7 @@ class Login extends Model
 
     public ?string $id = null;
     public ?string $ipAddress = null;
-    public ?string $password = null;
     public ?string $loginPath = null;
+    public ?string $password = null;
 
 }

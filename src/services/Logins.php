@@ -71,7 +71,7 @@ class Logins extends Component
         if (IpHelper::ipInCidrList($ipAddress, $settings->getAllowIps())) {
             return false;
         }
-        
+
         if (IpHelper::ipInCidrList($ipAddress, $settings->getDenyIps())) {
             return true;
         }

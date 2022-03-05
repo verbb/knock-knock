@@ -11,14 +11,14 @@ class Install extends Migration
     public function safeUp(): bool
     {
         $this->createTables();
-        
+
         return true;
     }
 
     public function safeDown(): bool
     {
         $this->dropTables();
-        
+
         return true;
     }
 
@@ -33,14 +33,14 @@ class Install extends Migration
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
-        
+
         return true;
     }
-    
+
     public function dropTables(): bool
     {
         $this->dropTable('{{%knockknock_logins}}');
-        
+
         return true;
     }
 }
