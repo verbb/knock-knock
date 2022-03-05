@@ -12,19 +12,14 @@ use verbb\base\BaseHelper;
 
 trait PluginTrait
 {
-    // Static Properties
+    // Properties
     // =========================================================================
 
     public static KnockKnock $plugin;
 
 
-    // Public Methods
+    // Static Methods
     // =========================================================================
-
-    public function getLogins(): Logins
-    {
-        return $this->get('logins');
-    }
 
     public static function log($message): void
     {
@@ -34,6 +29,15 @@ trait PluginTrait
     public static function error($message): void
     {
         Craft::getLogger()->log($message, Logger::LEVEL_ERROR, 'knock-knock');
+    }
+
+
+    // Public Methods
+    // =========================================================================
+
+    public function getLogins(): Logins
+    {
+        return $this->get('logins');
     }
 
 

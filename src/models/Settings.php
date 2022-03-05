@@ -1,8 +1,6 @@
 <?php
 namespace verbb\knockknock\models;
 
-use verbb\knockknock\KnockKnock;
-
 use Craft;
 use craft\base\Model;
 use craft\helpers\UrlHelper;
@@ -71,6 +69,8 @@ class Settings extends Model
 
     /**
      * @return string[]
+     * @throws \yii\base\Exception
+     * @throws \yii\base\Exception
      */
     public function getProtectedUrls(): array
     {
@@ -89,6 +89,8 @@ class Settings extends Model
 
     /**
      * @return string[]
+     * @throws \yii\base\Exception
+     * @throws \yii\base\Exception
      */
     public function getUnprotectedUrls(): array
     {

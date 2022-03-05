@@ -13,6 +13,7 @@ use craft\helpers\UrlHelper;
 use craft\services\Plugins;
 use craft\web\UrlManager;
 use yii\base\Event;
+use Throwable;
 
 class KnockKnock extends Plugin
 {
@@ -128,7 +129,7 @@ class KnockKnock extends Plugin
 
                             break;
                         }
-                    } catch (\Throwable) {
+                    } catch (Throwable) {
                         continue;
                     }
                 }
@@ -158,7 +159,7 @@ class KnockKnock extends Plugin
 
                             break;
                         }
-                    } catch (\Throwable) {
+                    } catch (Throwable) {
                         continue;
                     }
                 }
@@ -210,7 +211,7 @@ class KnockKnock extends Plugin
 
         foreach ($renamedSettings as $old => $new) {
             if (property_exists($settings, $old) && isset($settings->$old)) {
-                Craft::$app->getDeprecator()->log($old, sprintf('The %s config setting has been renamed to %s.', $old, $new));
+                Craft::$app->getDeprecator()->log($old, "The {$old} config setting has been renamed to {$new}.");
                 $settings[$new] = $settings[$old];
                 unset($settings[$old]);
             }

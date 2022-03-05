@@ -85,24 +85,24 @@ class DefaultController extends Controller
             
             Craft::$app->getResponse()->getCookies()->add($cookie);
             return $this->redirect($request->getValidatedBodyParam('redirect'));
-        } else {
-            $data['redirect'] = $request->getValidatedBodyParam('redirect');
-            $data['errors']['password'] = Craft::t('knock-knock', 'Invalid password');
-
-            // Log this login to the database
-            if (Craft::$app->getConfig()->getGeneral()->storeUserIps && $settings->checkInvalidLogins) {
-                $login = new Login();
-                $login->ipAddress = $ipAddress;
-                $login->password = $password;
-
-                // No need to log allow list
-                if (!IpHelper::ipInCidrList($ipAddress, $settings->getAllowIps())) {
-                    KnockKnock::$plugin->getLogins()->saveLogin($login);
-                }
-            }
-            
-            return $this->renderTemplate($template, $data);
         }
+
+        $data['redirect'] = $request->getValidatedBodyParam('redirect');
+        $data['errors']['password'] = Craft::t('knock-knock', 'Invalid password');
+
+        // Log this login to the database
+        if (Craft::$app->getConfig()->getGeneral()->storeUserIps && $settings->checkInvalidLogins) {
+            $login = new Login();
+            $login->ipAddress = $ipAddress;
+            $login->password = $password;
+
+            // No need to log allow list
+            if (!IpHelper::ipInCidrList($ipAddress, $settings->getAllowIps())) {
+                KnockKnock::$plugin->getLogins()->saveLogin($login);
+            }
+        }
+
+        return $this->renderTemplate($template, $data);
     }
 
 
@@ -119,13 +119,13 @@ class DefaultController extends Controller
         // Try CP template first
         if ($view->doesTemplateExist($template)) {
             return $template;
-        } else {
-            // Try site template if cp template does not exist
-            $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+        }
 
-            if ($view->doesTemplateExist($template)) {
-                return $template;
-            }
+        // Try site template if cp template does not exist
+        $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+
+        if ($view->doesTemplateExist($template)) {
+            return $template;
         }
 
         // Reset back to CP just in case to return the default template

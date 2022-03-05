@@ -1,11 +1,7 @@
 <?php
 namespace verbb\knockknock\assetbundles;
 
-use Craft;
 use craft\web\AssetBundle;
-use craft\web\assets\cp\CpAsset;
-
-use verbb\base\assetbundles\CpAsset as VerbbCpAsset;
 
 class FrontEndAsset extends AssetBundle
 {

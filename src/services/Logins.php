@@ -20,7 +20,7 @@ class Logins extends Component
     // =========================================================================
 
     /**
-     * @return \verbb\knockknock\models\Login[]
+     * @return Login[]
      */
     public function getAllLogins(): array
     {
