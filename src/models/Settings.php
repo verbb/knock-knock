@@ -8,7 +8,7 @@ use yii\base\Exception;
 
 class Settings extends Model
 {
-    // Public Properties
+    // Properties
     // =========================================================================
 
     public bool $enabled = false;
@@ -111,6 +111,7 @@ class Settings extends Model
 
     // Private Methods
     // =========================================================================
+    
     /**
      * @return string[]
      */
