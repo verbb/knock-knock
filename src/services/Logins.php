@@ -105,7 +105,7 @@ class Logins extends Component
             ->from(['{{%knockknock_logins}}']);
     }
 
-    private function _getLoginRecordById(int $loginId = null): LoginRecord
+    private function _getLoginRecordById(int $loginId = null): ?LoginRecord
     {
         if ($loginId !== null) {
             $loginRecord = LoginRecord::findOne(['id' => $loginId]);
