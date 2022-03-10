@@ -12,7 +12,9 @@ use craft\events\RegisterUrlRulesEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Plugins;
 use craft\web\UrlManager;
+
 use yii\base\Event;
+
 use Throwable;
 
 class KnockKnock extends Plugin

@@ -3,7 +3,9 @@ namespace verbb\knockknock\models;
 
 use Craft;
 use craft\base\Model;
+use craft\helpers\App;
 use craft\helpers\UrlHelper;
+
 use yii\base\Exception;
 
 class Settings extends Model
@@ -81,7 +83,7 @@ class Settings extends Model
             $url = trim($url);
 
             if ($url !== '' && $url !== '0') {
-                $urls[] = UrlHelper::siteUrl(Craft::parseEnv($url));
+                $urls[] = UrlHelper::siteUrl(App::parseEnv($url));
             }
         }
 
@@ -101,7 +103,7 @@ class Settings extends Model
             $url = trim($url);
 
             if ($url !== '' && $url !== '0') {
-                $urls[] = UrlHelper::siteUrl(Craft::parseEnv($url));
+                $urls[] = UrlHelper::siteUrl(App::parseEnv($url));
             }
         }
 
