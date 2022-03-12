@@ -24,7 +24,7 @@ class KnockKnock extends Plugin
 
     public bool $hasCpSettings = true;
     public string $schemaVersion = '1.1.1';
-    public string $minVersionRequired = '1.1.1';
+    public string $minVersionRequired = '1.2.16';
 
 
     // Traits
@@ -73,6 +73,8 @@ class KnockKnock extends Plugin
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS, function(Event $event) {
             $request = Craft::$app->getRequest();
+
+            /* @var Settings $settings */
             $settings = KnockKnock::$plugin->getSettings();
             $user = Craft::$app->getUser()->getIdentity();
             $token = $request->getToken();
@@ -192,6 +194,7 @@ class KnockKnock extends Plugin
 
     private function _registerSiteRoutes(): void
     {
+        /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
         $loginPath = $settings->getLoginPath();
 
