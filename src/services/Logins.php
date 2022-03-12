@@ -4,6 +4,7 @@ namespace verbb\knockknock\services;
 use verbb\knockknock\KnockKnock;
 use verbb\knockknock\helpers\IpHelper;
 use verbb\knockknock\models\Login;
+use verbb\knockknock\models\Settings;
 use verbb\knockknock\records\Login as LoginRecord;
 
 use Craft;
@@ -65,6 +66,7 @@ class Logins extends Component
 
     public function checkLockout($ipAddress): bool
     {
+        /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
         // Check for allow/deny

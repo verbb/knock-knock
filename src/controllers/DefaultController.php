@@ -4,6 +4,7 @@ namespace verbb\knockknock\controllers;
 use verbb\knockknock\KnockKnock;
 use verbb\knockknock\helpers\IpHelper;
 use verbb\knockknock\models\Login;
+use verbb\knockknock\models\Settings;
 
 use Craft;
 use craft\web\Controller;
@@ -24,6 +25,7 @@ class DefaultController extends Controller
 
     public function actionSettings(): Response
     {
+        /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
         return $this->renderTemplate('knock-knock/settings', [
@@ -34,6 +36,8 @@ class DefaultController extends Controller
     public function actionAsk(): Response
     {
         $data = [];
+
+        /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
         $template = $this->_getTemplate('knock-knock/ask', $settings->getTemplate());
@@ -54,6 +58,8 @@ class DefaultController extends Controller
     {
         $data = [];
         $request = Craft::$app->getRequest();
+
+        /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
         $template = $this->_getTemplate('knock-knock/ask', $settings->getTemplate());
