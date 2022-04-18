@@ -5,7 +5,7 @@ Password protect your entire Craft website front-end with a single password. A f
 ## Installation
 You can install Knock Knock via the plugin store, or through Composer.
 
-### Craft Plugin Store
+## Craft Plugin Store
 To install **Knock Knock**, navigate to the _Plugin Store_ section of your Craft control panel, search for `Knock Knock`, and click the _Try_ button.
 
 ### Composer
@@ -56,7 +56,7 @@ return [
 ];
 ```
 
-### Configuration options
+## Configuration options
 
 - `enabled` - Whether password protection should be enabled. Useful in multi-environment scenarios.
 - `password` - The password users will need to enter to access the site.
