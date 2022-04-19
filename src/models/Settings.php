@@ -11,7 +11,7 @@ class Settings extends Model
 {
     // Public Properties
     // =========================================================================
-    
+
     public $enabled = false;
     public $password;
     public $loginPath;
@@ -97,12 +97,16 @@ class Settings extends Model
     // Private Methods
     // =========================================================================
 
-    private function _getArrayFromMultiline($string)
+    private function _getArrayFromMultiline($value)
     {
+        if (is_array($value)) {
+            return $value;
+        }
+
         $array = [];
 
-        if ($string) {
-            $array = array_map('trim', explode(PHP_EOL, $string));
+        if ($value) {
+            $array = array_map('trim', explode(PHP_EOL, $value));
         }
 
         return $array;
