@@ -11,6 +11,7 @@ use craft\base\Plugin;
 use craft\events\RegisterUrlRulesEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Plugins;
+use craft\web\Application;
 use craft\web\UrlManager;
 
 use yii\base\Event;
@@ -71,7 +72,7 @@ class KnockKnock extends Plugin
 
     private function _testAccess(): void
     {
-        Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS, function(Event $event) {
+        Craft::$app->on(Application::EVENT_INIT, function() {
             $request = Craft::$app->getRequest();
 
             /* @var Settings $settings */
