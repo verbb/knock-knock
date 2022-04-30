@@ -24,6 +24,7 @@ class Install extends Migration
 
     public function createTables(): bool
     {
+        $this->archiveTableIfExists('{{%knockknock_logins}}');
         $this->createTable('{{%knockknock_logins}}', [
             'id' => $this->primaryKey(),
             'ipAddress' => $this->string(),
