@@ -45,9 +45,15 @@ class KnockKnock extends Plugin
 
         $this->_registerComponents();
         $this->_registerLogTarget();
-        $this->_registerSiteRoutes();
-        $this->_registerCpRoutes();
         $this->_checkDeprecations();
+
+        if (Craft::$app->getRequest()->getIsSiteRequest()) {
+            $this->_registerSiteRoutes();
+        }
+        
+        if (Craft::$app->getRequest()->getIsCpRequest()) {
+            $this->_registerCpRoutes();
+        }
 
         $this->_testAccess();
     }
