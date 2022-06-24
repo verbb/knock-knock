@@ -1,11 +1,10 @@
 # Knock Knock Plugin for Craft CMS
-
 Password protect your entire Craft website front-end with a single password. A fast and easy way to lock down access to your website, without worrying about Apache or Nginx configuration.
 
 ## Installation
 You can install Knock Knock via the plugin store, or through Composer.
 
-## Craft Plugin Store
+### Craft Plugin Store
 To install **Knock Knock**, navigate to the _Plugin Store_ section of your Craft control panel, search for `Knock Knock`, and click the _Try_ button.
 
 ### Composer
@@ -21,11 +20,10 @@ You can also add the package to your project using Composer.
 
 3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Knock Knock.
 
-### Usage
+## Usage
 In the Control Panel, go to Settings → Knock Knock, and enter a password. Anyone visiting your website will need to enter the password to see the website.
 
 ## Configuration
-
 Create a `knock-knock.php` file under your `/config` directory with the following options available to you. You can also use multi-environment options to change these per environment.
 
 ```php
@@ -145,7 +143,6 @@ You can also look at the template Knock Knock itself uses [here](https://github.
 Based on [KnockKock](https://github.com/dgrigg/knockknock) for Craft 2.
 
 ## Show your Support
-
 Knock Knock is licensed under the MIT license, meaning it will always be free and open source – we love free stuff! If you'd like to show your support to the plugin regardless, [Sponsor](https://github.com/sponsors/verbb) development.
 
 <h2></h2>

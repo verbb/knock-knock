@@ -17,7 +17,7 @@ class DefaultController extends Controller
 
     protected $allowAnonymous = true;
 
-    
+
     // Public Methods
     // =========================================================================
 
@@ -33,7 +33,7 @@ class DefaultController extends Controller
     public function actionAsk()
     {
         $settings = KnockKnock::$plugin->getSettings();
-        
+
         $template = $this->_getTemplate('knock-knock/ask', $settings->getTemplate());
 
         $redirect = Craft::$app->getCache()->get('knockknock-redirect');
@@ -44,7 +44,7 @@ class DefaultController extends Controller
         if ($settings->forcedRedirect) {
             $data['redirect'] = $settings->forcedRedirect;
         }
-        
+
         return $this->renderTemplate($template, $data);
     }
 
@@ -58,7 +58,7 @@ class DefaultController extends Controller
 
         $password = $request->getParam('password');
         $accessPassword = $settings->getPassword();
-        
+
         Craft::$app->getCache()->set('knockknock-redirect', null);
 
         // Check for lockout
@@ -68,7 +68,7 @@ class DefaultController extends Controller
             if ($hasLockout) {
                 $data['redirect'] = $request->getValidatedBodyParam('redirect');
                 $data['errors']['password'] = Craft::t('knock-knock', 'Too many invalid attempts');
-                
+
                 return $this->renderTemplate($template, $data);
             }
         }
@@ -79,7 +79,7 @@ class DefaultController extends Controller
                 'value' => $request->csrfToken,
                 'expire' => time() + 3600,
             ]));
-            
+
             Craft::$app->getResponse()->getCookies()->add($cookie);
             return $this->redirect($request->getValidatedBodyParam('redirect'));
         } else {
@@ -97,7 +97,7 @@ class DefaultController extends Controller
                     KnockKnock::$plugin->getLogins()->saveLogin($login);
                 }
             }
-            
+
             return $this->renderTemplate($template, $data);
         }
     }

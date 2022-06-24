@@ -32,7 +32,7 @@ class Install extends Migration
             'uid' => $this->uid(),
         ]);
     }
-    
+
     public function dropTables()
     {
         $this->dropTable('{{%knockknock_logins}}');
