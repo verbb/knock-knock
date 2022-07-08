@@ -22,7 +22,7 @@ class Install extends Migration
         return true;
     }
 
-    public function createTables(): bool
+    public function createTables(): voic
     {
         $this->archiveTableIfExists('{{%knockknock_logins}}');
         $this->createTable('{{%knockknock_logins}}', [
@@ -34,14 +34,10 @@ class Install extends Migration
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
-
-        return true;
     }
 
-    public function dropTables(): bool
+    public function dropTables(): void
     {
-        $this->dropTable('{{%knockknock_logins}}');
-
-        return true;
+        $this->dropTableIfExists('{{%knockknock_logins}}');
     }
 }
