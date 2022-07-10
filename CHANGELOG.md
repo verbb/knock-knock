@@ -15,7 +15,13 @@
 - Rename base plugin methods.
 - Use `Application::EVENT_INIT` to test access to ensure Craft is initialized properly.
 
-1.2.16
+## 1.2.17 - 2022-07-10
+
+### Added
+- Allow arrays in config settings for `allowIps`, `denyIps`, `protectedUrls`, `unprotectedUrls`. (thanks @Diewy).
+
+### Fixed
+- Fix a potential infinite redirect loop if changing from `http` to `https`.
 
 ## 1.2.16 - 2021-09-17
 

@@ -119,10 +119,14 @@ class Settings extends Model
      */
     private function _getArrayFromMultiline($string): array
     {
+        if (is_array($value)) {
+            return $value;
+        }
+
         $array = [];
 
-        if ($string) {
-            $array = array_map('trim', explode(PHP_EOL, $string));
+        if ($value) {
+            $array = array_map('trim', explode(PHP_EOL, $value));
         }
 
         return $array;
