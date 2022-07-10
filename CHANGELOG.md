@@ -1,10 +1,21 @@
 # Changelog
 
-## 2.0.0-beta.1 - 2022-03-10
+## 2.0.0 - 2022-07-10
+
+### Added
+- Add resave console command for elements.
+- Add checks for registering events for performance.
+- Add `archiveTableIfExists()` to install migration.
 
 ### Changed
-- Now requires PHP `^8.0.2`.
-- Now requires Craft `^4.0.0-beta.1`.
+- Now requires PHP `8.0.2+`.
+- Now requires Craft `4.0.0+`.
+- Now requires Knock Knock `1.2.16` in order to update from Craft 3.
+- Rename service classes.
+- Rename base plugin methods.
+- Use `Application::EVENT_INIT` to test access to ensure Craft is initialized properly.
+
+1.2.16
 
 ## 1.2.16 - 2021-09-17
 
