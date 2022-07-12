@@ -22,7 +22,7 @@ class Install extends Migration
         return true;
     }
 
-    public function createTables(): voic
+    public function createTables(): void
     {
         $this->archiveTableIfExists('{{%knockknock_logins}}');
         $this->createTable('{{%knockknock_logins}}', [
