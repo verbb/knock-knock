@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.1 - 2022-07-12
+
+### Fixed
+- Fix an error when installing the plugin.
+
 ## 2.0.0 - 2022-07-10
 
 ### Added
