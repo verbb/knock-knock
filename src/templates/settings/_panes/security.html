@@ -39,7 +39,7 @@
     rows: 10,
     id: 'allowIps',
     name: 'allowIps',
-    value: settings.allowIps,
+    value: settings.getSettingAsMultiline('allowIps'),
     errors: settings.getErrors('allowIps'),
     warning: macros.configWarning('allowIps', 'knock-knock'),
 }) }}
@@ -50,7 +50,7 @@
     rows: 10,
     id: 'denyIps',
     name: 'denyIps',
-    value: settings.denyIps,
+    value: settings.getSettingAsMultiline('denyIps'),
     errors: settings.getErrors('denyIps'),
     warning: macros.configWarning('denyIps', 'knock-knock'),
 }) }}

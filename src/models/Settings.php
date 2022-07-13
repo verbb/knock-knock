@@ -23,16 +23,38 @@ class Settings extends Model
     public bool $checkInvalidLogins = false;
     public string $invalidLoginWindowDuration = '3600';
     public int $maxInvalidLogins = 10;
-    public string $allowIps = '';
-    public string $denyIps = '';
+    public array $allowIps = [];
+    public array $denyIps = [];
     public bool $useRemoteIp = false;
     
-    public string $protectedUrls = '';
-    public string $unprotectedUrls = '';
+    public array $protectedUrls = [];
+    public array $unprotectedUrls = [];
 
 
     // Public Methods
     // =========================================================================
+
+    public function __construct($config = [])
+    {
+        // Config normalization
+        if (array_key_exists('allowIps', $config) && !is_array($config['allowIps'])) {
+            $config['allowIps'] = array_map('trim', explode(PHP_EOL, $config['allowIps']));
+        }
+
+        if (array_key_exists('denyIps', $config) && !is_array($config['denyIps'])) {
+            $config['denyIps'] = array_map('trim', explode(PHP_EOL, $config['denyIps']));
+        }
+
+        if (array_key_exists('protectedUrls', $config) && !is_array($config['protectedUrls'])) {
+            $config['protectedUrls'] = array_map('trim', explode(PHP_EOL, $config['protectedUrls']));
+        }
+
+        if (array_key_exists('unprotectedUrls', $config) && !is_array($config['unprotectedUrls'])) {
+            $config['unprotectedUrls'] = array_map('trim', explode(PHP_EOL, $config['unprotectedUrls']));
+        }
+
+        parent::__construct($config);
+    }
 
     public function getEnabled(): bool
     {
@@ -54,32 +76,20 @@ class Settings extends Model
         return $this->_getSettingValue('loginPath') ?? 'knock-knock/who-is-there';
     }
 
-    /**
-     * @return string[]
-     */
-    public function getAllowIps(): array
+    public function getSettingAsMultiline(string $setting): string
     {
-        return $this->_getArrayFromMultiline($this->allowIps);
+        return implode(PHP_EOL, $this->$setting);
     }
 
     /**
      * @return string[]
-     */
-    public function getDenyIps(): array
-    {
-        return $this->_getArrayFromMultiline($this->denyIps);
-    }
-
-    /**
-     * @return string[]
-     * @throws Exception
      * @throws Exception
      */
     public function getProtectedUrls(): array
     {
         $urls = [];
 
-        foreach ($this->_getArrayFromMultiline($this->protectedUrls) as $url) {
+        foreach ($this->protectedUrls as $url) {
             $url = trim($url);
 
             if ($url !== '' && $url !== '0') {
@@ -93,13 +103,12 @@ class Settings extends Model
     /**
      * @return string[]
      * @throws Exception
-     * @throws Exception
      */
     public function getUnprotectedUrls(): array
     {
         $urls = [];
 
-        foreach ($this->_getArrayFromMultiline($this->unprotectedUrls) as $url) {
+        foreach ($this->unprotectedUrls as $url) {
             $url = trim($url);
 
             if ($url !== '' && $url !== '0') {
@@ -113,24 +122,6 @@ class Settings extends Model
 
     // Private Methods
     // =========================================================================
-    
-    /**
-     * @return string[]
-     */
-    private function _getArrayFromMultiline($string): array
-    {
-        if (is_array($value)) {
-            return $value;
-        }
-
-        $array = [];
-
-        if ($value) {
-            $array = array_map('trim', explode(PHP_EOL, $value));
-        }
-
-        return $array;
-    }
 
     private function _getSettingValue($value)
     {

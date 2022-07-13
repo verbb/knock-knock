@@ -41,12 +41,12 @@ return [
         'checkInvalidLogins' => false,
         'invalidLoginWindowDuration' => '3600',
         'maxInvalidLogins' => 10,
-        'allowIps' => '',
-        'denyIps' => '',
+        'allowIps' => [],
+        'denyIps' => [],
         'useRemoteIp' => false,
         
-        'protectedUrls' => '',
-        'unprotectedUrls' => '',
+        'protectedUrls' => [],
+        'unprotectedUrls' => [],
     ],
     'staging' => [
         'enabled' => true,
@@ -68,8 +68,8 @@ return [
 - `allowIps` - Provide IP Addresses that should be exempt from lockouts out automatically.
 - `denyIps` - Provide IP Addresses that should be locked out automatically.
 - `useRemoteIp` - Whether to use the Remote IP address of the user to compare their IP against. If security if your primary concern, consider turning this on. This may not accurately report users behind proxies, so use with caution.
-- `protectedUrls` - A line-break delimited list of specific URLs to only protect.
-- `unprotectedUrls` - A line-break delimited list of specific URLs to not protect.
+- `protectedUrls` - A list of specific URLs to only protect.
+- `unprotectedUrls` - A list of specific URLs to not protect.
 
 ### Protected & unprotected URLs
 

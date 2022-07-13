@@ -103,7 +103,7 @@ class DefaultController extends Controller
             $login->password = $password;
 
             // No need to log allow list
-            if (!IpHelper::ipInCidrList($ipAddress, $settings->getAllowIps())) {
+            if (!IpHelper::ipInCidrList($ipAddress, $settings->allowIps)) {
                 KnockKnock::$plugin->getLogins()->saveLogin($login);
             }
         }

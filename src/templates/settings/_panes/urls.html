@@ -8,7 +8,7 @@
     rows: 10,
     id: 'protectedUrls',
     name: 'protectedUrls',
-    value: settings.protectedUrls,
+    value: settings.getSettingAsMultiline('protectedUrls'),
     errors: settings.getErrors('protectedUrls'),
     warning: macros.configWarning('protectedUrls', 'knock-knock'),
 }) }}
@@ -20,7 +20,7 @@
     rows: 10,
     id: 'unprotectedUrls',
     name: 'unprotectedUrls',
-    value: settings.unprotectedUrls,
+    value: settings.getSettingAsMultiline('unprotectedUrls'),
     errors: settings.getErrors('unprotectedUrls'),
     warning: macros.configWarning('unprotectedUrls', 'knock-knock'),
 }) }}

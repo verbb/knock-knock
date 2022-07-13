@@ -118,7 +118,7 @@ class KnockKnock extends Plugin
             }
 
             // Check if this IP is in the exclusion list
-            if (IpHelper::ipInCidrList($ipAddress, $settings->getAllowIps())) {
+            if (IpHelper::ipInCidrList($ipAddress, $settings->allowIps)) {
                 return;
             }
 
