@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.2 - 2022-07-13
+
+### Fixed
+- Fix `protectedUrls`, and `unprotectedUrls` URLs partial-matching incorrectly due to Regex rules.
+- Better normalising of `allowIps`, `denyIps`, `protectedUrls`, and `unprotectedUrls` settings.
+- Revert infinite loop check, which results in incorrect redirect URLs.
+
 ## 2.0.1 - 2022-07-12
 
 ### Fixed
