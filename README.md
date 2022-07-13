@@ -68,17 +68,10 @@ return [
 - `allowIps` - Provide IP Addresses that should be exempt from lockouts out automatically.
 - `denyIps` - Provide IP Addresses that should be locked out automatically.
 - `useRemoteIp` - Whether to use the Remote IP address of the user to compare their IP against. If security if your primary concern, consider turning this on. This may not accurately report users behind proxies, so use with caution.
-- `protectedUrls` - A list of specific URLs to only protect.
-- `unprotectedUrls` - A list of specific URLs to not protect.
-
-### Protected & unprotected URLs
-
-If you define your (un)protected URLs in the config file, you'll need to provide them as line-break-delimited values. For example: `/test\r\n/another-test`.
-
-Regex is also supported (for example `/some-channel/(.*)`).
+- `protectedUrls` - A list of specific URLs to only protect. Regex is also supported (for example `/some-channel/(.*)`).
+- `unprotectedUrls` - A list of specific URLs to not protect. Regex is also supported (for example `/some-channel/(.*)`).
 
 ### Multi-site configuration
-
 The above will set the values globally, for all sites. These global values will override each setting for each site, so they'll always be the same. If you want to set these values per-site, do not include them at the top level. For example:
 
 ```php

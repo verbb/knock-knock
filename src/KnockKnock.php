@@ -136,14 +136,16 @@ class KnockKnock extends Plugin
                     }
 
                     // See if it matches a Regex patten
-                    try {
-                        if (preg_match('`' . $unprotectedUrl . '`i', $currentUrl) === 1) {
-                            $match = true;
+                    if (strstr($unprotectedUrl, '(')) {
+                        try {
+                            if (preg_match('`' . $unprotectedUrl . '`i', $currentUrl) === 1) {
+                                $match = true;
 
-                            break;
+                                break;
+                            }
+                        } catch (Throwable) {
+                            continue;
                         }
-                    } catch (Throwable) {
-                        continue;
                     }
                 }
 
@@ -166,14 +168,16 @@ class KnockKnock extends Plugin
                     }
 
                     // See if it matches a Regex patten
-                    try {
-                        if (preg_match('`' . $protectedUrl . '`i', $currentUrl) === 1) {
-                            $noMatch = false;
+                    if (strstr($protectedUrl, '(')) {
+                        try {
+                            if (preg_match('`' . $protectedUrl . '`i', $currentUrl) === 1) {
+                                $noMatch = false;
 
-                            break;
+                                break;
+                            }
+                        } catch (Throwable) {
+                            continue;
                         }
-                    } catch (Throwable) {
-                        continue;
                     }
                 }
 
