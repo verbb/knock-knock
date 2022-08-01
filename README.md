@@ -103,7 +103,7 @@ If you keep the top level `enabled`, `password`, etc settings, they'll override 
 ### Security
 You can opt to log users' attempts to login to Craft to prevent brute-force attempts. Use the config settings to manage this.
 
-**Important:** You must also enable [storeUserIps](https://docs.craftcms.com/v3/config/config-settings.html#storeuserips) in your `general.php` file.
+**Important:** You must also enable [storeUserIps](https://craftcms.com/docs/4.x/config/config-settings.html#storeuserips) in your `general.php` file.
 
 ### Custom template
 Using the `template` configuration option, you can provide a path to your own custom template, shown to users when they try to login. A very simple example might look like the following:
