@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.18 - 2022-08-09
+
+### Fixed
+- Revert infinite loop check, which results in incorrect redirect URLs.
+
 ## 1.2.17 - 2022-07-10
 
 ### Added
