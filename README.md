@@ -8,17 +8,17 @@ You can install Knock Knock via the plugin store, or through Composer.
 To install **Knock Knock**, navigate to the _Plugin Store_ section of your Craft control panel, search for `Knock Knock`, and click the _Try_ button.
 
 ### Composer
-You can also add the package to your project using Composer.
+You can also add the package to your project using Composer and the command line.
 
 1. Open your terminal and go to your Craft project:
+```shell
+cd /path/to/project
+```
 
-        cd /path/to/project
-
-2. Then tell Composer to load the plugin:
-    
-        composer require verbb/knock-knock
-
-3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Knock Knock.
+2. Then tell Composer to require the plugin, and Craft to install it:
+```shell
+composer require verbb/knock-knock && php craft plugin/install knock-knock
+```
 
 ## Usage
 In the Control Panel, go to Settings → Knock Knock, and enter a password. Anyone visiting your website will need to enter the password to see the website.
