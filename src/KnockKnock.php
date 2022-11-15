@@ -101,8 +101,8 @@ class KnockKnock extends Plugin
                 return;
             }
 
-            // Only site requests are blocked and for guests
-            if (!$request->getIsSiteRequest() || $user) {
+            // Only site/cp requests are blocked and for guests
+            if ((!$request->getIsSiteRequest() && !$request->getIsCpRequest()) || $user) {
                 return;
             }
 
