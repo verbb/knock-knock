@@ -1,10 +1,31 @@
 <?php
 namespace verbb\knockknock\helpers;
 
+use verbb\knockknock\KnockKnock;
+
 class IpHelper
 {
     // Public Methods
     // =========================================================================
+
+    public static function getUserIp(): string
+    {
+        /* @var Settings $settings */
+        $settings = KnockKnock::$plugin->getSettings();
+
+        $ipAddress = $request->getUserIP();
+
+        if ($settings->useRemoteIp) {
+            $ipAddress = $request->getRemoteIP();
+        }
+
+        // Check for CloudFlare IP
+        if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+            $ipAddress = $_SERVER['HTTP_CF_CONNECTING_IP'];
+        }
+
+        return $ipAddress;
+    }
 
     /**
      * Check if IP exists in list of IP addresses and CIDR blocks

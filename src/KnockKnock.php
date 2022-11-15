@@ -116,11 +116,7 @@ class KnockKnock extends Plugin
                 return;
             }
 
-            $ipAddress = $request->getUserIP();
-
-            if ($settings->useRemoteIp) {
-                $ipAddress = $request->getRemoteIP();
-            }
+            $ipAddress = IpHelper::getUserIp();
 
             // Check if this IP is in the exclusion list
             if (IpHelper::ipInCidrList($ipAddress, $settings->allowIps)) {
