@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.4 - 2022-11-15
+
+- Add support for Cloudflare remote IP checking
+- Add support to block CP-based pages, not just site-based requests
+
 ## 2.0.3 - 2022-10-19
 
 ### Fixed
