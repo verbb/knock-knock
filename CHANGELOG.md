@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.5 - 2022-11-16
+
+### Fixed
+- Fix an error introduced in 2.0.4.
+
 ## 2.0.4 - 2022-11-15
 
 ### Added

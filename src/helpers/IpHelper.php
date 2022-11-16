@@ -10,6 +10,8 @@ class IpHelper
 
     public static function getUserIp(): string
     {
+        $request = Craft::$app->getRequest();
+        
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
