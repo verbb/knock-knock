@@ -1,6 +1,8 @@
 <?php
 namespace verbb\knockknock\helpers;
 
+use Craft;
+
 use verbb\knockknock\KnockKnock;
 
 class IpHelper
@@ -11,7 +13,7 @@ class IpHelper
     public static function getUserIp(): string
     {
         $request = Craft::$app->getRequest();
-        
+
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
