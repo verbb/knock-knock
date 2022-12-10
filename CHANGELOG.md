@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.6 - 2022-12-10
+
+### Added
+- Add `enableCpProtection` plugin setting.
+
+### Fixed
+- Fix login challenge when accessing the control panel.
+
 ## 2.0.5 - 2022-11-16
 
 ### Fixed
