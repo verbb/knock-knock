@@ -7,10 +7,19 @@
     instructions: 'Whether the plugin should be enabled.' | t('knock-knock'),
     id: 'enabled',
     name: 'enabled',
-    value: 1,
     on: settings.enabled,
     errors: settings.getErrors('enabled'),
     warning: macros.configWarning('enabled', 'knock-knock'),
+}) }}
+
+{{ forms.lightswitchField({
+    label: 'Enabled CP Protection' | t('knock-knock'),
+    instructions: 'Whether the plugin should be enabled control panel protection.' | t('knock-knock'),
+    id: 'enableCpProtection',
+    name: 'enableCpProtection',
+    on: settings.enableCpProtection,
+    errors: settings.getErrors('enableCpProtection'),
+    warning: macros.configWarning('enableCpProtection', 'knock-knock'),
 }) }}
 
 {{ forms.textField({

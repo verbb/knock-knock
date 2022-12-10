@@ -32,6 +32,7 @@ Create a `knock-knock.php` file under your `/config` directory with the followin
 return [
     '*' => [
         'enabled' => false,
+        'enableCpProtection' => false,
         'loginPath' => 'knock-knock/who-is-there',
         'template' => '',
         'forcedRedirect' => '',
@@ -57,6 +58,7 @@ return [
 ## Configuration options
 
 - `enabled` - Whether password protection should be enabled. Useful in multi-environment scenarios.
+- `enableCpProtection` - Whether password protection for the control panel should be enabled. By default, only the front-end is protected.
 - `password` - The password users will need to enter to access the site.
 - `loginPath` - The path to be used when to challenge is shown to the user.
 - `template` - Provide a path to a custom template to be shown instead of the default one.

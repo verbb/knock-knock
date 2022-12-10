@@ -19,6 +19,7 @@ class Settings extends Model
     public string $template = '';
     public string $forcedRedirect = '';
     public array $siteSettings = [];
+    public bool $enableCpProtection = false;
 
     public bool $checkInvalidLogins = false;
     public string $invalidLoginWindowDuration = '3600';
