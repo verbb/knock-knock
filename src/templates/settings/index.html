@@ -1,8 +1,8 @@
-{% requireAdmin %}
-
 {% extends 'knock-knock/_layouts' %}
 {% import '_includes/forms' as forms %}
 {% import 'verbb-base/_macros' as macros %}
+
+{% requireAdmin %}
 
 {% set crumbs = [
     { label: 'Knock Knock' | t('knock-knock'), url: url('knock-knock/settings') },
