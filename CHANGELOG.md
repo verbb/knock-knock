@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.7 - 2023-01-18
+
+### Changed
+- Only admins are now allowed to access plugin settings.
+
+### Fixed
+- Fix Protected URLs/Unprotected URLs not working correctly for multiple values when set via the control panel.
+
 ## 2.0.6 - 2022-12-10
 
 ### Added
