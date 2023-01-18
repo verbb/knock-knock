@@ -88,17 +88,19 @@ class Settings extends Model
      */
     public function getProtectedUrls(): array
     {
-        $urls = [];
+        $protectedUrls = [];
 
         foreach ($this->protectedUrls as $url) {
-            $url = trim($url);
+            $urls = explode(PHP_EOL, trim($url));
 
-            if ($url !== '' && $url !== '0') {
-                $urls[] = UrlHelper::siteUrl(App::parseEnv($url));
+            foreach ($urls as $url) {
+                if ($url !== '' && $url !== '0') {
+                    $protectedUrls[] = trim(UrlHelper::siteUrl(App::parseEnv($url)));
+                }
             }
         }
 
-        return $urls;
+        return array_filter($protectedUrls);
     }
 
     /**
@@ -107,17 +109,19 @@ class Settings extends Model
      */
     public function getUnprotectedUrls(): array
     {
-        $urls = [];
+        $unprotectedUrls = [];
 
         foreach ($this->unprotectedUrls as $url) {
-            $url = trim($url);
+            $urls = explode(PHP_EOL, trim($url));
 
-            if ($url !== '' && $url !== '0') {
-                $urls[] = UrlHelper::siteUrl(App::parseEnv($url));
+            foreach ($urls as $url) {
+                if ($url !== '' && $url !== '0') {
+                    $protectedUrls[] = trim(UrlHelper::siteUrl(App::parseEnv($url)));
+                }
             }
         }
 
-        return $urls;
+        return array_filter($unprotectedUrls);
     }
 
 
