@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.8 - 2023-03-02
+
+### Fixed
+- Fix `unprotectedUrls` as a config option not working correctly.
+
 ## 2.0.7 - 2023-01-18
 
 ### Changed
