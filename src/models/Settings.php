@@ -116,7 +116,7 @@ class Settings extends Model
 
             foreach ($urls as $url) {
                 if ($url !== '' && $url !== '0') {
-                    $protectedUrls[] = trim(UrlHelper::siteUrl(App::parseEnv($url)));
+                    $unprotectedUrls[] = trim(UrlHelper::siteUrl(App::parseEnv($url)));
                 }
             }
         }
