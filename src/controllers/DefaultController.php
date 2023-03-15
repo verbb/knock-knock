@@ -90,6 +90,8 @@ class DefaultController extends Controller
             ]));
 
             Craft::$app->getResponse()->getCookies()->add($cookie);
+            Craft::$app->getResponse()->setNoCacheHeaders();
+
             return $this->redirect($request->getValidatedBodyParam('redirect'));
         }
 
