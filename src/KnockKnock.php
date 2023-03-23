@@ -196,6 +196,7 @@ class KnockKnock extends Plugin
                 Craft::$app->getCache()->set('knockknock-redirect', $url);
             }
 
+            Craft::$app->getResponse()->setNoCacheHeaders();
             Craft::$app->getResponse()->redirect($loginPath);
             Craft::$app->end();
         });
