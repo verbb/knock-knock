@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.9 - 2023-05-27
+
+### Added
+- Add `Cache-Control` headers when redirecting.
+
+### Fixed
+- Fix an incorrect check for enabled state for multi-site installs.
+
 ## 2.0.8 - 2023-03-02
 
 ### Fixed
