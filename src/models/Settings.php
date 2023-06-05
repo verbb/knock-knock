@@ -134,7 +134,7 @@ class Settings extends Model
         $siteSettings = $this->siteSettings[$currentSite->handle] ?? [];
 
         // Allow global override
-        if (isset($this->$value)) {
+        if ($this->$value) {
             return $this->$value;
         }
 
