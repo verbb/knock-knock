@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.10 - 2023-06-05
+
+### Fixed
+- Fix an error when checking the enabled state of the plugin.
+
 ## 2.0.9 - 2023-05-27
 
 ### Added
