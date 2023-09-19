@@ -1,147 +1,22 @@
-# Knock Knock Plugin for Craft CMS
-Password protect your entire Craft website front-end with a single password. A fast and easy way to lock down access to your website, without worrying about Apache or Nginx configuration.
+# Knock Knock plugin for Craft CMS
+<img width="500" src="https://verbb.imgix.net/plugins/knock-knock/knock-knock-social-card.png?v=1">
 
-## Installation
-You can install Knock Knock via the plugin store, or through Composer.
+Knock Knock is a Craft CMS plugin to protect your site with a login challenge. It's a fast and easy way to lock down access to your website, without worrying about Apache or Nginx configuration.
 
-### Craft Plugin Store
-To install **Knock Knock**, navigate to the _Plugin Store_ section of your Craft control panel, search for `Knock Knock`, and click the _Try_ button.
+## Documentation
+Visit the [Knock Knock Plugin page](https://verbb.io/craft-plugins/knock-knock) for all documentation, guides, pricing and developer resources.
 
-### Composer
-You can also add the package to your project using Composer and the command line.
-
-1. Open your terminal and go to your Craft project:
-```shell
-cd /path/to/project
-```
-
-2. Then tell Composer to require the plugin, and Craft to install it:
-```shell
-composer require verbb/knock-knock && php craft plugin/install knock-knock
-```
-
-## Usage
-In the Control Panel, go to Settings → Knock Knock, and enter a password. Anyone visiting your website will need to enter the password to see the website.
-
-## Configuration
-Create a `knock-knock.php` file under your `/config` directory with the following options available to you. You can also use multi-environment options to change these per environment.
-
-```php
-<?php
-
-return [
-    '*' => [
-        'enabled' => false,
-        'enableCpProtection' => false,
-        'loginPath' => 'knock-knock/who-is-there',
-        'template' => '',
-        'forcedRedirect' => '',
-        'password' => 'superSecretPassword',
-        'siteSettings' => [],
-
-        'checkInvalidLogins' => false,
-        'invalidLoginWindowDuration' => '3600',
-        'maxInvalidLogins' => 10,
-        'allowIps' => [],
-        'denyIps' => [],
-        'useRemoteIp' => false,
-        
-        'protectedUrls' => [],
-        'unprotectedUrls' => [],
-    ],
-    'staging' => [
-        'enabled' => true,
-    ],
-];
-```
-
-## Configuration options
-
-- `enabled` - Whether password protection should be enabled. Useful in multi-environment scenarios.
-- `enableCpProtection` - Whether password protection for the control panel should be enabled. By default, only the front-end is protected.
-- `password` - The password users will need to enter to access the site.
-- `loginPath` - The path to be used when to challenge is shown to the user.
-- `template` - Provide a path to a custom template to be shown instead of the default one.
-- `forcedRedirect` - Provide a URL to be redirected to when logging in. Knock Knock will try and redirect to the referring URL, but you may want to enforce a specific URL to always go to.
-- `siteSettings` - See below on how to configure.
-- `checkInvalidLogins` - Whether to check and log invalid logins. This will lock IP addresses out of the system in certain circumstances, but can help against brute-force logins..
-- `invalidLoginWindowDuration` - The amount of time to track invalid login attempts for an IP, for determining if Knock Knock should lock the IP out.
-- `maxInvalidLogins` - The number of invalid login attempts Knock Knock will allow within the specified duration before the IP gets locked.
-- `allowIps` - Provide IP Addresses that should be exempt from lockouts out automatically.
-- `denyIps` - Provide IP Addresses that should be locked out automatically.
-- `useRemoteIp` - Whether to use the Remote IP address of the user to compare their IP against. If security if your primary concern, consider turning this on. This may not accurately report users behind proxies, so use with caution.
-- `protectedUrls` - A list of specific URLs to only protect. Regex is also supported (for example `/some-channel/(.*)`).
-- `unprotectedUrls` - A list of specific URLs to not protect. Regex is also supported (for example `/some-channel/(.*)`).
-
-### Multi-site configuration
-The above will set the values globally, for all sites. These global values will override each setting for each site, so they'll always be the same. If you want to set these values per-site, do not include them at the top level. For example:
-
-```php
-<?php
-
-return [
-    '*' => [
-        // Don't do this for multi-site specific settings
-        'enabled' => true,
-        'password' => 'superSecretPassword',
-
-        // Instead, do this:
-        'siteSettings' => [
-            'siteHandle' => [
-                'enabled' => true,
-                'password' => 'superSecretPassword',
-            ],
-            'anotherSiteHandle' => [
-                'enabled' => true,
-                'password' => 'anotherSecretPassword',
-            ],
-        ]
-    ],
-];
-```
-
-If you keep the top level `enabled`, `password`, etc settings, they'll override your settings for each site.
-
-### Security
-You can opt to log users' attempts to login to Craft to prevent brute-force attempts. Use the config settings to manage this.
-
-**Important:** You must also enable [storeUserIps](https://craftcms.com/docs/4.x/config/config-settings.html#storeuserips) in your `general.php` file.
-
-### Custom template
-Using the `template` configuration option, you can provide a path to your own custom template, shown to users when they try to login. A very simple example might look like the following:
-
-```
-<form method="post" accept-charset="utf-8">
-  <input type="hidden" name="action" value="knock-knock/default/answer">
-  <input type="hidden" name="redirect" value="{{ redirect | hash }}">
-  {{ csrfInput() }}
-
-  <label for="password">Password</label>
-  <input id="password" type="password" name="password" autocomplete="off" placeholder="Password" autofocus />
-
-  <button type="submit" name="unlock" value="Unlock">Unlock</button>
-
-  {% if errors is defined %}
-    <ul class="errors">
-      {% for error in errors %}
-        <li>{{ error }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-</form>
-```
-
-You can also look at the template Knock Knock itself uses [here](https://github.com/verbb/knock-knock/blob/craft-3/src/templates/ask.html). When using a custom template, be mindful to include all the provided `<input>` elements, taking note of the `name` attributes for each. Otherwise, you have complete control over the look and feel of this form.
-
-### Credits
+## Credit & Thanks
 Based on [KnockKock](https://github.com/dgrigg/knockknock) for Craft 2.
 
-## Show your Support
+## Support
+Get in touch with us via the [Knock Knock Support page](https://verbb.io/craft-plugins/knock-knock/support) or by [creating a Github issue](https://github.com/verbb/knock-knock/issues)
+
+## Sponsor
 Knock Knock is licensed under the MIT license, meaning it will always be free and open source – we love free stuff! If you'd like to show your support to the plugin regardless, [Sponsor](https://github.com/sponsors/verbb) development.
 
 <h2></h2>
 
 <a href="https://verbb.io" target="_blank">
-  <img width="100" src="https://verbb.io/assets/img/verbb-pill.svg">
+    <img width="100" src="https://verbb.io/assets/img/verbb-pill.svg">
 </a>
