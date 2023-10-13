@@ -47,7 +47,7 @@ class Logins extends Component
     public function saveLogin(Login $login, bool $runValidation = true): bool
     {
         if ($runValidation && !$login->validate()) {
-            Craft::info('Login not saved due to validation error.', __METHOD__);
+            KnockKnock::info('Login not saved due to validation error.');
             return false;
         }
 

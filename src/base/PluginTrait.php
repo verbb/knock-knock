@@ -3,37 +3,37 @@ namespace verbb\knockknock\base;
 
 use verbb\knockknock\KnockKnock;
 use verbb\knockknock\services\Logins;
-use verbb\base\BaseHelper;
 
-use Craft;
-
-use yii\log\Logger;
+use verbb\base\LogTrait;
+use verbb\base\helpers\Plugin;
 
 trait PluginTrait
 {
     // Properties
     // =========================================================================
 
-    public static KnockKnock $plugin;
+    public static ?KnockKnock $plugin = null;
 
+
+    // Traits
+    // =========================================================================
+
+    use LogTrait;
+    
 
     // Static Methods
     // =========================================================================
 
-    public static function log(string $message, array $params = []): void
+    public static function config(): array
     {
-        $message = Craft::t('knock-knock', $message, $params);
+        Plugin::bootstrapPlugin('knock-knock');
 
-        Craft::getLogger()->log($message, Logger::LEVEL_INFO, 'knock-knock');
+        return [
+            'components' => [
+                'logins' => Logins::class,
+            ],
+        ];
     }
-
-    public static function error(string $message, array $params = []): void
-    {
-        $message = Craft::t('knock-knock', $message, $params);
-
-        Craft::getLogger()->log($message, Logger::LEVEL_ERROR, 'knock-knock');
-    }
-
 
     // Public Methods
     // =========================================================================
@@ -41,24 +41,6 @@ trait PluginTrait
     public function getLogins(): Logins
     {
         return $this->get('logins');
-    }
-
-
-    // Private Methods
-    // =========================================================================
-
-    private function _registerComponents(): void
-    {
-        $this->setComponents([
-            'logins' => Logins::class,
-        ]);
-
-        BaseHelper::registerModule();
-    }
-
-    private function _registerLogTarget(): void
-    {
-        BaseHelper::setFileLogging('knock-knock');
     }
 
 }

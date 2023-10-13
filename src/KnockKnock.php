@@ -43,8 +43,6 @@ class KnockKnock extends Plugin
 
         self::$plugin = $this;
 
-        $this->_registerComponents();
-        $this->_registerLogTarget();
         $this->_checkDeprecations();
 
         if (Craft::$app->getRequest()->getIsSiteRequest()) {
@@ -55,7 +53,10 @@ class KnockKnock extends Plugin
             $this->_registerCpRoutes();
         }
 
-        $this->_testAccess();
+        // Defer most setup tasks until Craft is fully initialized:
+        Craft::$app->onInit(function() {
+            $this->_testAccess();
+        });
     }
 
     public function getSettingsResponse(): mixed
@@ -78,128 +79,126 @@ class KnockKnock extends Plugin
 
     private function _testAccess(): void
     {
-        Craft::$app->on(Application::EVENT_INIT, function() {
-            $request = Craft::$app->getRequest();
+        $request = Craft::$app->getRequest();
 
-            /* @var Settings $settings */
-            $settings = KnockKnock::$plugin->getSettings();
-            $user = Craft::$app->getUser()->getIdentity();
-            $token = $request->getToken();
+        /* @var Settings $settings */
+        $settings = KnockKnock::$plugin->getSettings();
+        $user = Craft::$app->getUser()->getIdentity();
+        $token = $request->getToken();
 
-            // Only care if the plugin is enabled
-            if (!$settings->getEnabled()) {
+        // Only care if the plugin is enabled
+        if (!$settings->getEnabled()) {
+            return;
+        }
+
+        // Console requests are excluded, as well as for cross-site preview tokens
+        if ($request->getIsConsoleRequest() || $token !== null) {
+            return;
+        }
+
+        // Live Preview requests are fine, but only for authenticated users
+        if ($user && ($request->getIsLivePreview() || $request->getIsPreview())) {
+            return;
+        }
+
+        // Only site requests are blocked and for guests
+        if (!$request->getIsSiteRequest() || $user) {
+            // Only CP requests are blocked if we're checking against that
+            if ($settings->enableCpProtection && $request->getIsCpRequest()) {
+                // We want to show the login screen
+            } else {
                 return;
             }
+        }
 
-            // Console requests are excluded, as well as for cross-site preview tokens
-            if ($request->getIsConsoleRequest() || $token !== null) {
-                return;
-            }
+        // Normalise the URLs a little, just in case to prevent infinite loops
+        $url = $request->getAbsoluteUrl();
+        $cookie = $request->getCookies()->get('siteAccessToken');
+        $loginPath = UrlHelper::siteUrl($settings->getLoginPath());
 
-            // Live Preview requests are fine, but only for authenticated users
-            if ($user && ($request->getIsLivePreview() || $request->getIsPreview())) {
-                return;
-            }
+        // Check for the site access cookie, and check we're not causing a loop
+        if ($cookie != '' || stripos($url, $loginPath) !== false) {
+            return;
+        }
 
-            // Only site requests are blocked and for guests
-            if (!$request->getIsSiteRequest() || $user) {
-                // Only CP requests are blocked if we're checking against that
-                if ($settings->enableCpProtection && $request->getIsCpRequest()) {
-                    // We want to show the login screen
-                } else {
-                    return;
+        $ipAddress = IpHelper::getUserIp();
+
+        // Check if this IP is in the exclusion list
+        if (IpHelper::ipInCidrList($ipAddress, $settings->allowIps)) {
+            return;
+        }
+
+        // Check if the requested URL is explicitly unprotected. If yes, allow the request.
+        if ($settings->getUnprotectedUrls()) {
+            $match = false;
+            $currentUrl = UrlHelper::stripQueryString($url);
+
+            foreach ($settings->getUnprotectedUrls() as $unprotectedUrl) {
+                // See if the URL matches exactly (without query string)
+                if ($currentUrl === $unprotectedUrl) {
+                    $match = true;
+
+                    break;
                 }
-            }
 
-            // Normalise the URLs a little, just in case to prevent infinite loops
-            $url = $request->getAbsoluteUrl();
-            $cookie = $request->getCookies()->get('siteAccessToken');
-            $loginPath = UrlHelper::siteUrl($settings->getLoginPath());
+                // See if it matches a Regex patten
+                if (strstr($unprotectedUrl, '(')) {
+                    try {
+                        if (preg_match('`' . $unprotectedUrl . '`i', $currentUrl) === 1) {
+                            $match = true;
 
-            // Check for the site access cookie, and check we're not causing a loop
-            if ($cookie != '' || stripos($url, $loginPath) !== false) {
-                return;
-            }
-
-            $ipAddress = IpHelper::getUserIp();
-
-            // Check if this IP is in the exclusion list
-            if (IpHelper::ipInCidrList($ipAddress, $settings->allowIps)) {
-                return;
-            }
-
-            // Check if the requested URL is explicitly unprotected. If yes, allow the request.
-            if ($settings->getUnprotectedUrls()) {
-                $match = false;
-                $currentUrl = UrlHelper::stripQueryString($url);
-
-                foreach ($settings->getUnprotectedUrls() as $unprotectedUrl) {
-                    // See if the URL matches exactly (without query string)
-                    if ($currentUrl === $unprotectedUrl) {
-                        $match = true;
-
-                        break;
-                    }
-
-                    // See if it matches a Regex patten
-                    if (strstr($unprotectedUrl, '(')) {
-                        try {
-                            if (preg_match('`' . $unprotectedUrl . '`i', $currentUrl) === 1) {
-                                $match = true;
-
-                                break;
-                            }
-                        } catch (Throwable) {
-                            continue;
+                            break;
                         }
+                    } catch (Throwable) {
+                        continue;
                     }
-                }
-
-                if ($match) {
-                    return;
                 }
             }
 
-            // Check to see if we're watching only specific URLs. By default, protect everything though
-            if ($settings->getProtectedUrls()) {
-                $noMatch = true;
-                $currentUrl = UrlHelper::stripQueryString($url);
+            if ($match) {
+                return;
+            }
+        }
 
-                foreach ($settings->getProtectedUrls() as $protectedUrl) {
-                    // See if the URL matches exactly (without query string)
-                    if ($currentUrl === $protectedUrl) {
-                        $noMatch = false;
+        // Check to see if we're watching only specific URLs. By default, protect everything though
+        if ($settings->getProtectedUrls()) {
+            $noMatch = true;
+            $currentUrl = UrlHelper::stripQueryString($url);
 
-                        break;
-                    }
+            foreach ($settings->getProtectedUrls() as $protectedUrl) {
+                // See if the URL matches exactly (without query string)
+                if ($currentUrl === $protectedUrl) {
+                    $noMatch = false;
 
-                    // See if it matches a Regex patten
-                    if (strstr($protectedUrl, '(')) {
-                        try {
-                            if (preg_match('`' . $protectedUrl . '`i', $currentUrl) === 1) {
-                                $noMatch = false;
+                    break;
+                }
 
-                                break;
-                            }
-                        } catch (Throwable) {
-                            continue;
+                // See if it matches a Regex patten
+                if (strstr($protectedUrl, '(')) {
+                    try {
+                        if (preg_match('`' . $protectedUrl . '`i', $currentUrl) === 1) {
+                            $noMatch = false;
+
+                            break;
                         }
+                    } catch (Throwable) {
+                        continue;
                     }
                 }
-
-                if ($noMatch) {
-                    return;
-                }
             }
 
-            if ($request->getIsSiteRequest()) {
-                Craft::$app->getCache()->set('knockknock-redirect', $url);
+            if ($noMatch) {
+                return;
             }
+        }
 
-            Craft::$app->getResponse()->setNoCacheHeaders();
-            Craft::$app->getResponse()->redirect($loginPath);
-            Craft::$app->end();
-        });
+        if ($request->getIsSiteRequest()) {
+            Craft::$app->getCache()->set('knockknock-redirect', $url);
+        }
+
+        Craft::$app->getResponse()->setNoCacheHeaders();
+        Craft::$app->getResponse()->redirect($loginPath);
+        Craft::$app->end();
     }
 
     private function _registerCpRoutes(): void
