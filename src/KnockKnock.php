@@ -91,8 +91,8 @@ class KnockKnock extends Plugin
                 return;
             }
 
-            // Console requests are excluded, as well as for cross-site preview tokens
-            if ($request->getIsConsoleRequest() || $token !== null) {
+            // Console and action requests are excluded, as well as for cross-site preview tokens
+            if ($request->getIsConsoleRequest() || $request->getIsActionRequest() || $token !== null) {
                 return;
             }
 
