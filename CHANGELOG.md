@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.19 - 2023-11-09
+
+### Fixed
+- Fix too-early call on `User::getIdentity()` when plugin is disabled, for better performance.
+
 ## 1.2.18 - 2022-08-09
 
 ### Fixed
