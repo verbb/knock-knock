@@ -67,15 +67,17 @@ class KnockKnock extends Plugin
     private function _testAccess()
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS, function(Event $event) {
-            $request = Craft::$app->getRequest();
+            /* @var Settings $settings */
             $settings = KnockKnock::$plugin->getSettings();
-            $user = Craft::$app->getUser()->getIdentity();
-            $token = $request->getToken();
 
             // Only care if the plugin is enabled
             if (!$settings->getEnabled()) {
                 return;
             }
+
+            $request = Craft::$app->getRequest();
+            $user = Craft::$app->getUser()->getIdentity();
+            $token = $request->getToken();
 
             // Console and Live Preview requests are fine. Also check for cross-site preview tokens
             if ($request->getIsConsoleRequest() || ($request->getIsLivePreview() || $token !== null || $request->getIsPreview())) {
