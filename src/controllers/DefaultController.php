@@ -57,7 +57,6 @@ class DefaultController extends Controller
     public function actionAnswer(): Response
     {
         $data = [];
-        $request = Craft::$app->getRequest();
 
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
@@ -65,7 +64,7 @@ class DefaultController extends Controller
         $template = $this->_getTemplate('knock-knock/ask', $settings->getTemplate());
         $ipAddress = Craft::$app->getRequest()->getRemoteIP();
 
-        $password = $request->getParam('password');
+        $password = $this->request->getParam('password');
         $accessPassword = $settings->getPassword();
 
         Craft::$app->getCache()->set('knockknock-redirect', null);
@@ -75,7 +74,7 @@ class DefaultController extends Controller
             $hasLockout = KnockKnock::$plugin->getLogins()->checkLockout($ipAddress);
 
             if ($hasLockout) {
-                $data['redirect'] = $request->getValidatedBodyParam('redirect');
+                $data['redirect'] = $this->request->getValidatedBodyParam('redirect');
                 $data['errors']['password'] = Craft::t('knock-knock', 'Too many invalid attempts');
 
                 return $this->renderTemplate($template, $data);
@@ -85,17 +84,17 @@ class DefaultController extends Controller
         if ($accessPassword == $password) {
             $cookie = new Cookie(Craft::cookieConfig([
                 'name' => 'siteAccessToken',
-                'value' => $request->csrfToken,
+                'value' => $this->request->csrfToken,
                 'expire' => time() + 3600,
             ]));
 
             Craft::$app->getResponse()->getCookies()->add($cookie);
             Craft::$app->getResponse()->setNoCacheHeaders();
 
-            return $this->redirect($request->getValidatedBodyParam('redirect'));
+            return $this->redirect($this->request->getValidatedBodyParam('redirect'));
         }
 
-        $data['redirect'] = $request->getValidatedBodyParam('redirect');
+        $data['redirect'] = $this->request->getValidatedBodyParam('redirect');
         $data['errors']['password'] = Craft::t('knock-knock', 'Invalid password');
 
         // Log this login to the database
