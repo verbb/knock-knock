@@ -7,7 +7,7 @@ Knock Knock is a Craft CMS plugin to protect your site with a login challenge. I
 Visit the [Knock Knock Plugin page](https://verbb.io/craft-plugins/knock-knock) for all documentation, guides, pricing and developer resources.
 
 ## Credit & Thanks
-Based on [KnockKock](https://github.com/dgrigg/knockknock) for Craft 2.
+Based on [KnockKnock](https://github.com/dgrigg/knockknock) for Craft 2.
 
 ## Support
 Get in touch with us via the [Knock Knock Support page](https://verbb.io/craft-plugins/knock-knock/support) or by [creating a Github issue](https://github.com/verbb/knock-knock/issues)

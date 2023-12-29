@@ -79,20 +79,20 @@ class KnockKnock extends Plugin
 
     private function _testAccess(): void
     {
-        $request = Craft::$app->getRequest();
-
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
-        $user = Craft::$app->getUser()->getIdentity();
-        $token = $request->getToken();
 
         // Only care if the plugin is enabled
         if (!$settings->getEnabled()) {
             return;
         }
 
-        // Console requests are excluded, as well as for cross-site preview tokens
-        if ($request->getIsConsoleRequest() || $token !== null) {
+        $request = Craft::$app->getRequest();
+        $user = Craft::$app->getUser()->getIdentity();
+        $token = $request->getToken();
+
+        // Console and action requests are excluded, as well as for cross-site preview tokens
+        if ($request->getIsConsoleRequest() || $request->getIsActionRequest() || $token !== null) {
             return;
         }
 

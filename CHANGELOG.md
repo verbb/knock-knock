@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.11 - 2023-11-09
+
+### Changed
+- Action request endpoints are now no longer protected.
+
+### Fixed
+- Fix too-early call on `User::getIdentity()` when plugin is disabled, for better performance.
+
 ## 2.0.10 - 2023-06-05
 
 ### Fixed
