@@ -43,8 +43,6 @@ class KnockKnock extends Plugin
 
         self::$plugin = $this;
 
-        $this->_checkDeprecations();
-
         if (Craft::$app->getRequest()->getIsSiteRequest()) {
             $this->_registerSiteRoutes();
         }
@@ -221,24 +219,5 @@ class KnockKnock extends Plugin
                 $loginPath => 'knock-knock/default/ask',
             ]);
         });
-    }
-
-    private function _checkDeprecations(): void
-    {
-        $settings = $this->getSettings();
-
-        // Check for renamed settings
-        $renamedSettings = [
-            'whitelistIps' => 'allowIps',
-            'blacklistIps' => 'denyIps',
-        ];
-
-        foreach ($renamedSettings as $old => $new) {
-            if (property_exists($settings, $old) && isset($settings->$old)) {
-                Craft::$app->getDeprecator()->log($old, "The {$old} config setting has been renamed to {$new}.");
-                $settings[$new] = $settings[$old];
-                unset($settings[$old]);
-            }
-        }
     }
 }
