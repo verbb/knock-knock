@@ -91,7 +91,7 @@ class Logins extends Component
     }
 
 
-    // Private methods
+    // Private Methods
     // =========================================================================
 
     private function _createLoginQuery(): Query

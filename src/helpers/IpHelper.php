@@ -102,7 +102,7 @@ class IpHelper
         return $return;
     }
 
-    // Private methods
+    // Private Methods
     // =========================================================================
     /**
      * Converts inet_pton output to string with bits
