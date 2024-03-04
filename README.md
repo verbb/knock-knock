@@ -1,5 +1,5 @@
-# Knock Knock plugin for Craft CMS
-<img width="500" src="https://verbb.imgix.net/plugins/knock-knock/knock-knock-social-card.png?v=1">
+<p align="center"><img src="https://verbb.imgix.net/plugins/knock-knock/knock-knock-icon.svg" width="100" height="100" alt="Knock Knock icon"></p>
+<h1 align="center">Knock Knock for Craft CMS</h1>
 
 Knock Knock is a Craft CMS plugin to protect your site with a login challenge. It's a fast and easy way to lock down access to your website, without worrying about Apache or Nginx configuration.
 
