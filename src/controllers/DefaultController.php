@@ -40,7 +40,7 @@ class DefaultController extends Controller
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
-        $template = $this->_getTemplate('knock-knock/ask', $settings->getTemplate());
+        $template = $this->_getTemplate($settings->getDefaultTemplate(), $settings->getTemplate());
 
         $redirect = Craft::$app->getCache()->get('knockknock-redirect');
 
@@ -61,7 +61,7 @@ class DefaultController extends Controller
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
-        $template = $this->_getTemplate('knock-knock/ask', $settings->getTemplate());
+        $template = $this->_getTemplate($settings->getDefaultTemplate(), $settings->getTemplate());
         $ipAddress = Craft::$app->getRequest()->getRemoteIP();
 
         $password = $this->request->getParam('password');

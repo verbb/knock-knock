@@ -1,0 +1,65 @@
+{% extends '_layouts/base' %}
+{% import '_includes/forms' as forms %}
+
+{% set title = 'Site Locked' | t('knock-knock') %}
+{% set bodyClass = 'login' %}
+
+{% do view.registerAssetBundle('verbb\\knockknock\\assetbundles\\FrontEndAsset') %}
+
+{% block body %}
+
+<main>
+    <div class="login-container">
+        <div class="pane secondary login-form-container">
+            {% tag 'form' with {
+                class: 'login-form',
+                method: 'post',
+                'accept-charset': 'UTF-8',
+            } %}
+                {{ actionInput('knock-knock/default/answer') }}
+                {{ redirectInput(redirect) }}
+                {{ csrfInput() }}
+
+                <h1 class="kk-h1">{{ 'Site locked' | t('knock-knock') }}</h1>
+
+                <div>
+                    {{ forms.passwordField({
+                        id: 'password',
+                        placeholder: 'Password' | t('knock-knock'),
+                        name: 'password',
+                        autofocus: true,
+                        autocomplete: 'kk-password',
+                        errors: (errors is defined ? errors : null),
+                        inputAttributes: {
+                            aria: {
+                                required: 'true',
+                            },
+                        },
+                    }) }}
+                </div>
+
+                {{ forms.submitButton({
+                    class: ['fullwidth', 'last'],
+                    label: 'Unlock' | t('knock-knock'),
+                    spinner: true,
+                    busyMessage: 'Signing in' | t('app'),
+                    successMessage: 'Signed in' | t('app'),
+                    failureMessage: 'Sign in unsuccessful' | t('app'),
+                    retryMessage: 'Try again' | t('app'),
+                }) }}
+            {% endtag %}
+        </div>
+    </div>
+</main>
+
+{% endblock %}
+
+{% css %}
+
+.kk-h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 1.6rem;
+}
+
+{% endcss %}

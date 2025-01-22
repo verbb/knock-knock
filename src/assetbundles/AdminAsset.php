@@ -20,7 +20,6 @@ class AdminAsset extends AssetBundle
             CpAsset::class,
         ];
 
-
         parent::init();
     }
 }

@@ -72,6 +72,15 @@ class Settings extends Model
         return $enabled ?? false;
     }
 
+    public function getDefaultTemplate(): string
+    {
+        if (version_compare(Craft::$app->getInfo()->version, '5.6.0', '>=')) {
+            return 'knock-knock/ask-craft-5-6';
+        }
+
+        return 'knock-knock/ask';
+    }
+
     public function getTemplate(): string
     {
         return $this->_getSettingValue('template') ?? '';
