@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.2 - 2025-02-05
+
+### Fixed
+- Fix layout in Craft 5.6 and match new front-end login theme.
+
 ## 3.0.1 - 2024-07-21
 
 ### Added
