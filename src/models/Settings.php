@@ -116,14 +116,14 @@ class Settings extends Model
         if (is_array($value)) {
             // Handle legacy format: array with a single multi-line string
             if (count($value) === 1 && is_string($value[0]) && str_contains($value[0], "\n")) {
-                return array_map('trim', preg_split('/\r\n|\r|\n/', $value[0]));
+                return array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $value[0])));
             }
             
-            return $value;
+            return array_filter($value);
         }
 
         if (is_string($value)) {
-            return array_map('trim', explode(PHP_EOL, $value));
+            return array_filter(array_map('trim', explode(PHP_EOL, $value)));
         }
 
         return [];
