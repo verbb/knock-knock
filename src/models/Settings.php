@@ -27,38 +27,16 @@ class Settings extends Model
     public bool $checkInvalidLogins = false;
     public string $invalidLoginWindowDuration = '3600';
     public int $maxInvalidLogins = 10;
-    public array $allowIps = [];
-    public array $denyIps = [];
+    public array|string|null $allowIps = [];
+    public array|string|null $denyIps = [];
     public bool $useRemoteIp = false;
     
-    public array $protectedUrls = [];
-    public array $unprotectedUrls = [];
+    public array|string|null $protectedUrls = [];
+    public array|string|null $unprotectedUrls = [];
 
 
     // Public Methods
     // =========================================================================
-
-    public function __construct($config = [])
-    {
-        // Config normalization
-        if (array_key_exists('allowIps', $config) && !is_array($config['allowIps'])) {
-            $config['allowIps'] = array_map('trim', explode(PHP_EOL, $config['allowIps']));
-        }
-
-        if (array_key_exists('denyIps', $config) && !is_array($config['denyIps'])) {
-            $config['denyIps'] = array_map('trim', explode(PHP_EOL, $config['denyIps']));
-        }
-
-        if (array_key_exists('protectedUrls', $config) && !is_array($config['protectedUrls'])) {
-            $config['protectedUrls'] = array_map('trim', explode(PHP_EOL, $config['protectedUrls']));
-        }
-
-        if (array_key_exists('unprotectedUrls', $config) && !is_array($config['unprotectedUrls'])) {
-            $config['unprotectedUrls'] = array_map('trim', explode(PHP_EOL, $config['unprotectedUrls']));
-        }
-
-        parent::__construct($config);
-    }
 
     public function getEnabled(): bool
     {
@@ -98,54 +76,60 @@ class Settings extends Model
 
     public function getSettingAsMultiline(string $setting): string
     {
-        return implode(PHP_EOL, $this->$setting);
+        if (is_array($this->$setting)) {
+            return implode(PHP_EOL, $this->$setting);
+        }
+
+        if (is_string((string)$this->$setting)) {
+            return (string)$this->$setting;
+        }
+
+        return '';
     }
 
-    /**
-     * @return string[]
-     * @throws Exception
-     */
+    public function getAllowIps(): array
+    {
+        return $this->_normalizeList($this->allowIps);
+    }
+
+    public function getDenyIps(): array
+    {
+        return $this->_normalizeList($this->denyIps);
+    }
+
     public function getProtectedUrls(): array
     {
-        $protectedUrls = [];
-
-        foreach (($this->_getSettingValue('protectedUrls') ?? []) as $url) {
-            $urls = explode(PHP_EOL, trim($url));
-
-            foreach ($urls as $url) {
-                if ($url !== '' && $url !== '0') {
-                    $protectedUrls[] = trim(UrlHelper::siteUrl(App::parseEnv($url)));
-                }
-            }
-        }
-
-        return array_filter($protectedUrls);
+        return $this->_normalizeUrls($this->protectedUrls);
     }
 
-    /**
-     * @return string[]
-     * @throws Exception
-     */
     public function getUnprotectedUrls(): array
     {
-        $unprotectedUrls = [];
-
-        foreach (($this->_getSettingValue('unprotectedUrls') ?? []) as $url) {
-            $urls = explode(PHP_EOL, trim($url));
-
-            foreach ($urls as $url) {
-                if ($url !== '' && $url !== '0') {
-                    $unprotectedUrls[] = trim(UrlHelper::siteUrl(App::parseEnv($url)));
-                }
-            }
-        }
-
-        return array_filter($unprotectedUrls);
+        return $this->_normalizeUrls($this->unprotectedUrls);
     }
 
 
     // Private Methods
     // =========================================================================
+
+    private function _normalizeList(array|string|null $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            return array_map('trim', explode(PHP_EOL, $value));
+        }
+
+        return [];
+    }
+
+    private function _normalizeUrls(array|string|null $value): array
+    {
+        $items = $this->_normalizeList($value);
+
+        return array_map(fn($item) => UrlHelper::siteUrl(App::parseEnv($item)), $items);
+    }
 
     private function _getSettingValue($value)
     {
