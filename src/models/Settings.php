@@ -114,6 +114,11 @@ class Settings extends Model
     private function _normalizeList(array|string|null $value): array
     {
         if (is_array($value)) {
+            // Handle legacy format: array with a single multi-line string
+            if (count($value) === 1 && is_string($value[0]) && str_contains($value[0], "\n")) {
+                return array_map('trim', preg_split('/\r\n|\r|\n/', $value[0]));
+            }
+            
             return $value;
         }
 
