@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.3 - 2025-05-01
+
+### Fixed
+- Fix normalization of multi-line settings like URLs and IPs.
+
 ## 3.0.2 - 2025-02-05
 
 ### Fixed
