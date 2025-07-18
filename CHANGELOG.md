@@ -28,6 +28,11 @@
 - Now requires PHP `8.2.0+`.
 - Now requires Craft `5.0.0+`.
 
+## 2.0.13 - 2025-07-18
+
+### Changed
+- Update English translations.
+
 ## 2.0.12 - 2024-07-21
 
 ### Added
@@ -197,7 +202,7 @@
 - Deprecate `whitelistIps`. Use `allowIps` instead.
 - Deprecate `blacklistIps`. Use `denyIps` instead.
 
-## 1.2.8 - 2020-05-20 [CRITICAL]
+## 1.2.8 - 2020-05-20
 
 ### Fixed
 - Fix fetching the IP for a user that could allow spoofing via headers. Vulnerability `IP Whitelist bypass` reported by Paweł Hałdrzyński.
