@@ -2,7 +2,7 @@
     "name": "verbb/knock-knock",
     "description": "Password protect your public facing Craft website with a single password.",
     "type": "craft-plugin",
-    "version": "3.0.4",
+    "version": "4.0.0-alpha.1",
     "keywords": [
         "craft",
         "cms",
@@ -25,9 +25,9 @@
         }
     ],
     "require": {
-        "php": "^8.2",
-        "craftcms/cms": "^5.0.0",
-        "verbb/base": "^3.0.0"
+        "php": "^8.4",
+        "craftcms/cms": "6.x-dev",
+        "verbb/base": "dev-craft-6"
     },
     "autoload": {
         "psr-4": {
@@ -37,7 +37,9 @@
     "extra": {
         "name": "Knock Knock",
         "handle": "knock-knock",
-        "changelogUrl": "https://raw.githubusercontent.com/verbb/knock-knock/craft-5/CHANGELOG.md",
+        "changelogUrl": "https://raw.githubusercontent.com/verbb/knock-knock/craft-6/CHANGELOG.md",
         "class": "verbb\\knockknock\\KnockKnock"
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
