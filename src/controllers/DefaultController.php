@@ -120,6 +120,9 @@ class DefaultController extends Controller
     {
         $template = $template ?: $defaultTemplate;
 
+        // Set “no-cache” headers for Craft Cloud
+        $this->response->setNoCacheHeaders();
+
         $view = $this->getView();
         $view->setTemplateMode($view::TEMPLATE_MODE_CP);
 
