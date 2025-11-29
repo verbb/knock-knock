@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.14 - 2025-11-29
+
+### Changed
+- Ensure rendering templates set a `no-cache` header for Craft Cloud.
+
 ## 2.0.13 - 2025-07-18
 
 ### Changed
