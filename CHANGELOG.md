@@ -28,6 +28,11 @@
 - Now requires PHP `8.2.0+`.
 - Now requires Craft `5.0.0+`.
 
+## 2.0.14 - 2025-11-29
+
+### Changed
+- Ensure rendering templates set a `no-cache` header for Craft Cloud.
+
 ## 2.0.13 - 2025-07-18
 
 ### Changed
@@ -202,7 +207,7 @@
 - Deprecate `whitelistIps`. Use `allowIps` instead.
 - Deprecate `blacklistIps`. Use `denyIps` instead.
 
-## 1.2.8 - 2020-05-20
+## 1.2.8 - 2020-05-20 [CRITICAL]
 
 ### Fixed
 - Fix fetching the IP for a user that could allow spoofing via headers. Vulnerability `IP Whitelist bypass` reported by Paweł Hałdrzyński.
