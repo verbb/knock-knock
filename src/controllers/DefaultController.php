@@ -64,8 +64,12 @@ class DefaultController extends Controller
         $template = $this->_getTemplate($settings->getDefaultTemplate(), $settings->getTemplate());
         $ipAddress = Craft::$app->getRequest()->getRemoteIP();
 
-        $password = $this->request->getParam('password');
+        $password = $this->request->getParam('password', '');
         $accessPassword = $settings->getPassword();
+
+        if (!is_string($password)) {
+            $password = '';
+        }
 
         Craft::$app->getCache()->set('knockknock-redirect', null);
 
@@ -81,7 +85,7 @@ class DefaultController extends Controller
             }
         }
 
-        if ($accessPassword == $password) {
+        if (Craft::$app->getSecurity()->compareString($accessPassword, $password)) {
             $cookie = new Cookie(Craft::cookieConfig([
                 'name' => 'siteAccessToken',
                 'value' => $this->request->csrfToken,
