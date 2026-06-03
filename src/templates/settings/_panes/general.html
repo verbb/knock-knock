@@ -1,33 +1,36 @@
 {% import '_includes/forms' as forms %}
 {% import 'verbb-base/_macros' as macros %}
 
-{{ forms.lightswitchField({
+{{ forms.booleanMenuField({
     first: true,
     label: 'Enabled' | t('knock-knock'),
     instructions: 'Whether the plugin should be enabled.' | t('knock-knock'),
     id: 'enabled',
     name: 'enabled',
-    on: settings.enabled,
+    includeEnvVars: true,
+    value: settings.getEnabled(false),
     errors: settings.getErrors('enabled'),
     warning: macros.configWarning('enabled', 'knock-knock'),
 }) }}
 
-{{ forms.lightswitchField({
+{{ forms.booleanMenuField({
     label: 'Enabled CP Protection' | t('knock-knock'),
     instructions: 'Whether the plugin should be enabled control panel protection.' | t('knock-knock'),
     id: 'enableCpProtection',
     name: 'enableCpProtection',
-    on: settings.enableCpProtection,
+    includeEnvVars: true,
+    value: settings.getEnableCpProtection(false),
     errors: settings.getErrors('enableCpProtection'),
     warning: macros.configWarning('enableCpProtection', 'knock-knock'),
 }) }}
 
-{{ forms.textField({
+{{ forms.autosuggestField({
     label: 'Password' | t('knock-knock'),
     instructions: 'Minimum 8 characters, don‘t make it easy.' | t('knock-knock'),
     id: 'password',
     name: 'password',
-    value: settings.password,
+    suggestEnvVars: true,
+    value: settings.getPassword(false),
     errors: settings.getErrors('password'),
     warning: macros.configWarning('password', 'knock-knock'),
 }) }}
@@ -62,11 +65,10 @@
     {% set siteRows = siteRows | merge({
         (site.handle): {
             heading: site.name | t('site'),
-            enabled: include('_includes/forms/lightswitch', {
+            enabled: forms.booleanMenu({
                 name: 'siteSettings[' ~ site.handle ~ '][enabled]',
-                on: siteSettings.enabled ?? false,
-                value: '1',
-                small: true,
+                includeEnvVars: true,
+                value: siteSettings.enabled ?? false,
             }),
             password: {
                 value: siteSettings.password ?? '',
@@ -95,9 +97,10 @@
             class: 'thin' ~ (not craft.app.getIsMultiSite() ? ' hidden')
         },
         password: {
-            type: 'singleline',
+            type: 'autosuggest',
             heading: 'Password' | t('knock-knock'),
             info: 'Minimum 8 characters, don’t make it easy.' | t('knock-knock'),
+            suggestEnvVars: true,
         },
         template: {
             type: 'template',

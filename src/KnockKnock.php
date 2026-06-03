@@ -102,7 +102,7 @@ class KnockKnock extends Plugin
         // Only site requests are blocked and for guests
         if (!$request->getIsSiteRequest() || $user) {
             // Only CP requests are blocked if we're checking against that
-            if ($settings->enableCpProtection && $request->getIsCpRequest()) {
+            if ($settings->getEnableCpProtection() && $request->getIsCpRequest()) {
                 // We want to show the login screen
             } else {
                 return;

@@ -16,13 +16,13 @@ class Settings extends Model
     // Properties
     // =========================================================================
 
-    public bool|Closure $enabled = false;
+    public bool|string|Closure $enabled = false;
     public string $password = '';
     public string $loginPath = '';
     public string $template = '';
     public string $forcedRedirect = '';
     public array $siteSettings = [];
-    public bool $enableCpProtection = false;
+    public bool|string $enableCpProtection = false;
 
     public bool $checkInvalidLogins = false;
     public string $invalidLoginWindowDuration = '3600';
@@ -38,16 +38,16 @@ class Settings extends Model
     // Public Methods
     // =========================================================================
 
-    public function getEnabled(): bool
+    public function getEnabled(bool $parse = true): bool|string
     {
-        $enabled = $this->_getSettingValue('enabled');
+        $enabled = $this->_getBooleanSettingValue('enabled', $parse);
 
         // Allow the enabled setting to be a callback function
         if (is_callable($enabled)) {
             return $enabled();
         }
 
-        return $enabled ?? false;
+        return $enabled;
     }
 
     public function getDefaultTemplate(): string
@@ -59,14 +59,21 @@ class Settings extends Model
         return 'knock-knock/ask';
     }
 
+    public function getEnableCpProtection(bool $parse = true): bool|string
+    {
+        return $this->_getBooleanSettingValue('enableCpProtection', $parse);
+    }
+
     public function getTemplate(): string
     {
         return $this->_getSettingValue('template') ?? '';
     }
 
-    public function getPassword(): string
+    public function getPassword(bool $parse = true): string
     {
-        return App::parseEnv($this->_getSettingValue('password')) ?? '';
+        $password = $this->_getSettingValue('password') ?? '';
+
+        return $parse ? App::parseEnv($password) ?? '' : $password;
     }
 
     public function getLoginPath(): string
@@ -134,6 +141,25 @@ class Settings extends Model
         $items = $this->_normalizeList($value);
 
         return array_map(fn($item) => UrlHelper::siteUrl(App::parseEnv($item)), $items);
+    }
+
+    private function _getBooleanSettingValue(string $value, bool $parse = true): bool|string
+    {
+        $setting = $this->_getSettingValue($value);
+
+        if (!$parse) {
+            return $setting ?? false;
+        }
+
+        if (is_bool($setting)) {
+            return $setting;
+        }
+
+        if (is_string($setting)) {
+            return App::parseBooleanEnv($setting) ?? filter_var($setting, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return false;
     }
 
     private function _getSettingValue($value)
