@@ -66,7 +66,7 @@ class Settings extends Model
 
     public function getPassword(): string
     {
-        return $this->_getSettingValue('password') ?? '';
+        return App::parseEnv($this->_getSettingValue('password')) ?? '';
     }
 
     public function getLoginPath(): string
