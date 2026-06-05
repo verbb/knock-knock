@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.6 - 2026-06-05
+
+### Added
+- Add support for environment variables in password and enabled settings, including Control Panel autosuggestions.
+
+### Fixed
+- Fix password comparison timing vulnerability.
+
 ## 3.0.5 - 2025-11-29
 
 ### Changed
