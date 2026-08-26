@@ -40,14 +40,7 @@ class Settings extends Model
 
     public function getEnabled(bool $parse = true): bool|string
     {
-        $enabled = $this->_getBooleanSettingValue('enabled', $parse);
-
-        // Allow the enabled setting to be a callback function
-        if (is_callable($enabled)) {
-            return $enabled();
-        }
-
-        return $enabled;
+        return $this->_getBooleanSettingValue('enabled', $parse);
     }
 
     public function getDefaultTemplate(): string
@@ -146,6 +139,10 @@ class Settings extends Model
     private function _getBooleanSettingValue(string $value, bool $parse = true): bool|string
     {
         $setting = $this->_getSettingValue($value);
+
+        if (is_callable($setting)) {
+            return (bool)$setting();
+        }
 
         if (!$parse) {
             return $setting ?? false;

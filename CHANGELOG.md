@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Fix `enabled` callback functions in config files no longer working after environment variable support was added in 3.0.6. (#83)
+
 ## 3.0.6 - 2026-06-05
 
 ### Added
