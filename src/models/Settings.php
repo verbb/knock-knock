@@ -4,6 +4,7 @@ namespace verbb\knockknock\models;
 use Craft;
 use craft\base\Model;
 use craft\helpers\App;
+use craft\helpers\ConfigHelper;
 use craft\helpers\UrlHelper;
 
 use yii\base\Exception;
@@ -21,6 +22,7 @@ class Settings extends Model
     public string $loginPath = '';
     public string $template = '';
     public string $forcedRedirect = '';
+    public string|int $cookieDuration = 3600;
     public array $siteSettings = [];
     public bool|string $enableCpProtection = false;
 
@@ -72,6 +74,14 @@ class Settings extends Model
     public function getLoginPath(): string
     {
         return $this->_getSettingValue('loginPath') ?? 'knock-knock/who-is-there';
+    }
+
+    public function getCookieDuration(): int
+    {
+        $duration = ConfigHelper::durationInSeconds($this->cookieDuration);
+
+        // A zero duration means a session cookie, which expires when the browser closes
+        return max($duration, 0);
     }
 
     public function getSettingAsMultiline(string $setting): string

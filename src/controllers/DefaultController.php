@@ -86,10 +86,12 @@ class DefaultController extends Controller
         }
 
         if (Craft::$app->getSecurity()->compareString($accessPassword, $password)) {
+            $duration = $settings->getCookieDuration();
+
             $cookie = new Cookie(Craft::cookieConfig([
                 'name' => 'siteAccessToken',
                 'value' => $this->request->csrfToken,
-                'expire' => time() + 3600,
+                'expire' => $duration ? time() + $duration : 0,
             ]));
 
             Craft::$app->getResponse()->getCookies()->add($cookie);

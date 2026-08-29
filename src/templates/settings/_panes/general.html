@@ -46,6 +46,17 @@
     warning: macros.configWarning('loginPath', 'knock-knock'),
 }) }}
 
+{{ forms.textField({
+    label: 'Cookie Duration' | t('knock-knock'),
+    instructions: 'How long a visitor stays logged in for, in seconds, before being asked for the password again. Set to `0` to have access last until the browser is closed.' | t('knock-knock'),
+    id: 'cookieDuration',
+    name: 'cookieDuration',
+    placeholder: '3600',
+    value: settings.cookieDuration,
+    errors: settings.getErrors('cookieDuration'),
+    warning: macros.configWarning('cookieDuration', 'knock-knock'),
+}) }}
+
 {{ forms.autosuggestField({
     label: 'Template' | t('knock-knock'),
     instructions: 'Select a custom template to be shown as the password protected page. Leave empty for the default.' | t('knock-knock'),

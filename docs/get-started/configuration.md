@@ -14,6 +14,7 @@ return [
         'template' => '',
         'forcedRedirect' => '',
         'password' => 'superSecretPassword',
+        'cookieDuration' => 3600,
         'siteSettings' => [],
         'checkInvalidLogins' => false,
         'invalidLoginWindowDuration' => '3600',
@@ -37,6 +38,7 @@ return [
 - `loginPath` - The path to be used when to challenge is shown to the user.
 - `template` - Provide a path to a custom template to be shown instead of the default one.
 - `forcedRedirect` - Provide a URL to be redirected to when logging in. Knock Knock will try and redirect to the referring URL, but you may want to enforce a specific URL to always go to.
+- `cookieDuration` - How long a visitor stays logged in for before being asked for the password again. Accepts a number of seconds, or any duration value Craft supports, like `'P1D'` for a day. Set to `0` for access to last until the visitor closes their browser. Note that this is a fixed expiry from the time of login, not an idle timeout.
 - `siteSettings` - See below on how to configure.
 - `checkInvalidLogins` - Whether to check and log invalid logins. This will lock IP addresses out of the system in certain circumstances, but can help against brute-force logins.
 - `invalidLoginWindowDuration` - The amount of time to track invalid login attempts for an IP, for determining if Knock Knock should lock the IP out.

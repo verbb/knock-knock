@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- Add `cookieDuration` setting to control how long a visitor stays logged in for before being asked for the password again. Previously hard-coded to one hour.
+
 ### Fixed
 - Fix `enabled` callback functions in config files no longer working after environment variable support was added in 3.0.6. (#83)
 

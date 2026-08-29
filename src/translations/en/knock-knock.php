@@ -3,11 +3,13 @@
 return [
   'Allow IPs' => 'Allow IPs',
   'Check Invalid Logins' => 'Check Invalid Logins',
+  'Cookie Duration' => 'Cookie Duration',
   'Custom Login Path' => 'Custom Login Path',
   'Deny IPs' => 'Deny IPs',
   'Enabled' => 'Enabled',
   'Enabled CP Protection' => 'Enabled CP Protection',
   'General Settings' => 'General Settings',
+  'How long a visitor stays logged in for, in seconds, before being asked for the password again. Set to `0` to have access last until the browser is closed.' => 'How long a visitor stays logged in for, in seconds, before being asked for the password again. Set to `0` to have access last until the browser is closed.',
   'Invalid Login Window Duration' => 'Invalid Login Window Duration',
   'Invalid password' => 'Invalid password',
   'Knock Knock' => 'Knock Knock',
