@@ -30,6 +30,7 @@ class DefaultController extends Controller
 
         return $this->renderTemplate('knock-knock/settings', [
             'settings' => $settings,
+            'selectedTab' => Craft::$app->getRequest()->getSegment(3) ?: 'general',
         ]);
     }
 

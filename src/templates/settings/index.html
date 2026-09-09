@@ -1,56 +1,23 @@
-{% extends 'knock-knock/_layouts' %}
+{% extends 'knock-knock/_layouts/settings' %}
+
 {% import '_includes/forms' as forms %}
 {% import 'verbb-base/_macros' as macros %}
 
 {% requireAdmin %}
 
-{% set crumbs = [
-    { label: 'Knock Knock' | t('knock-knock'), url: url('knock-knock/settings') },
-    { label: 'Settings' | t('app'), url: url('knock-knock/settings') },
-] %}
-
-{% set navItems = {
-    'general': { title: 'General Settings' | t('knock-knock') },
-    'urls': { title: 'URLs' | t('knock-knock') },
-    'security': { title: 'Security' | t('knock-knock') },
-} %}
-
-{% set selectedItem = 'general' %}
+{% set selectedTab = selectedTab ?? craft.app.request.getSegment(3) %}
+{% set selectedTab = selectedTab ?: 'general' %}
 {% set fullPageForm = true %}
+{% set pageTabs = {
+    general: { title: 'General Settings' | t('knock-knock'), url: url('knock-knock/settings') },
+    urls: { title: 'URLs' | t('knock-knock'), url: url('knock-knock/settings/urls') },
+    security: { title: 'Security' | t('knock-knock'), url: url('knock-knock/settings/security') },
+} %}
+{% set pageTitle = pageTabs[selectedTab].title ?? pageTabs[selectedTab].heading ?? null %}
+{% if not pageTitle %}{% exit 404 %}{% endif %}
+{% set pageAction = 'plugins/save-plugin-settings' %}
+{% set pageUrl = selectedTab == 'general' ? 'knock-knock/settings' : 'knock-knock/settings/' ~ selectedTab %}
 
-{% block sidebar %}
-    <nav class="knock-settings-tabs" data-vui-tabs>
-        <ul>
-            {% for id, item in navItems %}
-                {% if item.heading is defined %}
-                    <li class="heading"><span>{{ item.heading }}</span></li>
-                {% else %}
-                    <li>
-                        <a id="tab-{{ loop.index }}" href="#tab-{{ id }}" class="tab {% if id == selectedItem %}sel{% endif %}">
-                            {{ item.title }}
-                        </a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </nav>
-{% endblock %}
-
-{% block blockContent %}
-
-<input type="hidden" name="action" value="plugins/save-plugin-settings">
-<input type="hidden" name="pluginHandle" value="knock-knock">
-
-{% for id, item in navItems %}
-    {% if item.title is defined %}
-        <div id="tab-{{ id }}" {% if not loop.first %}class="hidden"{% endif %}>
-            <h2>{{ item.title }}</h2>
-
-            {% namespace 'settings' %}
-                {% include 'knock-knock/settings/_panes/' ~ id ignore missing %}
-            {% endnamespace %}
-        </div>
-    {% endif %}
-{% endfor %}
-
+{% block settingsContent %}
+    {% include 'knock-knock/settings/_panes/' ~ selectedTab ignore missing %}
 {% endblock %}

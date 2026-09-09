@@ -204,6 +204,7 @@ class KnockKnock extends Plugin
         Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES, function(RegisterUrlRulesEvent $event) {
             $event->rules = array_merge($event->rules, [
                 'knock-knock/settings' => 'knock-knock/default/settings',
+                'knock-knock/settings/<settingsNavItem:{handle}>' => 'knock-knock/default/settings',
             ]);
         });
     }

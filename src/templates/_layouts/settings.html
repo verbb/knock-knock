@@ -1,0 +1,27 @@
+{% extends 'verbb-base/_layouts/settings' %}
+
+{% import '_includes/forms' as forms %}
+{% import 'verbb-base/_macros' as macros %}
+
+{% requireAdmin %}
+
+{% set crumbs = [
+    { label: 'Settings' | t('app'), url: url('settings') },
+    { label: 'Plugins' | t('app'), url: url('settings/plugins') },
+    { label: 'Knock Knock' | t('knock-knock'), url: url('knock-knock/settings') },
+] | merge(crumbs ?? []) %}
+
+{% set pageTabs = pageTabs ?? {
+    general: { title: 'General Settings' | t('knock-knock'), url: url('knock-knock/settings') },
+    urls: { title: 'URLs' | t('knock-knock'), url: url('knock-knock/settings/urls') },
+    security: { title: 'Security' | t('knock-knock'), url: url('knock-knock/settings/security') },
+} %}
+
+{% set pageTitle = pageTitle ?? false %}
+{% if title is not defined and pageTitle %}
+    {% set title = pageTitle %}
+{% endif %}
+
+{% block settingsMeta %}
+    {{ hiddenInput('pluginHandle', 'knock-knock') }}
+{% endblock %}

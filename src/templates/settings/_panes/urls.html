@@ -2,7 +2,6 @@
 {% import 'verbb-base/_macros' as macros %}
 
 {{ forms.textAreaField({
-    first: true,
     label: 'Protected URLs' | t('knock-knock'),
     instructions: 'Provide a list of URLs to protect with a password. By default, this will be the entire site. You can use absolute or relative URLs and aliases. Regex is also supported (for example `/some-channel/(.*)`). One URL per line.' | t('knock-knock'),
     rows: 10,
@@ -14,7 +13,6 @@
 }) }}
 
 {{ forms.textAreaField({
-    first: true,
     label: 'Unprotected URLs' | t('knock-knock'),
     instructions: 'Provide a list of URLs to be excluded from password protection. By default, this will be empty. You can use absolute or relative URLs and aliases. Regex is also supported (for example `/some-channel/(.*)`). One URL per line.' | t('knock-knock'),
     rows: 10,
