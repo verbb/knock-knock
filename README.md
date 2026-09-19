@@ -3,6 +3,8 @@
 
 Knock Knock is a Craft CMS plugin to protect your site with a login challenge. It's a fast and easy way to lock down access to your website, without worrying about Apache or Nginx configuration.
 
+Configure how long successful access is remembered, and use environment variables for the password and enabled state when settings need to differ between environments.
+
 ## Documentation
 Visit the [Knock Knock Plugin page](https://verbb.io/craft-plugins/knock-knock) for all documentation, guides, pricing and developer resources.
 
