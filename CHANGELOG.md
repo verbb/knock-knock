@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Fix saving one settings page resetting settings on the other pages. ([#84](https://github.com/verbb/knock-knock/issues/84))
+
 ## 3.0.9 - 2026-09-14
 
 ### Changed

@@ -23,17 +23,6 @@ class DefaultController extends Controller
     // Public Methods
     // =========================================================================
 
-    public function actionSettings(): Response
-    {
-        /* @var Settings $settings */
-        $settings = KnockKnock::$plugin->getSettings();
-
-        return $this->renderTemplate('knock-knock/settings', [
-            'settings' => $settings,
-            'selectedTab' => Craft::$app->getRequest()->getSegment(3) ?: 'general',
-        ]);
-    }
-
     public function actionAsk(): Response
     {
         $data = [];
