@@ -5,6 +5,9 @@
 ### Changed
 - Route plugin settings through the plugin’s authorized settings controller.
 
+### Fixed
+- Fixed a high-severity access control vulnerability.
+
 ## 3.0.10 - 2026-09-23
 
 ### Fixed

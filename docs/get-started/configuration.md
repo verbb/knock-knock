@@ -39,7 +39,7 @@ Whether password protection for the control panel should be enabled. By default,
 
 **Type:** `string` · **Default:** `''`
 
-The password users will need to enter to access the site.
+The password users will need to enter to access the site. Protection fails closed when the effective value is empty, including when an environment variable is missing.
 :::
 
 
@@ -120,7 +120,7 @@ The number of invalid login attempts Knock Knock will allow within the specified
 
 **Type:** `array|string|null` · **Default:** `[]`
 
-Provide IP Addresses that should be exempt from lockouts out automatically.
+Provide IP addresses or CIDR blocks that should bypass the password gate and be exempt from automatic lockouts.
 :::
 
 
@@ -138,7 +138,9 @@ Provide IP Addresses that should be locked out automatically.
 
 **Type:** `bool` · **Default:** `false`
 
-Whether to use the Remote IP address of the user to compare their IP against. If security if your primary concern, consider turning this on. This may not accurately report users behind proxies, so use with caution.
+Whether to use the immediate network peer’s IP address and ignore all forwarded headers. This is the strictest option, but behind a proxy it normally identifies the proxy rather than the visitor.
+
+When this is disabled, Knock Knock still uses the direct peer unless it matches a concrete proxy IP address or CIDR in Craft’s `trustedHosts` setting and the forwarded header is permitted by that proxy entry and Craft’s `ipHeaders` setting. Craft’s default `trustedHosts` value of `any` is not treated as a trusted proxy boundary for password-gate access.
 :::
 
 
@@ -147,7 +149,7 @@ Whether to use the Remote IP address of the user to compare their IP against. If
 
 **Type:** `array|string|null` · **Default:** `[]`
 
-A list of specific URLs to only protect. Regex is also supported (for example `/some-channel/(.*)`).
+A list of specific request paths to protect. Query strings are ignored, and exact paths are compared without leading or trailing slashes. An absolute entry must belong to the current site; its scheme and host are then removed before matching. Entries containing `(` retain the existing case-insensitive regex behavior (for example `/some-channel/(.*)`).
 :::
 
 
@@ -156,7 +158,7 @@ A list of specific URLs to only protect. Regex is also supported (for example `/
 
 **Type:** `array|string|null` · **Default:** `[]`
 
-A list of specific URLs to not protect. Regex is also supported (for example `/some-channel/(.*)`).
+A list of specific request paths to leave unprotected. Query strings are ignored, and exact paths are compared without leading or trailing slashes. An absolute entry must belong to the current site; its scheme and host are then removed before matching. Entries containing `(` retain the existing case-insensitive regex behavior (for example `/some-channel/(.*)`).
 :::
 
 

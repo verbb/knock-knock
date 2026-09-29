@@ -10,6 +10,8 @@ use Craft;
 use craft\web\Controller;
 
 use yii\web\Cookie;
+use yii\web\HttpException;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class DefaultController extends Controller
@@ -51,11 +53,22 @@ class DefaultController extends Controller
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
+        if (!$settings->getEnabled()) {
+            throw new NotFoundHttpException();
+        }
+
+        $accessPassword = $settings->getPassword();
+
+        if ($accessPassword === '') {
+            Craft::warning('Knock Knock refused an access attempt because the effective password is empty.', __METHOD__);
+
+            throw new HttpException(503);
+        }
+
         $template = $this->_getTemplate($settings->getDefaultTemplate(), $settings->getTemplate());
-        $ipAddress = Craft::$app->getRequest()->getRemoteIP();
+        $ipAddress = IpHelper::getUserIp();
 
         $password = $this->request->getParam('password', '');
-        $accessPassword = $settings->getPassword();
 
         if (!is_string($password)) {
             $password = '';

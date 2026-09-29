@@ -5,7 +5,6 @@ use Craft;
 use craft\base\Model;
 use craft\helpers\App;
 use craft\helpers\ConfigHelper;
-use craft\helpers\UrlHelper;
 
 use yii\base\Exception;
 
@@ -143,7 +142,7 @@ class Settings extends Model
     {
         $items = $this->_normalizeList($value);
 
-        return array_map(fn($item) => UrlHelper::siteUrl(App::parseEnv($item)), $items);
+        return array_values(array_filter(array_map(fn($item) => App::parseEnv($item), $items), 'is_string'));
     }
 
     private function _getBooleanSettingValue(string $value, bool $parse = true): bool|string

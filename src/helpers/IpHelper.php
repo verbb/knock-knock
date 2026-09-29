@@ -1,9 +1,12 @@
 <?php
 namespace verbb\knockknock\helpers;
 
-use Craft;
-
 use verbb\knockknock\KnockKnock;
+
+use Craft;
+use craft\web\Request;
+
+use yii\validators\IpValidator;
 
 class IpHelper
 {
@@ -17,18 +20,11 @@ class IpHelper
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
-        $ipAddress = $request->getUserIP();
-
         if ($settings->useRemoteIp) {
-            $ipAddress = $request->getRemoteIP();
+            return $request->getRemoteIP() ?? '';
         }
 
-        // Check for CloudFlare IP
-        if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-            $ipAddress = $_SERVER['HTTP_CF_CONNECTING_IP'];
-        }
-
-        return $ipAddress;
+        return self::_getTrustedClientIp($request);
     }
 
     /**
@@ -124,5 +120,102 @@ class IpHelper
         }
 
         return $binaryip;
+    }
+
+    /**
+     * Forwarded addresses are accepted only from a concrete proxy range that also permits the header.
+     */
+    private static function _getTrustedClientIp(Request $request): string
+    {
+        $remoteIp = $request->getRemoteIP();
+
+        if (!$remoteIp) {
+            return '';
+        }
+
+        $trustedHeaders = self::_trustedHeadersForPeer($request, $remoteIp);
+
+        foreach ($request->ipHeaders as $header) {
+            if (!in_array(mb_strtolower($header), $trustedHeaders, true)) {
+                continue;
+            }
+
+            $value = $request->getHeaders()->get($header);
+
+            if (is_string($value) && ($clientIp = self::_clientIpFromHeader($value, $request->trustedHosts))) {
+                return $clientIp;
+            }
+        }
+
+        return $remoteIp;
+    }
+
+    private static function _trustedHeadersForPeer(Request $request, string $remoteIp): array
+    {
+        $validator = new IpValidator();
+
+        foreach ($request->trustedHosts as $cidr => $headers) {
+            if (!is_array($headers)) {
+                $cidr = $headers;
+                $headers = $request->secureHeaders;
+            }
+
+            // Universal ranges, including Craft's default `any`, are not an explicit proxy boundary.
+            if (!self::_isConcreteTrustedRange($cidr)) {
+                continue;
+            }
+
+            $validator->setRanges($cidr);
+
+            if ($validator->validate($remoteIp)) {
+                return array_map('mb_strtolower', $headers);
+            }
+        }
+
+        return [];
+    }
+
+    private static function _clientIpFromHeader(string $value, array $trustedHosts): ?string
+    {
+        $ips = preg_split('/\s*,\s*/', trim($value), -1, PREG_SPLIT_NO_EMPTY);
+
+        if (!$ips) {
+            return null;
+        }
+
+        $trustedRanges = [];
+
+        foreach ($trustedHosts as $cidr => $headers) {
+            $range = is_array($headers) ? $cidr : $headers;
+
+            if (self::_isConcreteTrustedRange($range)) {
+                $trustedRanges[] = $range;
+            }
+        }
+
+        $validator = new IpValidator();
+        $clientIp = null;
+
+        foreach (array_reverse($ips) as $ip) {
+            $ip = trim($ip);
+
+            if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
+                break;
+            }
+
+            $clientIp = $ip;
+            $validator->setRanges($trustedRanges);
+
+            if (!$trustedRanges || !$validator->validate($ip)) {
+                break;
+            }
+        }
+
+        return $clientIp;
+    }
+
+    private static function _isConcreteTrustedRange(mixed $range): bool
+    {
+        return is_string($range) && !in_array(mb_strtolower(trim($range)), ['*', 'any', 'ipv4', 'ipv6', '0.0.0.0/0', '::/0'], true);
     }
 }

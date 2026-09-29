@@ -16,8 +16,6 @@ use craft\web\UrlManager;
 
 use yii\base\Event;
 
-use Throwable;
-
 class KnockKnock extends Plugin
 {
     // Properties
@@ -109,13 +107,18 @@ class KnockKnock extends Plugin
             }
         }
 
-        // Normalise the URLs a little, just in case to prevent infinite loops
         $url = $request->getAbsoluteUrl();
+        $currentPath = $this->_normalizePath($request->getPathInfo());
         $cookie = $request->getCookies()->get('siteAccessToken');
-        $loginPath = UrlHelper::siteUrl($settings->getLoginPath());
+        $loginPath = $this->_normalizePath($settings->getLoginPath());
 
-        // Check for the site access cookie, and check we're not causing a loop
-        if ($cookie != '' || stripos($url, $loginPath) !== false) {
+        // The challenge route must remain reachable, but its URL in a query string grants nothing.
+        if ($currentPath === $loginPath) {
+            return;
+        }
+
+        // An empty effective password cannot make an existing bare cookie authoritative.
+        if ($settings->getPassword() !== '' && $cookie != '') {
             return;
         }
 
@@ -128,64 +131,14 @@ class KnockKnock extends Plugin
 
         // Check if the requested URL is explicitly unprotected. If yes, allow the request.
         if ($settings->getUnprotectedUrls()) {
-            $match = false;
-            $currentUrl = UrlHelper::stripQueryString($url);
-
-            foreach ($settings->getUnprotectedUrls() as $unprotectedUrl) {
-                // See if the URL matches exactly (without query string)
-                if ($currentUrl === $unprotectedUrl) {
-                    $match = true;
-
-                    break;
-                }
-
-                // See if it matches a Regex patten
-                if (strstr($unprotectedUrl, '(')) {
-                    try {
-                        if (preg_match('`' . $unprotectedUrl . '`i', $currentUrl) === 1) {
-                            $match = true;
-
-                            break;
-                        }
-                    } catch (Throwable) {
-                        continue;
-                    }
-                }
-            }
-
-            if ($match) {
+            if ($this->_matchesUrlRules($currentPath, $settings->getUnprotectedUrls())) {
                 return;
             }
         }
 
         // Check to see if we're watching only specific URLs. By default, protect everything though
         if ($settings->getProtectedUrls()) {
-            $noMatch = true;
-            $currentUrl = UrlHelper::stripQueryString($url);
-
-            foreach ($settings->getProtectedUrls() as $protectedUrl) {
-                // See if the URL matches exactly (without query string)
-                if ($currentUrl === $protectedUrl) {
-                    $noMatch = false;
-
-                    break;
-                }
-
-                // See if it matches a Regex patten
-                if (strstr($protectedUrl, '(')) {
-                    try {
-                        if (preg_match('`' . $protectedUrl . '`i', $currentUrl) === 1) {
-                            $noMatch = false;
-
-                            break;
-                        }
-                    } catch (Throwable) {
-                        continue;
-                    }
-                }
-            }
-
-            if ($noMatch) {
+            if (!$this->_matchesUrlRules($currentPath, $settings->getProtectedUrls())) {
                 return;
             }
         }
@@ -195,8 +148,64 @@ class KnockKnock extends Plugin
         }
 
         Craft::$app->getResponse()->setNoCacheHeaders();
-        Craft::$app->getResponse()->redirect($loginPath);
+        Craft::$app->getResponse()->redirect(UrlHelper::siteUrl($settings->getLoginPath()));
         Craft::$app->end();
+    }
+
+    private function _matchesUrlRules(string $currentPath, array $rules): bool
+    {
+        foreach ($rules as $rule) {
+            if (!$this->_ruleBelongsToCurrentSite($rule)) {
+                continue;
+            }
+
+            $rulePath = $this->_normalizePath($rule, true);
+
+            if ($currentPath === $rulePath) {
+                return true;
+            }
+
+            // Preserve the plugin's established convention that rules containing `(` are regexes.
+            if (str_contains($rulePath, '(') && @preg_match('`' . $rulePath . '`i', $currentPath) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function _ruleBelongsToCurrentSite(string $rule): bool
+    {
+        $ruleHost = parse_url($rule, PHP_URL_HOST);
+
+        if ($ruleHost === null) {
+            return true;
+        }
+
+        $siteHost = parse_url(UrlHelper::siteUrl(), PHP_URL_HOST);
+
+        return is_string($siteHost) && strcasecmp($ruleHost, $siteHost) === 0;
+    }
+
+    private function _normalizePath(string $url, bool $relativeToSite = false): string
+    {
+        $path = parse_url($url, PHP_URL_PATH);
+
+        if (!is_string($path)) {
+            $path = $url;
+        }
+
+        $path = trim(rawurldecode($path), '/');
+
+        if ($relativeToSite && parse_url($url, PHP_URL_HOST) !== null) {
+            $sitePath = trim((string)parse_url(UrlHelper::siteUrl(), PHP_URL_PATH), '/');
+
+            if ($sitePath !== '' && ($path === $sitePath || str_starts_with($path, $sitePath . '/'))) {
+                $path = ltrim(substr($path, strlen($sitePath)), '/');
+            }
+        }
+
+        return $path;
     }
 
     private function _registerCpRoutes(): void
