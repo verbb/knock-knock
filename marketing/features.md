@@ -7,7 +7,7 @@ Knock Knock places a simple shared-password gate in front of a Craft site. Prote
 
 Visitors enter one project password before accessing protected pages. Successful access is remembered for the configured period, making the gate useful for client review without creating and maintaining individual Craft accounts.
 
-![Knock Knock’s Site locked screen with a password field and Unlock button.](../screenshots/output/feature-tour/knock-knock-gate-craft5.png)
+![Knock Knock’s Site locked screen with a password field and Unlock button.](../screenshots/knock-knock-gate-craft5.png)
 <!-- feature-section-end -->
 
 <!-- feature-grid -->
