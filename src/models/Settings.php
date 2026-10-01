@@ -31,7 +31,7 @@ class Settings extends Model
     public array|string|null $allowIps = [];
     public array|string|null $denyIps = [];
     public bool $useRemoteIp = false;
-    
+
     public array|string|null $protectedUrls = [];
     public array|string|null $unprotectedUrls = [];
 
@@ -127,7 +127,7 @@ class Settings extends Model
             if (count($value) === 1 && is_string($value[0]) && str_contains($value[0], "\n")) {
                 return array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $value[0])));
             }
-            
+
             return array_filter($value);
         }
 

@@ -44,7 +44,7 @@ class KnockKnock extends Plugin
         if (Craft::$app->getRequest()->getIsSiteRequest()) {
             $this->_registerSiteRoutes();
         }
-        
+
         if (Craft::$app->getRequest()->getIsCpRequest()) {
             $this->_registerCpRoutes();
         }
