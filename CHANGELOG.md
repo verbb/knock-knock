@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Fixed a high-severity access control vulnerability.
+
 ## 3.0.11 - 2026-09-30
 
 ### Changed

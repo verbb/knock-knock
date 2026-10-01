@@ -9,10 +9,12 @@ use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
 use craft\events\RegisterUrlRulesEvent;
+use craft\events\TemplateEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Plugins;
 use craft\web\Application;
 use craft\web\UrlManager;
+use craft\web\View;
 
 use yii\base\Event;
 
@@ -24,6 +26,8 @@ class KnockKnock extends Plugin
     public bool $hasCpSettings = true;
     public string $schemaVersion = '1.1.1';
     public string $minVersionRequired = '1.2.16';
+
+    private bool $_testAccessAfterAction = false;
 
 
     // Traits
@@ -43,6 +47,7 @@ class KnockKnock extends Plugin
 
         if (Craft::$app->getRequest()->getIsSiteRequest()) {
             $this->_registerSiteRoutes();
+            $this->_registerSiteEvents();
         }
 
         if (Craft::$app->getRequest()->getIsCpRequest()) {
@@ -73,7 +78,7 @@ class KnockKnock extends Plugin
     // Private Methods
     // =========================================================================
 
-    private function _testAccess(): void
+    private function _testAccess(bool $allowActionRequests = true): void
     {
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
@@ -87,8 +92,15 @@ class KnockKnock extends Plugin
         $user = Craft::$app->getUser()->getIdentity();
         $token = $request->getToken();
 
-        // Console and action requests are excluded, as well as for cross-site preview tokens
-        if ($request->getIsConsoleRequest() || $request->getIsActionRequest() || $token !== null) {
+        // Console requests and cross-site preview tokens remain outside the gate.
+        if ($request->getIsConsoleRequest() || $token !== null) {
+            return;
+        }
+
+        // Action responses stay available, but a later site-page render must run the gate again.
+        if ($allowActionRequests && $request->getIsActionRequest()) {
+            $this->_testAccessAfterAction = true;
+
             return;
         }
 
@@ -112,8 +124,8 @@ class KnockKnock extends Plugin
         $cookie = $request->getCookies()->get('siteAccessToken');
         $loginPath = $this->_normalizePath($settings->getLoginPath());
 
-        // The challenge route must remain reachable, but its URL in a query string grants nothing.
-        if ($currentPath === $loginPath) {
+        // Challenge and account routes remain reachable, but their URL in a query string grants nothing.
+        if ($currentPath === $loginPath || $this->_isCraftAccountPath($currentPath)) {
             return;
         }
 
@@ -167,6 +179,24 @@ class KnockKnock extends Plugin
 
             // Preserve the plugin's established convention that rules containing `(` are regexes.
             if (str_contains($rulePath, '(') && @preg_match('`' . $rulePath . '`i', $currentPath) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function _isCraftAccountPath(string $currentPath): bool
+    {
+        $generalConfig = Craft::$app->getConfig()->getGeneral();
+        $paths = [
+            $generalConfig->getLoginPath(),
+            $generalConfig->getSetPasswordPath(),
+            $generalConfig->getVerifyEmailPath(),
+        ];
+
+        foreach ($paths as $path) {
+            if (is_string($path) && $currentPath === $this->_normalizePath($path)) {
                 return true;
             }
         }
@@ -228,6 +258,19 @@ class KnockKnock extends Plugin
             $event->rules = array_merge($event->rules, [
                 $loginPath => 'knock-knock/default/ask',
             ]);
+        });
+    }
+
+    private function _registerSiteEvents(): void
+    {
+        Event::on(View::class, View::EVENT_BEFORE_RENDER_PAGE_TEMPLATE, function(TemplateEvent $event) {
+            if (!$this->_testAccessAfterAction || $event->templateMode !== View::TEMPLATE_MODE_SITE) {
+                return;
+            }
+
+            // Consume the deferred check before enforcement so nested rendering cannot repeat it.
+            $this->_testAccessAfterAction = false;
+            $this->_testAccess(false);
         });
     }
 }
