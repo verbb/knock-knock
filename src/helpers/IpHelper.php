@@ -54,6 +54,10 @@ class IpHelper
 
             $netBits = self::_ipToBits($net);
 
+            if ($netBits === false || strlen($netBits) !== strlen($ipBits)) {
+                continue;
+            }
+
             if (!empty($maskbits)) {
                 $ipNetBits = substr($ipNetBits, 0, $maskbits);
                 $netBits = substr($netBits, 0, $maskbits);
