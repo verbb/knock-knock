@@ -75,7 +75,7 @@ Provide a URL to be redirected to after the password is accepted. By default, Kn
 
 **Type:** `string|int` · **Default:** `3600`
 
-How long a visitor stays logged in for before being asked for the password again. Accepts a number of seconds, or any duration value Craft supports, like `'P1D'` for a day. Set to `0` for access to last until the visitor closes their browser. Note that this is a fixed expiry from the time of login, not an idle timeout.
+How long a visitor stays logged in for before being asked for the password again. Accepts a number of seconds, or any duration value Craft supports, like `'P1D'` for a day. Set to `0` for access to last until the visitor closes their browser. This is a fixed expiry from the time of login, not an idle timeout. Changing the duration or effective password invalidates existing access.
 :::
 
 
@@ -190,6 +190,8 @@ return [
 ```
 
 If you keep the top level `enabled`, `password`, etc settings, they'll override your settings for each site.
+
+Access is remembered independently for each site. Visitors must pass each site's gate separately, even when multiple sites use the same global password.
 
 ## Control Panel
 You can also manage configuration settings through the Control Panel by visiting Settings → Knock Knock.

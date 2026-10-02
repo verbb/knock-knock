@@ -2,6 +2,7 @@
 namespace verbb\knockknock;
 
 use verbb\knockknock\base\PluginTrait;
+use verbb\knockknock\helpers\AccessTokenHelper;
 use verbb\knockknock\helpers\IpHelper;
 use verbb\knockknock\helpers\ReturnUrlHelper;
 use verbb\knockknock\models\Settings;
@@ -121,7 +122,6 @@ class KnockKnock extends Plugin
         }
 
         $currentPath = $this->_normalizePath($request->getPathInfo());
-        $cookie = $request->getCookies()->get('siteAccessToken');
         $loginPath = $this->_normalizePath($settings->getLoginPath());
 
         // Challenge and account routes remain reachable, but their URL in a query string grants nothing.
@@ -129,8 +129,9 @@ class KnockKnock extends Plugin
             return;
         }
 
-        // An empty effective password cannot make an existing bare cookie authoritative.
-        if ($settings->getPassword() !== '' && $cookie != '') {
+        $accessPassword = $settings->getPassword();
+
+        if ($accessPassword !== '' && AccessTokenHelper::validate($accessPassword, $settings->getCookieDuration())) {
             return;
         }
 

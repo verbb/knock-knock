@@ -2,6 +2,7 @@
 namespace verbb\knockknock\controllers;
 
 use verbb\knockknock\KnockKnock;
+use verbb\knockknock\helpers\AccessTokenHelper;
 use verbb\knockknock\helpers\IpHelper;
 use verbb\knockknock\helpers\ReturnUrlHelper;
 use verbb\knockknock\models\Login;
@@ -84,8 +85,8 @@ class DefaultController extends Controller
             $duration = $settings->getCookieDuration();
 
             $cookie = new Cookie(Craft::cookieConfig([
-                'name' => 'siteAccessToken',
-                'value' => $this->request->csrfToken,
+                'name' => AccessTokenHelper::getCookieName(),
+                'value' => AccessTokenHelper::create($accessPassword, $duration),
                 'expire' => $duration ? time() + $duration : 0,
             ]));
 
