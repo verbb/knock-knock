@@ -1,5 +1,5 @@
 <?php
-namespace verbb\knockknock\assetbundles;
+namespace verbb\knockknock\web\assets\frontend;
 
 use Craft;
 use craft\web\AssetBundle;
@@ -11,12 +11,12 @@ class FrontEndAsset extends AssetBundle
 
     public function init(): void
     {
-        $this->sourcePath = '@verbb/knockknock/resources/dist';
+        $this->sourcePath = '@verbb/knockknock/web/assets/frontend/dist';
 
-        // No longer required in Craft 5.6, due to front-end styles
+        // Craft 5.6 includes these front-end styles itself.
         if (version_compare(Craft::$app->getInfo()->version, '5.6.0', '<')) {
             $this->css = [
-                'css/knock-knock.css',
+                'knock-knock.css',
             ];
         }
 

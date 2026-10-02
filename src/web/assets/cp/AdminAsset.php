@@ -1,10 +1,10 @@
 <?php
-namespace verbb\knockknock\assetbundles;
+namespace verbb\knockknock\web\assets\cp;
 
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
 
-use verbb\base\assetbundles\CpAsset as VerbbCpAsset;
+use verbb\base\web\assets\cp\CpAsset as VerbbCpAsset;
 
 class AdminAsset extends AssetBundle
 {
@@ -13,8 +13,6 @@ class AdminAsset extends AssetBundle
 
     public function init(): void
     {
-        $this->sourcePath = "@verbb/knockknock/resources/dist";
-
         $this->depends = [
             VerbbCpAsset::class,
             CpAsset::class,
