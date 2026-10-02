@@ -3,6 +3,7 @@ namespace verbb\knockknock\controllers;
 
 use verbb\knockknock\KnockKnock;
 use verbb\knockknock\helpers\IpHelper;
+use verbb\knockknock\helpers\ReturnUrlHelper;
 use verbb\knockknock\models\Login;
 use verbb\knockknock\models\Settings;
 
@@ -34,14 +35,7 @@ class DefaultController extends Controller
 
         $template = $this->_getTemplate($settings->getDefaultTemplate(), $settings->getTemplate());
 
-        $redirect = Craft::$app->getCache()->get('knockknock-redirect');
-
-        $data['redirect'] = $redirect ?? '/';
-
-        // Allow config to override everything
-        if ($settings->forcedRedirect) {
-            $data['redirect'] = $settings->forcedRedirect;
-        }
+        $data['redirect'] = $this->_getRedirect($settings);
 
         return $this->renderTemplate($template, $data);
     }
@@ -74,14 +68,12 @@ class DefaultController extends Controller
             $password = '';
         }
 
-        Craft::$app->getCache()->set('knockknock-redirect', null);
-
         // Check for lockout
         if (Craft::$app->getConfig()->getGeneral()->storeUserIps && $settings->checkInvalidLogins) {
             $hasLockout = KnockKnock::$plugin->getLogins()->checkLockout($ipAddress);
 
             if ($hasLockout) {
-                $data['redirect'] = $this->request->getValidatedBodyParam('redirect');
+                $data['redirect'] = $this->_getRedirect($settings);
                 $data['errors']['password'] = Craft::t('knock-knock', 'Too many invalid attempts');
 
                 return $this->renderTemplate($template, $data);
@@ -100,10 +92,14 @@ class DefaultController extends Controller
             Craft::$app->getResponse()->getCookies()->add($cookie);
             Craft::$app->getResponse()->setNoCacheHeaders();
 
-            return $this->redirect($this->request->getValidatedBodyParam('redirect'));
+            $redirect = $this->_getRedirect($settings);
+
+            ReturnUrlHelper::forget();
+
+            return $this->redirect($redirect);
         }
 
-        $data['redirect'] = $this->request->getValidatedBodyParam('redirect');
+        $data['redirect'] = $this->_getRedirect($settings);
         $data['errors']['password'] = Craft::t('knock-knock', 'Invalid password');
 
         // Log this login to the database
@@ -124,6 +120,11 @@ class DefaultController extends Controller
 
     // Private Methods
     // =========================================================================
+
+    private function _getRedirect(Settings $settings): string
+    {
+        return $settings->forcedRedirect ?: ReturnUrlHelper::get();
+    }
 
     private function _getTemplate($defaultTemplate, $template = ''): string
     {

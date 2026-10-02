@@ -17,7 +17,6 @@
                 'accept-charset': 'UTF-8',
             } %}
                 {{ actionInput('knock-knock/default/answer') }}
-                {{ redirectInput(redirect) }}
                 {{ csrfInput() }}
 
                 <h1 class="kk-h1">{{ 'Site locked' | t('knock-knock') }}</h1>

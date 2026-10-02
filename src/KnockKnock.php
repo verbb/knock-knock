@@ -3,6 +3,7 @@ namespace verbb\knockknock;
 
 use verbb\knockknock\base\PluginTrait;
 use verbb\knockknock\helpers\IpHelper;
+use verbb\knockknock\helpers\ReturnUrlHelper;
 use verbb\knockknock\models\Settings;
 
 use Craft;
@@ -119,7 +120,6 @@ class KnockKnock extends Plugin
             }
         }
 
-        $url = $request->getAbsoluteUrl();
         $currentPath = $this->_normalizePath($request->getPathInfo());
         $cookie = $request->getCookies()->get('siteAccessToken');
         $loginPath = $this->_normalizePath($settings->getLoginPath());
@@ -156,7 +156,7 @@ class KnockKnock extends Plugin
         }
 
         if ($request->getIsSiteRequest()) {
-            Craft::$app->getCache()->set('knockknock-redirect', $url);
+            ReturnUrlHelper::store($request->getUrl());
         }
 
         Craft::$app->getResponse()->setNoCacheHeaders();

@@ -23,7 +23,6 @@ Using the `template` [configuration setting](docs:get-started/configuration), yo
 ```twig
 <form method="post" accept-charset="utf-8">
     <input type="hidden" name="action" value="knock-knock/default/answer">
-    <input type="hidden" name="redirect" value="{{ redirect | hash }}">
     {{ csrfInput() }}
 
     <label for="password">Password</label>
@@ -41,4 +40,4 @@ Using the `template` [configuration setting](docs:get-started/configuration), yo
 </form>
 ```
 
-You can also look at the template Knock Knock itself uses [here](https://github.com/verbb/knock-knock/blob/craft-5/src/templates/ask.html). When using a custom template, be mindful to include all the provided `<input>` elements, taking note of the `name` attributes for each. Otherwise, you have complete control over the look and feel of this form.
+You can also look at the template Knock Knock itself uses [here](https://github.com/verbb/knock-knock/blob/craft-5/src/templates/ask.html). When using a custom template, include the action and CSRF inputs shown above, and keep the password field’s `name` attribute. Knock Knock tracks the destination server-side, so a redirect input is not required. Otherwise, you have complete control over the look and feel of this form.

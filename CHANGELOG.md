@@ -8,6 +8,7 @@
 
 ### Fixed
 - Fixed a high-severity access control vulnerability.
+- Fixed a medium-severity open redirect vulnerability.
 
 ## 3.0.11 - 2026-09-30
 

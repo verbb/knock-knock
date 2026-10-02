@@ -66,7 +66,7 @@ Provide a path to a custom template to be shown instead of the default one.
 
 **Type:** `string` · **Default:** `''`
 
-Provide a URL to be redirected to when logging in. Knock Knock will try and redirect to the referring URL, but you may want to enforce a specific URL to always go to.
+Provide a URL to be redirected to after the password is accepted. By default, Knock Knock returns each visitor to the protected page they originally requested, but you may want to enforce a specific destination instead.
 :::
 
 
