@@ -8,6 +8,7 @@
 
 ### Fixed
 - Fixed a high-severity access control vulnerability.
+- Fixed a medium-severity cross-site request forgery vulnerability affecting password-gate lockouts.
 - Fixed a medium-severity open redirect vulnerability.
 - Fixed a medium-severity access control vulnerability affecting protected URL matching.
 - Fixed a medium-severity access control vulnerability affecting access cookies.

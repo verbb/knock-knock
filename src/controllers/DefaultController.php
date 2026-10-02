@@ -43,6 +43,8 @@ class DefaultController extends Controller
 
     public function actionAnswer(): Response
     {
+        $this->requirePostRequest();
+
         $data = [];
 
         /* @var Settings $settings */
@@ -63,7 +65,7 @@ class DefaultController extends Controller
         $template = $this->_getTemplate($settings->getDefaultTemplate(), $settings->getTemplate());
         $ipAddress = IpHelper::getUserIp();
 
-        $password = $this->request->getParam('password', '');
+        $password = $this->request->getBodyParam('password', '');
 
         if (!is_string($password)) {
             $password = '';
