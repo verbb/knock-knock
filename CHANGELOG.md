@@ -9,6 +9,7 @@
 ### Fixed
 - Fixed a high-severity access control vulnerability.
 - Fixed a medium-severity open redirect vulnerability.
+- Fixed a medium-severity access control vulnerability affecting protected URL matching.
 
 ## 3.0.11 - 2026-09-30
 

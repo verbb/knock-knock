@@ -149,7 +149,7 @@ When this is disabled, Knock Knock still uses the direct peer unless it matches 
 
 **Type:** `array|string|null` · **Default:** `[]`
 
-A list of specific request paths to protect. Query strings are ignored, and exact paths are compared without leading or trailing slashes. An absolute entry must belong to the current site; its scheme and host are then removed before matching. Entries containing `(` retain the existing case-insensitive regex behavior (for example `/some-channel/(.*)`).
+A list of specific request paths to protect. Query strings are ignored, and exact paths are compared case-insensitively without leading or trailing slashes. An absolute entry must belong to the current site; its scheme and host are then removed before matching. Entries containing `(` retain the existing case-insensitive regex behavior (for example `/some-channel/(.*)`).
 :::
 
 
@@ -158,7 +158,7 @@ A list of specific request paths to protect. Query strings are ignored, and exac
 
 **Type:** `array|string|null` · **Default:** `[]`
 
-A list of specific request paths to leave unprotected. Query strings are ignored, and exact paths are compared without leading or trailing slashes. An absolute entry must belong to the current site; its scheme and host are then removed before matching. Entries containing `(` retain the existing case-insensitive regex behavior (for example `/some-channel/(.*)`).
+A list of specific request paths to leave unprotected. Query strings are ignored, and exact paths are compared case-sensitively without leading or trailing slashes. An absolute entry must belong to the current site; its scheme and host are then removed before matching. Entries containing `(` retain the existing case-insensitive regex behavior (for example `/some-channel/(.*)`).
 :::
 
 

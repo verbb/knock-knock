@@ -150,7 +150,7 @@ class KnockKnock extends Plugin
 
         // Check to see if we're watching only specific URLs. By default, protect everything though
         if ($settings->getProtectedUrls()) {
-            if (!$this->_matchesUrlRules($currentPath, $settings->getProtectedUrls())) {
+            if (!$this->_matchesUrlRules($currentPath, $settings->getProtectedUrls(), true)) {
                 return;
             }
         }
@@ -164,8 +164,10 @@ class KnockKnock extends Plugin
         Craft::$app->end();
     }
 
-    private function _matchesUrlRules(string $currentPath, array $rules): bool
+    private function _matchesUrlRules(string $currentPath, array $rules, bool $caseInsensitive = false): bool
     {
+        $elementIds = [];
+
         foreach ($rules as $rule) {
             if (!$this->_ruleBelongsToCurrentSite($rule)) {
                 continue;
@@ -173,17 +175,53 @@ class KnockKnock extends Plugin
 
             $rulePath = $this->_normalizePath($rule, true);
 
-            if ($currentPath === $rulePath) {
+            if ($currentPath === $rulePath || ($caseInsensitive && mb_strtolower($currentPath) === mb_strtolower($rulePath))) {
                 return true;
             }
 
             // Preserve the plugin's established convention that rules containing `(` are regexes.
-            if (str_contains($rulePath, '(') && @preg_match('`' . $rulePath . '`i', $currentPath) === 1) {
+            if (str_contains($rulePath, '(')) {
+                if (@preg_match('`' . $rulePath . '`i', $currentPath) === 1) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if ($caseInsensitive && $this->_pathsResolveToSameElement($currentPath, $rulePath, $elementIds)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private function _pathsResolveToSameElement(string $currentPath, string $rulePath, array &$elementIds): bool
+    {
+        // MySQL's default Craft collations can treat more than letter case as equivalent.
+        if (!Craft::$app->getDb()->getIsMysql()) {
+            return false;
+        }
+
+        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        $currentElementId = $this->_elementIdForPath($currentPath, $siteId, $elementIds);
+
+        if (!$currentElementId) {
+            return false;
+        }
+
+        $ruleElementId = $this->_elementIdForPath($rulePath, $siteId, $elementIds);
+
+        return $currentElementId === $ruleElementId;
+    }
+
+    private function _elementIdForPath(string $path, int $siteId, array &$elementIds): ?int
+    {
+        if (!array_key_exists($path, $elementIds)) {
+            $elementIds[$path] = Craft::$app->getElements()->getElementByUri($path, $siteId, true)?->id;
+        }
+
+        return $elementIds[$path];
     }
 
     private function _isCraftAccountPath(string $currentPath): bool
