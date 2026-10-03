@@ -64,6 +64,7 @@ class DefaultController extends Controller
 
         $template = $this->_getTemplate($settings->getDefaultTemplate(), $settings->getTemplate());
         $ipAddress = IpHelper::getUserIp();
+        $ipAccessStatus = IpHelper::getAccessStatus($ipAddress, $settings->getAllowIps(), $settings->getDenyIps());
 
         $password = $this->request->getBodyParam('password', '');
 
@@ -71,16 +72,18 @@ class DefaultController extends Controller
             $password = '';
         }
 
-        // Check for lockout
-        if (Craft::$app->getConfig()->getGeneral()->storeUserIps && $settings->checkInvalidLogins) {
+        $hasLockout = $ipAccessStatus === IpHelper::ACCESS_DENIED;
+
+        // Check dynamic lockouts only when no static IP policy applies.
+        if ($ipAccessStatus === IpHelper::ACCESS_NEUTRAL && Craft::$app->getConfig()->getGeneral()->storeUserIps && $settings->checkInvalidLogins) {
             $hasLockout = KnockKnock::$plugin->getLogins()->checkLockout($ipAddress);
+        }
 
-            if ($hasLockout) {
-                $data['redirect'] = $this->_getRedirect($settings);
-                $data['errors']['password'] = Craft::t('knock-knock', 'Too many invalid attempts');
+        if ($hasLockout) {
+            $data['redirect'] = $this->_getRedirect($settings);
+            $data['errors']['password'] = Craft::t('knock-knock', 'Too many invalid attempts');
 
-                return $this->renderTemplate($template, $data);
-            }
+            return $this->renderTemplate($template, $data);
         }
 
         if (Craft::$app->getSecurity()->compareString($accessPassword, $password)) {

@@ -137,16 +137,16 @@ class KnockKnock extends Plugin
             return;
         }
 
-        $accessPassword = $settings->getPassword();
+        $ipAddress = IpHelper::getUserIp();
+        $ipAccessStatus = IpHelper::getAccessStatus($ipAddress, $settings->getAllowIps(), $settings->getDenyIps());
 
-        if ($accessPassword !== '' && AccessTokenHelper::validate($accessPassword, $settings->getCookieDuration())) {
+        if ($ipAccessStatus === IpHelper::ACCESS_ALLOWED) {
             return;
         }
 
-        $ipAddress = IpHelper::getUserIp();
+        $accessPassword = $settings->getPassword();
 
-        // Check if this IP is in the exclusion list
-        if (IpHelper::ipInCidrList($ipAddress, $settings->getAllowIps())) {
+        if ($ipAccessStatus !== IpHelper::ACCESS_DENIED && $accessPassword !== '' && AccessTokenHelper::validate($accessPassword, $settings->getCookieDuration())) {
             return;
         }
 

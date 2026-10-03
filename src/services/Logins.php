@@ -69,12 +69,13 @@ class Logins extends Component
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
-        // Check for allow/deny
-        if (IpHelper::ipInCidrList($ipAddress, $settings->getAllowIps())) {
+        $ipAccessStatus = IpHelper::getAccessStatus($ipAddress, $settings->getAllowIps(), $settings->getDenyIps());
+
+        if ($ipAccessStatus === IpHelper::ACCESS_ALLOWED) {
             return false;
         }
 
-        if (IpHelper::ipInCidrList($ipAddress, $settings->getDenyIps())) {
+        if ($ipAccessStatus === IpHelper::ACCESS_DENIED) {
             return true;
         }
 

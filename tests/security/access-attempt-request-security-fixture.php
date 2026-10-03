@@ -113,13 +113,15 @@ namespace verbb\knockknock\models {
 
     class Settings
     {
+        public array $allowIps = [];
         public bool $checkInvalidLogins = true;
+        public array $denyIps = [];
         public bool $enabled = true;
         public string $password = 'correct-password';
 
         public function getAllowIps(): array
         {
-            return [];
+            return $this->allowIps;
         }
 
         public function getCookieDuration(): int
@@ -130,6 +132,11 @@ namespace verbb\knockknock\models {
         public function getDefaultTemplate(): string
         {
             return 'ask';
+        }
+
+        public function getDenyIps(): array
+        {
+            return $this->denyIps;
         }
 
         public function getEnabled(): bool
@@ -167,6 +174,10 @@ namespace verbb\knockknock\helpers {
 
     class IpHelper
     {
+        public const ACCESS_DENIED = -1;
+        public const ACCESS_NEUTRAL = 0;
+        public const ACCESS_ALLOWED = 1;
+
         public static function getUserIp(): string
         {
             return '203.0.113.10';
@@ -174,7 +185,20 @@ namespace verbb\knockknock\helpers {
 
         public static function ipInCidrList(string $ipAddress, array $cidrs): bool
         {
-            return false;
+            return in_array($ipAddress, $cidrs, true);
+        }
+
+        public static function getAccessStatus(string $ipAddress, array $allowIps, array $denyIps): int
+        {
+            if (self::ipInCidrList($ipAddress, $allowIps)) {
+                return self::ACCESS_ALLOWED;
+            }
+
+            if (self::ipInCidrList($ipAddress, $denyIps)) {
+                return self::ACCESS_DENIED;
+            }
+
+            return self::ACCESS_NEUTRAL;
         }
     }
 
@@ -397,13 +421,13 @@ namespace {
         throw new RuntimeException($message . '\nNo exception was thrown.');
     }
 
-    function createController(bool $isPost, array $query, array $body, ?Settings $settings = null, ?FakeLogins $logins = null): array
+    function createController(bool $isPost, array $query, array $body, ?Settings $settings = null, ?FakeLogins $logins = null, bool $storeUserIps = true): array
     {
         $settings ??= new Settings();
         $logins ??= new FakeLogins();
         $request = new FakeRequest($isPost, $query, $body);
         $plugin = new FakePlugin($settings, $logins);
-        $application = new FakeApplication();
+        $application = new FakeApplication($storeUserIps);
         Craft::$app = $application;
         KnockKnock::$plugin = $plugin;
 
@@ -453,6 +477,28 @@ namespace {
     assertSame('Too many invalid attempts', $response->data['errors']['password'] ?? null, 'Existing lockouts must retain their current response.');
     assertSame(0, count($logins->saved), 'A locked request must not add another failed attempt.');
     assertSame(0, count($application->response->cookies->cookies), 'A locked request must not set an access cookie.');
+
+    foreach ([[false, false], [false, true], [true, false], [true, true]] as [$checkInvalidLogins, $storeUserIps]) {
+        $deniedSettings = new Settings();
+        $deniedSettings->checkInvalidLogins = $checkInvalidLogins;
+        $deniedSettings->denyIps = ['203.0.113.10'];
+        [$controller, $request, $plugin, $logins, $application] = createController(true, [], ['password' => 'correct-password'], $deniedSettings, null, $storeUserIps);
+        $response = $controller->actionAnswer();
+        assertSame('Too many invalid attempts', $response->data['errors']['password'] ?? null, 'A statically denied IP must be refused independently of invalid-login recording settings.');
+        assertSame(0, $logins->lockoutChecks, 'A static deny rule must not require the dynamic lockout query.');
+        assertSame(0, count($application->response->cookies->cookies), 'A denied IP must not receive an access cookie.');
+        assertSame(0, count($logins->saved), 'A statically denied password submission must not be stored as a failed login.');
+    }
+
+    $allowedSettings = new Settings();
+    $allowedSettings->checkInvalidLogins = false;
+    $allowedSettings->allowIps = ['203.0.113.10'];
+    $allowedSettings->denyIps = ['203.0.113.10'];
+    [$controller, $request, $plugin, $logins, $application] = createController(true, [], ['password' => 'correct-password'], $allowedSettings, null, false);
+    $response = $controller->actionAnswer();
+    assertSame('/protected', $response->redirect, 'An allow rule must continue to override a deny rule.');
+    assertSame(1, count($application->response->cookies->cookies), 'An explicitly allowed IP may still receive an access cookie.');
+    assertSame(0, $logins->lockoutChecks, 'A static allow rule must not require the dynamic lockout query.');
 
     $disabledSettings = new Settings();
     $disabledSettings->enabled = false;

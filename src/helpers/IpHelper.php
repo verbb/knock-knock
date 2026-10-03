@@ -10,6 +10,14 @@ use yii\validators\IpValidator;
 
 class IpHelper
 {
+    // Constants
+    // =========================================================================
+
+    public const ACCESS_DENIED = -1;
+    public const ACCESS_NEUTRAL = 0;
+    public const ACCESS_ALLOWED = 1;
+
+
     // Public Methods
     // =========================================================================
 
@@ -69,6 +77,19 @@ class IpHelper
         }
 
         return false;
+    }
+
+    public static function getAccessStatus(string $ip, array $allowIps, array $denyIps): int
+    {
+        if (self::ipInCidrList($ip, $allowIps)) {
+            return self::ACCESS_ALLOWED;
+        }
+
+        if (self::ipInCidrList($ip, $denyIps)) {
+            return self::ACCESS_DENIED;
+        }
+
+        return self::ACCESS_NEUTRAL;
     }
 
     /**

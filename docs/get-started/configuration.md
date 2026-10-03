@@ -120,7 +120,7 @@ The number of invalid login attempts Knock Knock will allow within the specified
 
 **Type:** `array|string|null` · **Default:** `[]`
 
-Provide IP addresses or CIDR blocks that should bypass the password gate and be exempt from automatic lockouts.
+Provide IP addresses or CIDR blocks that should bypass the password gate and be exempt from automatic lockouts. An allow rule takes precedence when the same address also matches `denyIps`.
 :::
 
 
@@ -129,7 +129,7 @@ Provide IP addresses or CIDR blocks that should bypass the password gate and be 
 
 **Type:** `array|string|null` · **Default:** `[]`
 
-Provide IP Addresses that should be locked out automatically.
+Provide IP addresses or CIDR blocks that should be locked out of password-protected pages. Denied visitors cannot use an existing access cookie or submit the password, but deliberately unprotected URLs remain public. Matching `allowIps` rules take precedence.
 :::
 
 
