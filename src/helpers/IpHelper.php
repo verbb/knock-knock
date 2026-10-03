@@ -57,7 +57,11 @@ class IpHelper
             if (!str_contains($cidrnet, '/')) {
                 $net = $cidrnet;
             } else {
-                [$net, $maskbits] = explode('/', $cidrnet);
+                [$net, $maskbits] = explode('/', $cidrnet, 2);
+
+                if (str_contains($maskbits, '/')) {
+                    continue;
+                }
             }
 
             $netBits = self::_ipToBits($net);
@@ -66,7 +70,7 @@ class IpHelper
                 continue;
             }
 
-            if (!empty($maskbits)) {
+            if ($maskbits !== false && $maskbits !== '') {
                 $ipNetBits = substr($ipNetBits, 0, $maskbits);
                 $netBits = substr($netBits, 0, $maskbits);
             }
