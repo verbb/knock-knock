@@ -17,6 +17,7 @@
 - Fixed a low-severity access control vulnerability affecting denied IP addresses with access cookies.
 - Fixed a low-severity access control vulnerability affecting zero-prefix CIDR rules.
 - Fixed a low-severity sensitive data storage vulnerability.
+- Fixed a low-severity resource exhaustion vulnerability affecting invalid-login records.
 
 ## 3.0.11 - 2026-09-30
 

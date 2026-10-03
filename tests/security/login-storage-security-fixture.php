@@ -52,6 +52,7 @@ namespace craft\db {
     class Migration
     {
         public array $archivedPasswordColumns = [];
+        public array $createdIndexes = [];
         public array $createdTables = [];
         public FakeDb $db;
         public array $droppedColumns = [];
@@ -76,6 +77,11 @@ namespace craft\db {
             $this->createdTables[$table] = $columns;
             $this->db->tableExistsResult = true;
             $this->db->columnExistsResult = array_key_exists('password', $columns);
+        }
+
+        public function createIndex(?string $name, string $table, array|string $columns, bool $unique = false): void
+        {
+            $this->createdIndexes[] = [$table, $columns, $unique];
         }
 
         public function dateTime(): FakeColumn
@@ -137,6 +143,10 @@ namespace {
     $freshColumns = $install->createdTables['{{%knockknock_logins}}'] ?? [];
     assertSame(true, array_key_exists('ipAddress', $freshColumns), 'Fresh installs must retain IP metadata for lockout counting.');
     assertSame(false, array_key_exists('password', $freshColumns), 'Fresh installs must not create password storage.');
+    assertSame([
+        ['{{%knockknock_logins}}', ['dateCreated', 'id'], false],
+        ['{{%knockknock_logins}}', ['ipAddress', 'dateCreated'], false],
+    ], $install->createdIndexes, 'Fresh installs must index retention cleanup and per-IP lockout queries.');
 
     $staleDb = new FakeDb(true, true);
     $install = new Install($staleDb);
@@ -168,7 +178,7 @@ namespace {
     $pluginSource = file_get_contents(dirname(__DIR__, 2) . '/src/KnockKnock.php');
     $controllerSource = file_get_contents(dirname(__DIR__, 2) . '/src/controllers/DefaultController.php');
     $serviceSource = file_get_contents(dirname(__DIR__, 2) . '/src/services/Logins.php');
-    assertSame(true, str_contains($pluginSource, "schemaVersion = '1.1.2'"), 'The plugin schema version must schedule the removal migration.');
+    assertSame(true, str_contains($pluginSource, "schemaVersion = '1.1.3'"), 'The plugin schema version must schedule the security migrations.');
     assertSame(false, str_contains($controllerSource, '$login->password'), 'Failed submissions must not copy the request secret into attempt metadata.');
     assertSame(false, str_contains($serviceSource, '$loginRecord->password'), 'The login service must not write password data.');
     assertSame(false, str_contains($serviceSource, "'password'"), 'The login service must not select password data.');

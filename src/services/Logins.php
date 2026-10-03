@@ -17,6 +17,12 @@ use yii\base\Exception;
 
 class Logins extends Component
 {
+    // Constants
+    // =========================================================================
+
+    private const MAX_LOGIN_RECORDS = 10000;
+
+
     // Public Methods
     // =========================================================================
 
@@ -54,11 +60,15 @@ class Logins extends Component
         $loginRecord = $this->_getLoginRecordById($login->id);
         $loginRecord->ipAddress = $login->ipAddress;
 
-        $loginRecord->save(false);
+        if (!$loginRecord->save(false)) {
+            return false;
+        }
 
         if (!$login->id) {
             $login->id = $loginRecord->id;
         }
+
+        $this->_pruneLoginRecords();
 
         return true;
     }
@@ -119,5 +129,39 @@ class Logins extends Component
         }
 
         return $loginRecord;
+    }
+
+    private function _pruneLoginRecords(): void
+    {
+        /* @var Settings $settings */
+        $settings = KnockKnock::$plugin->getSettings();
+
+        $interval = DateTimeHelper::secondsToInterval($settings->invalidLoginWindowDuration);
+        $cutoff = DateTimeHelper::currentUTCDateTime()->sub($interval);
+
+        LoginRecord::deleteAll(['<', 'dateCreated', Db::prepareDateForDb($cutoff)]);
+
+        $boundary = $this->_createLoginQuery()
+            ->select(['id', 'dateCreated'])
+            ->orderBy([
+                'dateCreated' => SORT_DESC,
+                'id' => SORT_DESC,
+            ])
+            ->offset(self::MAX_LOGIN_RECORDS)
+            ->one();
+
+        if (!$boundary) {
+            return;
+        }
+
+        LoginRecord::deleteAll([
+            'or',
+            ['<', 'dateCreated', $boundary['dateCreated']],
+            [
+                'and',
+                ['dateCreated' => $boundary['dateCreated']],
+                ['<=', 'id', $boundary['id']],
+            ],
+        ]);
     }
 }

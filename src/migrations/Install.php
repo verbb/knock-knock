@@ -11,6 +11,7 @@ class Install extends Migration
     public function safeUp(): bool
     {
         $this->createTables();
+        $this->createIndexes();
 
         return true;
     }
@@ -40,6 +41,12 @@ class Install extends Migration
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
+    }
+
+    public function createIndexes(): void
+    {
+        $this->createIndex(null, '{{%knockknock_logins}}', ['dateCreated', 'id']);
+        $this->createIndex(null, '{{%knockknock_logins}}', ['ipAddress', 'dateCreated']);
     }
 
     public function dropTables(): void
