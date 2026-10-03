@@ -22,6 +22,14 @@ use yii\base\Event;
 
 class KnockKnock extends Plugin
 {
+    // Constants
+    // =========================================================================
+
+    private const URL_RULE_INVALID = -1;
+    private const URL_RULE_NO_MATCH = 0;
+    private const URL_RULE_MATCH = 1;
+
+
     // Properties
     // =========================================================================
 
@@ -144,14 +152,14 @@ class KnockKnock extends Plugin
 
         // Check if the requested URL is explicitly unprotected. If yes, allow the request.
         if ($settings->getUnprotectedUrls()) {
-            if ($this->_matchesUrlRules($currentPath, $settings->getUnprotectedUrls())) {
+            if ($this->_matchesUrlRules($currentPath, $settings->getUnprotectedUrls()) === self::URL_RULE_MATCH) {
                 return;
             }
         }
 
         // Check to see if we're watching only specific URLs. By default, protect everything though
         if ($settings->getProtectedUrls()) {
-            if (!$this->_matchesUrlRules($currentPath, $settings->getProtectedUrls(), true)) {
+            if ($this->_matchesUrlRules($currentPath, $settings->getProtectedUrls(), true) === self::URL_RULE_NO_MATCH) {
                 return;
             }
         }
@@ -165,9 +173,10 @@ class KnockKnock extends Plugin
         Craft::$app->end();
     }
 
-    private function _matchesUrlRules(string $currentPath, array $rules, bool $caseInsensitive = false): bool
+    private function _matchesUrlRules(string $currentPath, array $rules, bool $caseInsensitive = false): int
     {
         $elementIds = [];
+        $result = self::URL_RULE_NO_MATCH;
 
         foreach ($rules as $rule) {
             if (!$this->_ruleBelongsToCurrentSite($rule)) {
@@ -176,25 +185,62 @@ class KnockKnock extends Plugin
 
             $rulePath = $this->_normalizePath($rule, true);
 
-            if ($currentPath === $rulePath || ($caseInsensitive && mb_strtolower($currentPath) === mb_strtolower($rulePath))) {
-                return true;
-            }
-
             // Preserve the plugin's established convention that rules containing `(` are regexes.
             if (str_contains($rulePath, '(')) {
-                if (@preg_match('`' . $rulePath . '`i', $currentPath) === 1) {
-                    return true;
+                $pattern = $this->_urlRulePattern($rulePath);
+
+                // Validate the configured expression before placing it inside the full-path wrapper.
+                // Otherwise, unmatched grouping syntax could escape the wrapper and restore substring matching.
+                if ($pattern === null || @preg_match($pattern, '') === false) {
+                    $result = self::URL_RULE_INVALID;
+                    Craft::warning("Knock Knock could not evaluate the URL regular expression “{$rulePath}”.", __METHOD__);
+
+                    continue;
+                }
+
+                $fullPathPattern = $this->_urlRulePattern($rulePath, true);
+                $match = @preg_match($fullPathPattern, $currentPath, $matches, PREG_OFFSET_CAPTURE);
+
+                if ($match === 1) {
+                    [$matchedPath, $offset] = $matches[0];
+
+                    // PCRE control verbs can report success before the closing anchor is evaluated.
+                    if ($offset === 0 && strlen($matchedPath) === strlen($currentPath)) {
+                        return self::URL_RULE_MATCH;
+                    }
+                }
+
+                if ($match === false) {
+                    $result = self::URL_RULE_INVALID;
+                    Craft::warning("Knock Knock could not evaluate the URL regular expression “{$rulePath}”.", __METHOD__);
                 }
 
                 continue;
             }
 
+            if ($currentPath === $rulePath || ($caseInsensitive && mb_strtolower($currentPath) === mb_strtolower($rulePath))) {
+                return self::URL_RULE_MATCH;
+            }
+
             if ($caseInsensitive && $this->_pathsResolveToSameElement($currentPath, $rulePath, $elementIds)) {
-                return true;
+                return self::URL_RULE_MATCH;
             }
         }
 
-        return false;
+        return $result;
+    }
+
+    private function _urlRulePattern(string $rulePath, bool $fullPath = false): ?string
+    {
+        foreach (['`', '~', '#', '%', '!', '@', ';', '=', ':', ','] as $delimiter) {
+            if (!str_contains($rulePath, $delimiter)) {
+                $expression = $fullPath ? '\\A(?:' . $rulePath . ')\\z' : $rulePath;
+
+                return $delimiter . $expression . $delimiter . 'i';
+            }
+        }
+
+        return null;
     }
 
     private function _pathsResolveToSameElement(string $currentPath, string $rulePath, array &$elementIds): bool
