@@ -11,6 +11,24 @@ class Login extends Model
     public ?string $id = null;
     public ?string $ipAddress = null;
     public ?string $loginPath = null;
-    public ?string $password = null;
+
+
+    // Public Methods
+    // =========================================================================
+
+    /**
+     * @deprecated Attempted passwords are no longer retained.
+     */
+    public function getPassword(): null
+    {
+        return null;
+    }
+
+    /**
+     * @deprecated Attempted passwords are no longer retained.
+     */
+    public function setPassword(mixed $value): void
+    {
+    }
 
 }

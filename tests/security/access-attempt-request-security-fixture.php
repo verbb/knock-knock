@@ -108,7 +108,6 @@ namespace verbb\knockknock\models {
     class Login
     {
         public ?string $ipAddress = null;
-        public ?string $password = null;
     }
 
     class Settings
@@ -459,16 +458,21 @@ namespace {
     [$controller, $request, $plugin, $logins, $application] = createController(true, ['password' => 'correct-password'], ['password' => 'wrong']);
     $response = $controller->actionAnswer();
     assertSame('Invalid password', $response->data['errors']['password'] ?? null, 'A correct query password must not override an invalid body password.');
-    assertSame('wrong', $logins->saved[0]->password ?? null, 'Only the invalid body password may be recorded.');
+    assertSame('203.0.113.10', $logins->saved[0]->ipAddress ?? null, 'A failed attempt must retain the resolved IP metadata.');
+    assertSame(false, property_exists($logins->saved[0], 'password'), 'A failed attempt must not retain the submitted password.');
     assertSame(0, count($application->response->cookies->cookies), 'An invalid body password must not set an access cookie.');
 
     [$controller, $request, $plugin, $logins] = createController(true, ['password' => 'correct-password'], []);
-    $controller->actionAnswer();
-    assertSame('', $logins->saved[0]->password ?? null, 'A missing body password must retain the existing empty-password failure behavior.');
+    $response = $controller->actionAnswer();
+    assertSame('Invalid password', $response->data['errors']['password'] ?? null, 'A missing body password must retain the existing invalid response.');
+    assertSame('203.0.113.10', $logins->saved[0]->ipAddress ?? null, 'A missing body password must still record attempt metadata.');
+    assertSame(false, property_exists($logins->saved[0], 'password'), 'A missing body password must not add a password field to attempt metadata.');
 
     [$controller, $request, $plugin, $logins] = createController(true, [], ['password' => ['wrong']]);
-    $controller->actionAnswer();
-    assertSame('', $logins->saved[0]->password ?? null, 'A non-string body password must retain the existing empty-password failure behavior.');
+    $response = $controller->actionAnswer();
+    assertSame('Invalid password', $response->data['errors']['password'] ?? null, 'A non-string body password must retain the existing invalid response.');
+    assertSame('203.0.113.10', $logins->saved[0]->ipAddress ?? null, 'A non-string body password must still record attempt metadata.');
+    assertSame(false, property_exists($logins->saved[0], 'password'), 'A non-string body password must not add a password field to attempt metadata.');
 
     $lockedLogins = new FakeLogins();
     $lockedLogins->locked = true;

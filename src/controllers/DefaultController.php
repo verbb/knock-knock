@@ -112,7 +112,6 @@ class DefaultController extends Controller
         if (Craft::$app->getConfig()->getGeneral()->storeUserIps && $settings->checkInvalidLogins) {
             $login = new Login();
             $login->ipAddress = $ipAddress;
-            $login->password = $password;
 
             // No need to log allow list
             if (!IpHelper::ipInCidrList($ipAddress, $settings->getAllowIps())) {

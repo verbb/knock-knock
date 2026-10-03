@@ -24,11 +24,17 @@ class Install extends Migration
 
     public function createTables(): void
     {
-        $this->archiveTableIfExists('{{%knockknock_logins}}');
-        $this->createTable('{{%knockknock_logins}}', [
+        $table = '{{%knockknock_logins}}';
+
+        // Remove retained secrets before Craft archives a stale table during installation.
+        if ($this->db->tableExists($table) && $this->db->columnExists($table, 'password')) {
+            $this->dropColumn($table, 'password');
+        }
+
+        $this->archiveTableIfExists($table);
+        $this->createTable($table, [
             'id' => $this->primaryKey(),
             'ipAddress' => $this->string(),
-            'password' => $this->string(),
             'loginPath' => $this->string(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),

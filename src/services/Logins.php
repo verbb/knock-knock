@@ -53,7 +53,6 @@ class Logins extends Component
 
         $loginRecord = $this->_getLoginRecordById($login->id);
         $loginRecord->ipAddress = $login->ipAddress;
-        $loginRecord->password = $login->password;
 
         $loginRecord->save(false);
 
@@ -101,7 +100,6 @@ class Logins extends Component
             ->select([
                 'id',
                 'ipAddress',
-                'password',
                 'dateCreated',
                 'dateUpdated',
             ])

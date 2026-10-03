@@ -34,7 +34,7 @@ class KnockKnock extends Plugin
     // =========================================================================
 
     public bool $hasCpSettings = true;
-    public string $schemaVersion = '1.1.1';
+    public string $schemaVersion = '1.1.2';
     public string $minVersionRequired = '1.2.16';
 
     private bool $_testAccessAfterAction = false;
