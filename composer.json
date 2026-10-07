@@ -2,7 +2,7 @@
     "name": "verbb/knock-knock",
     "description": "A Craft CMS plugin for protecting a site's front end with one shared password.",
     "type": "craft-plugin",
-    "version": "3.0.12",
+    "version": "3.0.13",
     "keywords": [
         "craft",
         "cms",
