@@ -88,7 +88,7 @@ class Logins extends Component
             return true;
         }
 
-        $interval = DateTimeHelper::secondsToInterval($settings->invalidLoginWindowDuration);
+        $interval = DateTimeHelper::toDateInterval($settings->invalidLoginWindowDuration);
         $start = DateTimeHelper::currentUTCDateTime()->sub($interval);
         $end = DateTimeHelper::currentUTCDateTime();
 
@@ -136,7 +136,7 @@ class Logins extends Component
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
-        $interval = DateTimeHelper::secondsToInterval($settings->invalidLoginWindowDuration);
+        $interval = DateTimeHelper::toDateInterval($settings->invalidLoginWindowDuration);
         $cutoff = DateTimeHelper::currentUTCDateTime()->sub($interval);
 
         LoginRecord::deleteAll(['<', 'dateCreated', Db::prepareDateForDb($cutoff)]);
