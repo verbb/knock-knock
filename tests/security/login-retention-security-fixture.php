@@ -107,7 +107,7 @@ namespace craft\helpers {
             return new DateTimeImmutable('2026-10-03 12:00:00', new DateTimeZone('UTC'));
         }
 
-        public static function secondsToInterval(int $seconds): DateInterval
+        public static function toDateInterval(int $seconds): DateInterval
         {
             return new DateInterval('PT' . $seconds . 'S');
         }
