@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- Updated the minimum required Craft version to 5.9.12.
+
+### Fixed
+- Fixed a high-severity access control vulnerability.
+
 ## 3.0.14 - 2026-10-15
 
 ### Changed
