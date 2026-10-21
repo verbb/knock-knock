@@ -215,6 +215,30 @@ namespace {
     assertSame(1, $match('alternate-home', ['()'], true), 'The homepage canonical URI must use the empty URL path.');
     Craft::$app->matchedElement = false;
 
+    assertSame(1, $match('members', ['members(/.*)?'], true), 'An optional trailing group must protect the parent path.');
+    assertSame(1, $match('members/article', ['members(/.*)?'], true), 'An optional trailing group must protect child paths.');
+    assertSame(1, $match('member-page', ['(member|staff)-pages?'], true), 'An optional character must remain optional.');
+    assertSame(1, $match('members', ['(?:members)'], true), 'Noncapturing groups must remain valid.');
+    assertSame(1, $match('members', ['(?#comment)members'], true), 'Regex comments must remain part of the expression.');
+    assertSame(1, $match('members', ['(?=members)members'], true), 'Lookaheads must remain valid.');
+    assertSame(1, $match('members', ['https://example.test/subfolder/members(/.*)?'], true), 'Absolute regexes must preserve optional syntax and site base removal.');
+    assertSame(1, $match('members', ['//example.test/subfolder/members(/.*)?'], true), 'Protocol-relative regexes must preserve optional syntax.');
+    assertSame(0, $match('members', ['https://other.test/subfolder/members(/.*)?'], true), 'Foreign hosts must remain excluded.');
+    assertSame(1, $match('members', ['%28%3F%3Amembers%29'], true), 'Encoded regex syntax must be decoded once.');
+    assertSame(0, $match('members', ['%2528members%2529'], true), 'Double-encoded grouping must not become regex syntax.');
+    assertSame(1, $match('members', ['members?filter=(other)'], true), 'Parentheses in a literal query must not turn the rule into a regex.');
+    assertSame(1, $match('members', ['members#(other)'], true), 'Parentheses in a literal fragment must not turn the rule into a regex.');
+    assertSame(1, $match('members', ['members(/.*)?']), 'Unprotected regexes must preserve optional syntax.');
+    assertSame(0, $match('members/article', ['members/(.*)#section']), 'Unprotected regexes must not silently discard a required suffix.');
+    assertSame(1, $match('members/#section', ['members/(.*)#section']), 'Regex hash literals must match the actual path.');
+    assertSame(-1, $match('members', ['members(/.*)?('], true), 'Invalid syntax after a quantifier must retain invalid-rule handling.');
+    assertSame(0, $match('members/other', ['members/(*ACCEPT)(?:article)']), 'Recovered expression syntax must retain full-path safeguards.');
+    Craft::$app->matchedElement = (object)['uri'=>'members'];
+    assertSame(1, $match('mémbers', ['members(/.*)?'], true), 'Canonical protected paths must use the complete expression.');
+    Craft::$app->matchedElement = (object)['uri'=>'members/article%23section'];
+    assertSame(1, $match('mémbers/article#section', ['members/(.*)#section'], true), 'Canonical URI punctuation must survive decoding.');
+    Craft::$app->matchedElement = false;
+
     $source = file_get_contents(dirname(__DIR__, 2) . '/src/KnockKnock.php');
     assertSame(true, str_contains($source, '_matchesUrlRules($currentPath, $settings->getUnprotectedUrls()) === self::URL_RULE_MATCH'), 'Only a valid unprotected match may bypass the gate.');
     assertSame(true, str_contains($source, '_matchesUrlRules($currentPath, $settings->getProtectedUrls(), true) === self::URL_RULE_NO_MATCH'), 'An invalid protected rule must keep the gate enabled.');

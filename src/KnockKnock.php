@@ -130,7 +130,8 @@ class KnockKnock extends Plugin
             }
         }
 
-        $currentPath = $this->_normalizePath($request->getPathInfo());
+        // Craft has already decoded the request path; its punctuation is not a query or fragment.
+        $currentPath = trim($request->getPathInfo(), '/');
         $loginPath = $this->_normalizePath($settings->getLoginPath());
 
         // Challenge and account routes remain reachable, but their URL in a query string grants nothing.
@@ -189,6 +190,9 @@ class KnockKnock extends Plugin
 
             // Preserve the plugin's established convention that rules containing `(` are regexes.
             if (str_contains($rulePath, '(')) {
+                // Once recognised as a regex, retain query/fragment characters as expression syntax.
+                // Start from the original rule so encoded paths are still decoded only once.
+                $rulePath = $this->_normalizePath(str_replace(['?', '#'], ['%3F', '%23'], $rule), true);
                 $pattern = $this->_urlRulePattern($rulePath);
 
                 // Validate the configured expression before placing it inside the full-path wrapper.
@@ -214,7 +218,7 @@ class KnockKnock extends Plugin
                             $canonicalPath = '';
                         } elseif ($canonicalPath !== null) {
                             // Compare the canonical URL exactly as we compare a direct request for it.
-                            $canonicalPath = $this->_normalizePath($canonicalPath);
+                            $canonicalPath = trim(rawurldecode($canonicalPath), '/');
                         }
                     }
 

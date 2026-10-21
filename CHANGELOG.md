@@ -10,6 +10,7 @@
 - Fixed a high-severity access control vulnerability.
 - Fixed a medium-severity access control vulnerability affecting protected URL rules.
 - Fixed a medium-severity access control vulnerability affecting URL aliases.
+- Fixed a low-severity access control vulnerability affecting regular-expression URL rules.
 
 ## 3.0.14 - 2026-10-15
 

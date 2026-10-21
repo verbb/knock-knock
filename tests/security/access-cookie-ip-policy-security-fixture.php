@@ -392,5 +392,20 @@ namespace {
     [$application] = runGate(IpHelper::ACCESS_DENIED, 'public', [], ['members']);
     assertSame(0, $application->endCalls, 'A URL outside the configured protected set must remain public for a denied IP.');
 
+    foreach (['#' => '#', '?' => '\\?'] as $character => $expression) {
+        [$application] = runGate(IpHelper::ACCESS_DENIED, 'members/article' . $character . 'section', [], ['members/(.*)' . $expression . 'section']);
+        assertSame(1, $application->endCalls, 'Literal request punctuation must reach protected regex matching intact.');
+    }
+
+    [$application] = runGate(IpHelper::ACCESS_DENIED, 'members/%23section', [], ['members/(%2523section)']);
+    assertSame(1, $application->endCalls, 'An already decoded request path must not be decoded a second time.');
+
+    foreach (['login', 'set-password', 'verify-email', 'knock-knock/who-is-there'] as $accountPath) {
+        [$application] = runGate(IpHelper::ACCESS_DENIED, $accountPath);
+        assertSame(0, $application->endCalls, 'Normal account and challenge routes must remain available.');
+        [$application] = runGate(IpHelper::ACCESS_DENIED, $accountPath . '#section');
+        assertSame(1, $application->endCalls, 'A literal path suffix must not become an account-route exemption.');
+    }
+
     echo "Knock Knock access-cookie IP policy security fixture passed.\n";
 }

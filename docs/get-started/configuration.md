@@ -149,7 +149,7 @@ When this is disabled, Knock Knock still uses the direct peer unless it matches 
 
 **Type:** `array|string|null` · **Default:** `[]`
 
-A list of specific request paths to protect. Query strings are ignored, and exact paths are compared case-insensitively without leading or trailing slashes. An absolute entry must belong to the current site; its scheme and host are then removed before matching. Entries containing `(` are treated as case-insensitive regular expressions that must match the complete path. For example, `/some-channel/(.*)` matches `/some-channel/news`, but not `/private/some-channel/news`.
+A list of specific request paths to protect. For exact paths, query strings and fragments are ignored, and paths are compared case-insensitively without leading or trailing slashes. An absolute entry must belong to the current site; its scheme and host are then removed before matching. A rule is recognised as a regular expression when its path contains `(` before any unencoded `?` or `#`. Once recognised, the entire expression is preserved, including `?` and `#`, and must match the complete path case-insensitively. For example, `/some-channel/(.*)` matches `/some-channel/news`, but not `/private/some-channel/news`.
 :::
 
 
@@ -158,7 +158,7 @@ A list of specific request paths to protect. Query strings are ignored, and exac
 
 **Type:** `array|string|null` · **Default:** `[]`
 
-A list of specific request paths to leave unprotected. Query strings are ignored, and exact paths are compared case-sensitively without leading or trailing slashes. An absolute entry must belong to the current site; its scheme and host are then removed before matching. Entries containing `(` are treated as case-insensitive regular expressions that must match the complete path. For example, `/some-channel/(.*)` matches `/some-channel/news`, but not `/private/some-channel/news`.
+A list of specific request paths to leave unprotected. For exact paths, query strings and fragments are ignored, and paths are compared case-sensitively without leading or trailing slashes. An absolute entry must belong to the current site; its scheme and host are then removed before matching. A rule is recognised as a regular expression when its path contains `(` before any unencoded `?` or `#`. Once recognised, the entire expression is preserved, including `?` and `#`, and must match the complete path case-insensitively. For example, `/some-channel/(.*)` matches `/some-channel/news`, but not `/private/some-channel/news`.
 :::
 
 
