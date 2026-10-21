@@ -4,6 +4,7 @@
 
 ### Changed
 - Updated the minimum required Craft version to 5.9.12.
+- Updated the frontend build toolchain to Vite 8.3.4.
 
 ### Fixed
 - Fixed a high-severity access control vulnerability.
