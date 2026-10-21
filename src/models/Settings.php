@@ -5,6 +5,8 @@ use Craft;
 use craft\base\Model;
 use craft\helpers\App;
 use craft\helpers\ConfigHelper;
+use craft\helpers\UrlHelper;
+use craft\web\Request;
 
 use yii\base\Exception;
 
@@ -142,7 +144,54 @@ class Settings extends Model
     {
         $items = $this->_normalizeList($value);
 
-        return array_values(array_filter(array_map(fn($item) => App::parseEnv($item), $items), 'is_string'));
+        if (!$items) {
+            return [];
+        }
+
+        $webAlias = $this->_getUrlRuleWebAlias();
+        $originalAlias = Craft::$aliases['@web'] ?? null;
+
+        try {
+            if ($webAlias !== null) {
+                Craft::setAlias('@web', $webAlias);
+            }
+
+            return array_values(array_filter(array_map(fn($item) => App::parseEnv($item), $items), 'is_string'));
+        } finally {
+            if ($webAlias !== null) {
+                Craft::$aliases['@web'] = $originalAlias;
+            }
+        }
+    }
+
+    private function _getUrlRuleWebAlias(): ?string
+    {
+        $request = Craft::$app->getRequest();
+
+        if (!$request instanceof Request || !$request->isWebAliasSetDynamically) {
+            return null;
+        }
+
+        // Preserve aliases explicitly replaced by trusted PHP after request initialization.
+        if (Craft::getAlias('@web', false) !== rtrim($request->getHostInfo() . $request->getBaseUrl(), '\\/')) {
+            return null;
+        }
+
+        $siteUrl = parse_url(UrlHelper::siteUrl());
+
+        if (!isset($siteUrl['host'])) {
+            return null;
+        }
+
+        // Use the site's authority without adding its locale path to the application's base path.
+        $authority = isset($siteUrl['scheme']) ? $siteUrl['scheme'] . '://' : '//';
+        $authority .= $siteUrl['host'];
+
+        if (isset($siteUrl['port'])) {
+            $authority .= ':' . $siteUrl['port'];
+        }
+
+        return $authority . $request->getBaseUrl();
     }
 
     private function _getBooleanSettingValue(string $value, bool $parse = true): bool|string
