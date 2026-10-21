@@ -3,6 +3,11 @@
 declare(strict_types=1);
 
 namespace craft\base {
+    class Element
+    {
+        public const HOMEPAGE_URI = '__home__';
+    }
+
     class Model
     {
     }
@@ -111,6 +116,21 @@ namespace {
 
     final class FakeApplication
     {
+        public object|false $matchedElement = false;
+        public int $matchedElementCalls = 0;
+
+        public function getUrlManager(): self
+        {
+            return $this;
+        }
+
+        public function getMatchedElement(): object|false
+        {
+            $this->matchedElementCalls++;
+
+            return $this->matchedElement;
+        }
+
         public function getDb(): object
         {
             return new class {
@@ -168,6 +188,32 @@ namespace {
     assertSame(0, $match('some-channel/evil', ['some-channel/(*ACCEPT)news']), 'A regex control verb must not report a match before consuming the complete path.');
 
     assertSame(1, $match('literal`/value', ['(literal`/value)']), 'A literal backtick must not collide with the regex delimiter.');
+
+    Craft::$app->matchedElement = (object)['uri'=>'some-channel/news'];
+    assertSame(1, $match('somé-channel/news', ['some-channel/(.*)'], true), 'A protected regex must cover equivalent paths to its matched element.');
+    assertSame(1, $match('somé-channel/news', ['https://example.test/subfolder/some-channel/(.*)'], true), 'Canonical matching must preserve same-site base paths.');
+    assertSame(0, $match('somé-channel/news', ['https://other.test/subfolder/some-channel/(.*)'], true), 'Canonical matching must not activate foreign-site rules.');
+    assertSame(0, $match('somé-channel/news', ['some-channel/(.*)']), 'Canonical matching must not expand unprotected regex rules.');
+    assertSame(1, $match('somé-channel/news', ['(somé-channel/news)'], true), 'Direct request-path matches must remain supported.');
+
+    Craft::$app->matchedElementCalls = 0;
+    assertSame(1, $match('somé-channel/news', ['unrelated/(.*)', 'another/(.*)', 'some-channel/(.*)'], true), 'Later protected rules must still check the canonical path.');
+    assertSame(1, Craft::$app->matchedElementCalls, 'Resolve the matched element only once across regex rules.');
+    Craft::$app->matchedElement = false;
+    Craft::$app->matchedElementCalls = 0;
+    assertSame(0, $match('template-page', ['unrelated/(.*)', 'another/(.*)'], true), 'Template routes without a matched element must retain direct-rule behavior.');
+    assertSame(1, Craft::$app->matchedElementCalls, 'Cache missing matched elements across regex rules.');
+
+    Craft::$app->matchedElement = (object)['uri'=>'some-channel/evil'];
+    assertSame(0, $match('somé-channel/evil', ['some-channel/(*ACCEPT)news'], true), 'Canonical matching must preserve control-verb full-path safeguards.');
+    Craft::$app->matchedElement = (object)['uri'=>'news/news'];
+    assertSame(1, $match('néws/news', ['(news)/\\1'], true), 'Canonical matching must preserve backreferences.');
+    Craft::$app->matchedElement = (object)['uri'=>'some%20channel/news'];
+    assertSame(1, $match('some channel/news', ['some%20channel/(.*)'], true), 'A direct request for an encoded canonical URI must remain protected.');
+    assertSame(1, $match('somé channel/news', ['some%20channel/(.*)'], true), 'Canonical URI normalization must agree with direct request and rule normalization.');
+    Craft::$app->matchedElement = (object)['uri'=>'__home__'];
+    assertSame(1, $match('alternate-home', ['()'], true), 'The homepage canonical URI must use the empty URL path.');
+    Craft::$app->matchedElement = false;
 
     $source = file_get_contents(dirname(__DIR__, 2) . '/src/KnockKnock.php');
     assertSame(true, str_contains($source, '_matchesUrlRules($currentPath, $settings->getUnprotectedUrls()) === self::URL_RULE_MATCH'), 'Only a valid unprotected match may bypass the gate.');

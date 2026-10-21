@@ -8,6 +8,7 @@ use verbb\knockknock\helpers\ReturnUrlHelper;
 use verbb\knockknock\models\Settings;
 
 use Craft;
+use craft\base\Element;
 use craft\base\Model;
 use craft\base\Plugin;
 use craft\events\RegisterUrlRulesEvent;
@@ -176,6 +177,7 @@ class KnockKnock extends Plugin
     private function _matchesUrlRules(string $currentPath, array $rules, bool $caseInsensitive = false): int
     {
         $elementIds = [];
+        $canonicalPath = false;
         $result = self::URL_RULE_NO_MATCH;
 
         foreach ($rules as $rule) {
@@ -199,18 +201,33 @@ class KnockKnock extends Plugin
                 }
 
                 $fullPathPattern = $this->_urlRulePattern($rulePath, true);
-                $match = @preg_match($fullPathPattern, $currentPath, $matches, PREG_OFFSET_CAPTURE);
+                $match = $this->_matchUrlRule($fullPathPattern, $currentPath);
 
-                if ($match === 1) {
-                    [$matchedPath, $offset] = $matches[0];
+                // A database-equivalent URL can route to a protected element without matching its regex.
+                // Use Craft's cached routing result so site, headless and route-less element handling agree.
+                if ($match === self::URL_RULE_NO_MATCH && $caseInsensitive) {
+                    if ($canonicalPath === false) {
+                        $element = Craft::$app->getUrlManager()->getMatchedElement();
+                        $canonicalPath = $element ? $element->uri : null;
 
-                    // PCRE control verbs can report success before the closing anchor is evaluated.
-                    if ($offset === 0 && strlen($matchedPath) === strlen($currentPath)) {
-                        return self::URL_RULE_MATCH;
+                        if ($canonicalPath === Element::HOMEPAGE_URI) {
+                            $canonicalPath = '';
+                        } elseif ($canonicalPath !== null) {
+                            // Compare the canonical URL exactly as we compare a direct request for it.
+                            $canonicalPath = $this->_normalizePath($canonicalPath);
+                        }
+                    }
+
+                    if ($canonicalPath !== null && $canonicalPath !== $currentPath) {
+                        $match = $this->_matchUrlRule($fullPathPattern, $canonicalPath);
                     }
                 }
 
-                if ($match === false) {
+                if ($match === self::URL_RULE_MATCH) {
+                    return self::URL_RULE_MATCH;
+                }
+
+                if ($match === self::URL_RULE_INVALID) {
                     $result = self::URL_RULE_INVALID;
                     Craft::warning("Knock Knock could not evaluate the URL regular expression “{$rulePath}”.", __METHOD__);
                 }
@@ -228,6 +245,26 @@ class KnockKnock extends Plugin
         }
 
         return $result;
+    }
+
+    private function _matchUrlRule(string $pattern, string $path): int
+    {
+        $match = @preg_match($pattern, $path, $matches, PREG_OFFSET_CAPTURE);
+
+        if ($match === false) {
+            return self::URL_RULE_INVALID;
+        }
+
+        if ($match === 1) {
+            [$matchedPath, $offset] = $matches[0];
+
+            // PCRE control verbs can report success before the closing anchor is evaluated.
+            if ($offset === 0 && strlen($matchedPath) === strlen($path)) {
+                return self::URL_RULE_MATCH;
+            }
+        }
+
+        return self::URL_RULE_NO_MATCH;
     }
 
     private function _urlRulePattern(string $rulePath, bool $fullPath = false): ?string
