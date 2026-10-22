@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.0.15 - 2026-10-22
 
 ### Changed
 - Updated the minimum required Craft version to 5.9.12.
