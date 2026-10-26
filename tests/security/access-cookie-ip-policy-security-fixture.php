@@ -145,6 +145,7 @@ namespace verbb\knockknock\models {
         public array $protectedUrls = [];
         public array $unprotectedUrls = [];
         public bool $enableStaticCaching = false;
+        public bool $enabled = true;
 
         public function getAllowIps(): array
         {
@@ -178,7 +179,7 @@ namespace verbb\knockknock\models {
 
         public function getEnabled(): bool
         {
-            return true;
+            return $this->enabled;
         }
 
         public function getLoginPath(): string
@@ -314,6 +315,7 @@ namespace {
             private readonly string $path,
             private readonly bool $isGet = true,
             private readonly ?string $token = null,
+            private readonly array $options = [],
         ) {
         }
 
@@ -324,22 +326,22 @@ namespace {
 
         public function getIsActionRequest(): bool
         {
-            return false;
+            return $this->options['action'] ?? false;
         }
 
         public function getIsConsoleRequest(): bool
         {
-            return false;
+            return $this->options['console'] ?? false;
         }
 
         public function getIsCpRequest(): bool
         {
-            return false;
+            return $this->options['cp'] ?? false;
         }
 
         public function getIsLivePreview(): bool
         {
-            return false;
+            return $this->options['livePreview'] ?? false;
         }
 
         public function getIsPreview(): bool
@@ -349,7 +351,7 @@ namespace {
 
         public function getIsSiteRequest(): bool
         {
-            return true;
+            return !$this->getIsCpRequest() && !$this->getIsConsoleRequest();
         }
 
         public function getPathInfo(): string
@@ -372,6 +374,16 @@ namespace {
     {
         public int $noCacheCalls = 0;
         public ?string $redirect = null;
+        public ?\craft\web\Response $frameworkResponse = null;
+
+        public function __construct()
+        {
+            // Optional framework coverage checks actual headers without booting a shared Craft site.
+            if (getenv('KK_VENDOR_PATH')) {
+                $this->frameworkResponse = new \craft\web\Response(['charset' => 'UTF-8', 'version' => '1.1']);
+                $this->frameworkResponse->getHeaders()->set('Cache-Control', 'public, max-age=600');
+            }
+        }
 
         public function redirect(string $url): self
         {
@@ -383,6 +395,7 @@ namespace {
         public function setNoCacheHeaders(): void
         {
             $this->noCacheCalls++;
+            $this->frameworkResponse?->setNoCacheHeaders();
         }
     }
 
@@ -411,7 +424,8 @@ namespace {
         $settings->unprotectedUrls = $unprotectedUrls;
         $settings->protectedUrls = $protectedUrls;
         $settings->enableStaticCaching = $options['static'] ?? false;
-        $request = new FakeRequest($path, $options['get'] ?? true, $options['token'] ?? null);
+        $settings->enabled = $options['enabled'] ?? true;
+        $request = new FakeRequest($path, $options['get'] ?? true, $options['token'] ?? null, $options);
         $application = new FakeApplication($request, $options['user'] ?? null);
 
         Craft::$app = $application;
@@ -428,7 +442,23 @@ namespace {
         $testAccess = new ReflectionMethod(KnockKnock::class, '_testAccess');
         $testAccess->invoke($plugin);
 
+        if ($application->response->frameworkResponse !== null) {
+            $headers = $application->response->frameworkResponse->getHeaders();
+            $expectedCacheControl = $application->response->noCacheCalls ? 'no-cache, no-store, must-revalidate' : 'public, max-age=600';
+            assertSame($expectedCacheControl, $headers->get('Cache-Control'), 'The gate must apply its cache decision to the actual Craft response headers.');
+
+            if ($application->response->noCacheCalls) {
+                assertSame('0', $headers->get('Expires'), 'Protected responses must expire immediately.');
+                assertSame('no-cache', $headers->get('Pragma'), 'Protected responses must send the legacy no-cache header.');
+            }
+        }
+
         return [$application, AccessTokenHelper::$validationCalls, ReturnUrlHelper::$storeCalls];
+    }
+
+    if ($vendor = getenv('KK_VENDOR_PATH')) {
+        require $vendor . '/autoload.php';
+        require_once $vendor . '/yiisoft/yii2/Yii.php';
     }
 
     require dirname(__DIR__, 2) . '/src/KnockKnock.php';
@@ -441,10 +471,12 @@ namespace {
     [$application, $validationCalls] = runGate(IpHelper::ACCESS_NEUTRAL);
     assertSame(1, $validationCalls, 'A neutral IP must retain normal cookie validation.');
     assertSame(0, $application->endCalls, 'A valid cookie must continue to grant a neutral IP access.');
+    assertSame(1, $application->response->noCacheCalls, 'A protected page accessed with the default cookie must not be cached.');
 
     [$application, $validationCalls] = runGate(IpHelper::ACCESS_ALLOWED);
     assertSame(0, $validationCalls, 'An allowed IP must bypass the gate without consulting the cookie.');
     assertSame(0, $application->endCalls, 'An allowed IP must retain its gate bypass.');
+    assertSame(1, $application->response->noCacheCalls, 'A protected page served to an allowed IP must not be cached in default mode.');
 
     [$application, $validationCalls] = runGate(IpHelper::ACCESS_DENIED, 'public', ['public']);
     assertSame(0, $validationCalls, 'A denied IP must not regain gated access through its cookie.');
@@ -466,6 +498,33 @@ namespace {
         assertSame(0, $application->endCalls, 'Normal account and challenge routes must remain available.');
         [$application] = runGate(IpHelper::ACCESS_DENIED, $accountPath . '#section');
         assertSame(1, $application->endCalls, 'A literal path suffix must not become an account-route exemption.');
+    }
+
+    // Successful access must not turn a protected page into a public cache entry.
+    foreach ([
+        'cookie' => [IpHelper::ACCESS_NEUTRAL, []],
+        'allowed IP' => [IpHelper::ACCESS_ALLOWED, []],
+        'Craft user' => [IpHelper::ACCESS_NEUTRAL, ['user' => new stdClass()]],
+        'preview token' => [IpHelper::ACCESS_NEUTRAL, ['token' => 'preview-token']],
+        'live preview' => [IpHelper::ACCESS_NEUTRAL, ['user' => new stdClass(), 'livePreview' => true]],
+    ] as $label => [$accessStatus, $options]) {
+        [$application] = runGate($accessStatus, 'members', [], [], $options);
+        assertSame(0, $application->endCalls, "$label must retain access.");
+        assertSame(1, $application->response->noCacheCalls, "$label must not make protected content cacheable.");
+
+        [$application] = runGate($accessStatus, 'public', ['public'], [], $options);
+        assertSame(0, $application->response->noCacheCalls, "$label must leave explicitly public URLs cacheable.");
+
+        [$application] = runGate($accessStatus, 'public', [], ['members'], $options);
+        assertSame(0, $application->response->noCacheCalls, "$label must leave URLs outside the protected set cacheable.");
+
+        [$application] = runGate($accessStatus, 'members', [], [], $options + ['enabled' => false]);
+        assertSame(0, $application->response->noCacheCalls, "Disabled protection must leave $label responses alone.");
+    }
+
+    foreach ([['action' => true], ['console' => true], ['cp' => true, 'user' => new stdClass()]] as $options) {
+        [$application] = runGate(IpHelper::ACCESS_NEUTRAL, 'members', [], [], $options);
+        assertSame(0, $application->response->noCacheCalls, 'Unprotected action, console and CP responses must be left alone.');
     }
 
     // Static caching mode
@@ -502,7 +561,7 @@ namespace {
     assertSame(1, $application->response->noCacheCalls, 'A protected page served to a logged-in user must not be cached for visitors without the access cookie.');
 
     [$application] = runGate(IpHelper::ACCESS_NEUTRAL, 'members', [], [], ['user' => new stdClass()]);
-    assertSame(0, $application->response->noCacheCalls, 'Without static caching, logged-in users’ responses must be left alone.');
+    assertSame(1, $application->response->noCacheCalls, 'Without static caching, protected pages served to logged-in users must not be cached.');
 
     [$application] = runGate(IpHelper::ACCESS_NEUTRAL, 'members', [], [], $static + ['token' => 'preview-token']);
     assertSame(0, $application->endCalls, 'Token requests must retain their gate bypass.');

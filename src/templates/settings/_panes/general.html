@@ -47,7 +47,7 @@
 
 {{ forms.textField({
     label: 'Cookie Duration' | t('knock-knock'),
-    instructions: 'How long a visitor stays logged in for, in seconds, before being asked for the password again. Set to `0` to have access last until the browser is closed.' | t('knock-knock'),
+    instructions: 'How long a visitor stays logged in for, in seconds, before being asked for the password again. Set to `0` to have access last until the browser is closed. With static caching enabled, expiry is enforced only by the browser.' | t('knock-knock'),
     id: 'cookieDuration',
     name: 'cookieDuration',
     placeholder: '3600',
@@ -58,7 +58,7 @@
 
 {{ forms.booleanMenuField({
     label: 'Enable Static Caching' | t('knock-knock'),
-    instructions: 'Whether the password prompt and protected pages should be statically cacheable, using an access cookie that your static cache (e.g. Craft Cloud) includes in its cache keys. Only enable this once your cache rules include the cookie.' | t('knock-knock'),
+    instructions: 'Allow the password prompt and protected pages to be cached. Only enable this after your cache rules include the access cookie for every protected URL. Cookies have no server-side expiry, and IP rules and access exemptions only apply when requests reach Craft. Clear static caches after changing access settings.' | t('knock-knock'),
     id: 'enableStaticCaching',
     name: 'enableStaticCaching',
     includeEnvVars: true,

@@ -75,7 +75,9 @@ Provide a URL to be redirected to after the password is accepted. By default, Kn
 
 **Type:** `string|int` · **Default:** `3600`
 
-How long a visitor stays logged in for before being asked for the password again. Accepts a number of seconds, or any duration value Craft supports, like `'P1D'` for a day. Set to `0` for access to last until the visitor closes their browser. This is a fixed expiry from the time of login, not an idle timeout. Changing the duration or effective password invalidates existing access.
+How long a visitor stays logged in for before being asked for the password again. Accepts a number of seconds, or any duration value Craft supports, like `'P1D'` for a day. Set to `0` for access to last until the visitor closes their browser. This is a fixed expiry from the time of login, not an idle timeout. With static caching disabled, changing the duration or effective password invalidates existing access.
+
+With `enableStaticCaching` enabled, this only sets the browser cookie’s expiry. The static access token has no server-side expiry, and changing the duration does not revoke existing access. See the [static caching limitations](docs:feature-tour/usage#static-caching).
 :::
 
 
@@ -86,7 +88,9 @@ How long a visitor stays logged in for before being asked for the password again
 
 Whether the password prompt and protected pages should be statically cacheable, such as by [Craft Cloud](https://craftcms.com/docs/cloud/static-caching.html). By default, Knock Knock prevents its responses from being cached, so a cached password prompt can’t be shown to visitors who have entered the password.
 
-When enabled, visitors who enter the password get an access cookie with the same value, which your static cache must include in its cache keys. **Only enable this once your cache rules include the cookie.** See [Static Caching](docs:feature-tour/usage#static-caching).
+When enabled, visitors who enter the password get an access cookie with the same value, which your static cache must include in its cache keys. **Only enable this once your cache rules include the cookie for every protected URL.**
+
+This mode relies on browser-only cookie expiry. IP rules and other access exemptions only run when requests reach Craft, and access changes require cache purging. Read the setup instructions and limitations under [Static Caching](docs:feature-tour/usage#static-caching) before enabling it.
 :::
 
 

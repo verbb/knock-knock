@@ -164,6 +164,11 @@ class KnockKnock extends Plugin
         $accessPassword = $settings->getPassword();
 
         if ($ipAccessStatus !== IpHelper::ACCESS_DENIED && $accessPassword !== '' && $this->_hasValidAccessCookie($settings, $accessPassword)) {
+            // Only the opt-in static cookie can safely distinguish protected cached responses.
+            if (!$settings->getEnableStaticCaching()) {
+                $this->_preventStaticCaching($settings);
+            }
+
             return;
         }
 
@@ -220,16 +225,11 @@ class KnockKnock extends Plugin
     }
 
     /**
-     * Prevents a protected page from being statically cached, when it’s being served to a visitor who hasn’t
-     * entered the password (e.g. a logged-in user or an allowed IP). Otherwise, it would be cached for all
-     * visitors without the access cookie.
+     * Keeps protected responses out of shared caches in default mode and when access bypasses the
+     * static cookie. Public URLs retain their existing cache policy in either mode.
      */
     private function _preventStaticCaching(Settings $settings): void
     {
-        if (!$settings->getEnableStaticCaching()) {
-            return;
-        }
-
         $currentPath = trim(Craft::$app->getRequest()->getPathInfo(), '/');
 
         if ($this->_isProtectedPath($currentPath, $settings)) {

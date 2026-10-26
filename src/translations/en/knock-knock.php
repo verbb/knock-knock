@@ -2,6 +2,7 @@
 
 return [
   'Allow IPs' => 'Allow IPs',
+  'Allow the password prompt and protected pages to be cached. Only enable this after your cache rules include the access cookie for every protected URL. Cookies have no server-side expiry, and IP rules and access exemptions only apply when requests reach Craft. Clear static caches after changing access settings.' => 'Allow the password prompt and protected pages to be cached. Only enable this after your cache rules include the access cookie for every protected URL. Cookies have no server-side expiry, and IP rules and access exemptions only apply when requests reach Craft. Clear static caches after changing access settings.',
   'Check Invalid Logins' => 'Check Invalid Logins',
   'Cookie Duration' => 'Cookie Duration',
   'Custom Login Path' => 'Custom Login Path',
@@ -10,7 +11,7 @@ return [
   'Enabled' => 'Enabled',
   'Enabled CP Protection' => 'Enabled CP Protection',
   'General Settings' => 'General Settings',
-  'How long a visitor stays logged in for, in seconds, before being asked for the password again. Set to `0` to have access last until the browser is closed.' => 'How long a visitor stays logged in for, in seconds, before being asked for the password again. Set to `0` to have access last until the browser is closed.',
+  'How long a visitor stays logged in for, in seconds, before being asked for the password again. Set to `0` to have access last until the browser is closed. With static caching enabled, expiry is enforced only by the browser.' => 'How long a visitor stays logged in for, in seconds, before being asked for the password again. Set to `0` to have access last until the browser is closed. With static caching enabled, expiry is enforced only by the browser.',
   'Invalid Login Window Duration' => 'Invalid Login Window Duration',
   'Invalid password' => 'Invalid password',
   'Knock Knock' => 'Knock Knock',
@@ -39,7 +40,6 @@ return [
   'Unprotected URLs' => 'Unprotected URLs',
   'URLs' => 'URLs',
   'Use Remote IP' => 'Use Remote IP',
-  'Whether the password prompt and protected pages should be statically cacheable, using an access cookie that your static cache (e.g. Craft Cloud) includes in its cache keys. Only enable this once your cache rules include the cookie.' => 'Whether the password prompt and protected pages should be statically cacheable, using an access cookie that your static cache (e.g. Craft Cloud) includes in its cache keys. Only enable this once your cache rules include the cookie.',
   'Whether the plugin should be enabled control panel protection.' => 'Whether the plugin should be enabled control panel protection.',
   'Whether the plugin should be enabled.' => 'Whether the plugin should be enabled.',
   'Whether to check and log invalid logins. This will lock IP addresses out of the system in certain circumstances, but can help against brute-force logins.' => 'Whether to check and log invalid logins. This will lock IP addresses out of the system in certain circumstances, but can help against brute-force logins.',
