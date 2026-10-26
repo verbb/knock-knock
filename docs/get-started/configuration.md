@@ -80,6 +80,26 @@ How long a visitor stays logged in for before being asked for the password again
 
 
 ::: reference
+### `enableStaticCaching`
+
+**Type:** `bool|string` · **Default:** `false`
+
+Whether the password prompt and protected pages should be statically cacheable, such as by [Craft Cloud](https://craftcms.com/docs/cloud/static-caching.html). By default, Knock Knock prevents its responses from being cached, so a cached password prompt can’t be shown to visitors who have entered the password.
+
+When enabled, visitors who enter the password get an access cookie with the same value, which your static cache must include in its cache keys. **Only enable this once your cache rules include the cookie.** See [Static Caching](docs:feature-tour/usage#static-caching).
+:::
+
+
+::: reference
+### `staticCacheCookieName`
+
+**Type:** `string` · **Default:** `'knockKnockAccess'`
+
+The name of the access cookie to set when `enableStaticCaching` is enabled. Cookie names may only contain letters, numbers and the characters `` !#$%&'*+-^_`|~ ``.
+:::
+
+
+::: reference
 ### `siteSettings`
 
 **Type:** `array` · **Default:** `[]`

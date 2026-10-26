@@ -1,0 +1,110 @@
+{#
+ # The password prompt used when static caching is enabled.
+ #
+ # This avoids the control panel layout and synchronous CSRF inputs, which set cookies,
+ # so the prompt can be statically cached for visitors who haven’t entered the password.
+ #}
+<!DOCTYPE html>
+<html lang="{{ craft.app.language }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{{ 'Site Locked' | t('knock-knock') }}</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e4edf6;
+            color: #1f2a37;
+        }
+
+        .kk-form {
+            box-sizing: border-box;
+            width: calc(100% - 32px);
+            max-width: 340px;
+            padding: 24px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 0 0 1px rgba(31, 42, 55, 0.1), 0 2px 12px rgba(31, 42, 55, 0.1);
+        }
+
+        .kk-h1 {
+            margin: 0 0 20px;
+            text-align: center;
+            font-size: 1.6rem;
+        }
+
+        .kk-input,
+        .kk-button {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font: inherit;
+        }
+
+        .kk-input {
+            border: 1px solid #b9c3cf;
+        }
+
+        .kk-errors {
+            margin: 8px 0 0;
+            padding: 0;
+            list-style: none;
+            color: #cf1124;
+            font-size: 0.875rem;
+        }
+
+        .kk-button {
+            margin-top: 16px;
+            border: 0;
+            background-color: #e12d39;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <form class="kk-form" method="post" accept-charset="UTF-8">
+            {{ actionInput('knock-knock/default/answer') }}
+            {{ csrfInput({ async: true }) }}
+            {{ redirectInput(redirect) }}
+
+            <h1 class="kk-h1">{{ 'Site locked' | t('knock-knock') }}</h1>
+
+            <input
+                id="kk-password"
+                class="kk-input"
+                type="password"
+                name="password"
+                placeholder="{{ 'Password' | t('knock-knock') }}"
+                aria-label="{{ 'Password' | t('knock-knock') }}"
+                autocomplete="kk-password"
+                required
+                autofocus
+                {% if errors.password is defined %}aria-describedby="kk-password-errors" aria-invalid="true"{% endif %}
+            >
+
+            {% if errors.password is defined %}
+                <ul id="kk-password-errors" class="kk-errors">
+                    {% for error in errors.password is iterable ? errors.password : [errors.password] %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <button class="kk-button" type="submit">{{ 'Unlock' | t('knock-knock') }}</button>
+        </form>
+    </main>
+</body>
+</html>

@@ -26,6 +26,8 @@ class Settings extends Model
     public string|int $cookieDuration = 3600;
     public array $siteSettings = [];
     public bool|string $enableCpProtection = false;
+    public bool|string $enableStaticCaching = false;
+    public string $staticCacheCookieName = '';
 
     public bool $checkInvalidLogins = false;
     public string $invalidLoginWindowDuration = '3600';
@@ -48,6 +50,11 @@ class Settings extends Model
 
     public function getDefaultTemplate(): string
     {
+        // Cacheable responses can’t use the control panel layout, as it sets a CSRF cookie
+        if ($this->getEnableStaticCaching()) {
+            return 'knock-knock/ask-static';
+        }
+
         if (version_compare(Craft::$app->getInfo()->version, '5.6.0', '>=')) {
             return 'knock-knock/ask-craft-5-6';
         }
@@ -58,6 +65,16 @@ class Settings extends Model
     public function getEnableCpProtection(bool $parse = true): bool|string
     {
         return $this->_getBooleanSettingValue('enableCpProtection', $parse);
+    }
+
+    public function getEnableStaticCaching(bool $parse = true): bool|string
+    {
+        return $this->_getBooleanSettingValue('enableStaticCaching', $parse);
+    }
+
+    public function getStaticCacheCookieName(): string
+    {
+        return $this->_getSettingValue('staticCacheCookieName') ?? 'knockKnockAccess';
     }
 
     public function getTemplate(): string
@@ -116,6 +133,20 @@ class Settings extends Model
     public function getUnprotectedUrls(): array
     {
         return $this->_normalizeUrls($this->unprotectedUrls);
+    }
+
+
+    // Protected Methods
+    // =========================================================================
+
+    protected function defineRules(): array
+    {
+        $rules = parent::defineRules();
+
+        // Must be a valid cookie name (RFC 6265 token), without dots, which PHP converts to underscores
+        $rules[] = [['staticCacheCookieName'], 'match', 'pattern' => '/^[!#$%&\'*+\-^_`|~0-9A-Za-z]*$/'];
+
+        return $rules;
     }
 
 
