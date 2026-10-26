@@ -7,6 +7,12 @@ namespace yii\web {
     {
         public array $data = [];
         public ?string $redirect = null;
+        public ?string $template = null;
+        public ?string $templateMode = null;
+    }
+
+    class BadRequestHttpException extends \RuntimeException
+    {
     }
 
     class Cookie
@@ -69,10 +75,12 @@ namespace craft\web {
             return $response;
         }
 
-        public function renderTemplate(string $template, array $data): Response
+        public function renderTemplate(string $template, array $data, ?string $templateMode = null): Response
         {
             $response = new Response();
             $response->data = $data;
+            $response->template = $template;
+            $response->templateMode = $templateMode;
 
             return $response;
         }
@@ -97,6 +105,11 @@ namespace craft\web {
             return true;
         }
 
+        public function getTemplateMode(): string
+        {
+            return $this->templateMode;
+        }
+
         public function setTemplateMode(string $templateMode): void
         {
             $this->templateMode = $templateMode;
@@ -116,6 +129,7 @@ namespace verbb\knockknock\models {
         public bool $checkInvalidLogins = true;
         public array $denyIps = [];
         public bool $enabled = true;
+        public bool $enableStaticCaching = false;
         public string $password = 'correct-password';
 
         public function getAllowIps(): array
@@ -143,6 +157,16 @@ namespace verbb\knockknock\models {
             return $this->enabled;
         }
 
+        public function getEnableStaticCaching(): bool
+        {
+            return $this->enableStaticCaching;
+        }
+
+        public function getStaticCacheCookieName(): string
+        {
+            return 'knockKnockAccess';
+        }
+
         public function getPassword(): string
         {
             return $this->password;
@@ -168,6 +192,18 @@ namespace verbb\knockknock\helpers {
         public static function getCookieName(): string
         {
             return 'knock-knock-access';
+        }
+
+        public static array $presentCookies = [];
+
+        public static function createStatic(string $password): string
+        {
+            return "static:$password";
+        }
+
+        public static function hasCookie(string $cookieName): bool
+        {
+            return in_array($cookieName, self::$presentCookies, true);
         }
     }
 
@@ -214,6 +250,11 @@ namespace verbb\knockknock\helpers {
         {
             return '/protected';
         }
+
+        public static function sanitize(?string $url): string
+        {
+            return is_string($url) && str_starts_with($url, '/') && !str_starts_with($url, '//') ? $url : '/';
+        }
     }
 }
 
@@ -230,6 +271,8 @@ namespace {
     use verbb\knockknock\helpers\ReturnUrlHelper;
     use verbb\knockknock\models\Login;
     use verbb\knockknock\models\Settings;
+    use verbb\knockknock\helpers\AccessTokenHelper;
+    use yii\web\BadRequestHttpException;
     use yii\web\MethodNotAllowedHttpException;
     use yii\web\NotFoundHttpException;
 
@@ -367,6 +410,27 @@ namespace {
         public function getIsPost(): bool
         {
             return $this->isPost;
+        }
+
+        public function getIsGet(): bool
+        {
+            return !$this->isPost;
+        }
+
+        public function getValidatedBodyParam(string $name): ?string
+        {
+            $value = $this->body[$name] ?? null;
+
+            if ($value === null) {
+                return null;
+            }
+
+            // Simulates Craft’s hashed body params: only values signed by the app are accepted
+            if (!is_string($value) || !str_starts_with($value, 'signed:')) {
+                throw new BadRequestHttpException('Request contained an invalid body param');
+            }
+
+            return substr($value, strlen('signed:'));
         }
 
         public function getParam(string $name, mixed $defaultValue = null): mixed
@@ -508,6 +572,67 @@ namespace {
     $disabledSettings->enabled = false;
     [$controller] = createController(true, [], ['password' => 'correct-password'], $disabledSettings);
     assertThrows(NotFoundHttpException::class, $controller->actionAnswer(...), 'A disabled gate must retain its existing not-found behavior.');
+
+    // Static caching mode
+    // -------------------------------------------------------------------------
+
+    $staticSettings = static function(string $forcedRedirect = ''): Settings {
+        $settings = new Settings();
+        $settings->enableStaticCaching = true;
+        $settings->forcedRedirect = $forcedRedirect;
+
+        return $settings;
+    };
+
+    ReturnUrlHelper::$forgetCalls = 0;
+    [$controller, $request, $plugin, $logins, $application] = createController(true, [], ['password' => 'correct-password', 'redirect' => 'signed:/members?page=2'], $staticSettings());
+    $response = $controller->actionAnswer();
+    $cookie = $application->response->cookies->cookies[0] ?? null;
+    assertSame('knockKnockAccess', $cookie?->config['name'] ?? null, 'Static caching must set the configured access cookie.');
+    assertSame('static:correct-password', $cookie?->config['value'] ?? null, 'Static caching must set the shared, password-derived access token.');
+    assertSame(true, ($cookie?->config['expire'] ?? 0) > time(), 'The static access cookie must still expire after the cookie duration.');
+    assertSame('/members?page=2', $response->redirect, 'Static caching must return the visitor to the signed, posted return URL.');
+    assertSame(0, ReturnUrlHelper::$forgetCalls, 'Static caching must not touch the session-based return URL.');
+    assertSame(true, $application->response->noCacheCalls > 0, 'A successful access attempt must never be cached.');
+
+    [$controller, $request, $plugin, $logins, $application] = createController(true, [], ['password' => 'correct-password', 'redirect' => '/members'], $staticSettings());
+    assertThrows(BadRequestHttpException::class, $controller->actionAnswer(...), 'An unsigned return URL must be rejected.');
+    assertSame(0, count($application->response->cookies->cookies), 'A rejected return URL must not leave an access cookie behind.');
+
+    [$controller] = createController(true, [], ['password' => 'correct-password'], $staticSettings());
+    assertSame('/', $controller->actionAnswer()->redirect, 'A missing return URL must fall back to the site.');
+
+    foreach (['https://evil.test/members', '//evil.test/members'] as $offsiteUrl) {
+        [$controller] = createController(true, [], ['password' => 'correct-password', 'redirect' => "signed:$offsiteUrl"], $staticSettings());
+        assertSame('/', $controller->actionAnswer()->redirect, 'A return URL must stay on the site, even when signed.');
+    }
+
+    [$controller] = createController(true, [], ['password' => 'correct-password', 'redirect' => 'signed:/members'], $staticSettings('/welcome'));
+    assertSame('/welcome', $controller->actionAnswer()->redirect, 'A forced redirect must still take precedence.');
+
+    [$controller, $request, $plugin, $logins, $application] = createController(true, [], ['password' => 'wrong', 'redirect' => 'signed:/members'], $staticSettings());
+    $response = $controller->actionAnswer();
+    assertSame('Invalid password', $response->data['errors']['password'] ?? null, 'Static caching must retain the invalid password response.');
+    assertSame('/members', $response->data['redirect'] ?? null, 'An invalid attempt must keep the return URL for the next attempt.');
+    assertSame(0, count($application->response->cookies->cookies), 'An invalid attempt must not set an access cookie.');
+    assertSame(true, $application->response->noCacheCalls > 0, 'An access attempt response must never be cached.');
+
+    AccessTokenHelper::$presentCookies = [];
+    [$controller, $request, $plugin, $logins, $application] = createController(false, [], [], $staticSettings());
+    $response = $controller->renderPrompt('/members');
+    assertSame('/members', $response->data['redirect'] ?? null, 'The prompt must be given the return URL.');
+    assertSame('cp', $response->templateMode, 'The prompt must render in the template mode its template was found in.');
+    assertSame(0, $application->response->noCacheCalls, 'With static caching, the prompt must be cacheable for visitors without the access cookie.');
+
+    AccessTokenHelper::$presentCookies = ['knockKnockAccess'];
+    [$controller, $request, $plugin, $logins, $application] = createController(false, [], [], $staticSettings());
+    $controller->renderPrompt('/members');
+    assertSame(1, $application->response->noCacheCalls, 'The prompt must not be cached under a key that includes the access cookie.');
+    AccessTokenHelper::$presentCookies = [];
+
+    [$controller, $request, $plugin, $logins, $application] = createController(false, [], []);
+    $controller->renderPrompt('/members');
+    assertSame(1, $application->response->noCacheCalls, 'Without static caching, the prompt must never be cached.');
 
     echo "Knock Knock access-attempt request security fixture passed.\n";
 }

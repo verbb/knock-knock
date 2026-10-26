@@ -2,6 +2,7 @@
 namespace verbb\knockknock;
 
 use verbb\knockknock\base\PluginTrait;
+use verbb\knockknock\controllers\DefaultController;
 use verbb\knockknock\helpers\AccessTokenHelper;
 use verbb\knockknock\helpers\IpHelper;
 use verbb\knockknock\helpers\ReturnUrlHelper;
@@ -104,7 +105,13 @@ class KnockKnock extends Plugin
         $token = $request->getToken();
 
         // Console requests and cross-site preview tokens remain outside the gate.
-        if ($request->getIsConsoleRequest() || $token !== null) {
+        if ($request->getIsConsoleRequest()) {
+            return;
+        }
+
+        if ($token !== null) {
+            $this->_preventStaticCaching($settings);
+
             return;
         }
 
@@ -117,6 +124,8 @@ class KnockKnock extends Plugin
 
         // Live Preview requests are fine, but only for authenticated users
         if ($user && ($request->getIsLivePreview() || $request->getIsPreview())) {
+            $this->_preventStaticCaching($settings);
+
             return;
         }
 
@@ -126,6 +135,10 @@ class KnockKnock extends Plugin
             if ($settings->getEnableCpProtection() && $request->getIsCpRequest()) {
                 // We want to show the login screen
             } else {
+                if ($user && $request->getIsSiteRequest()) {
+                    $this->_preventStaticCaching($settings);
+                }
+
                 return;
             }
         }
@@ -143,27 +156,30 @@ class KnockKnock extends Plugin
         $ipAccessStatus = IpHelper::getAccessStatus($ipAddress, $settings->getAllowIps(), $settings->getDenyIps());
 
         if ($ipAccessStatus === IpHelper::ACCESS_ALLOWED) {
+            $this->_preventStaticCaching($settings);
+
             return;
         }
 
         $accessPassword = $settings->getPassword();
 
-        if ($ipAccessStatus !== IpHelper::ACCESS_DENIED && $accessPassword !== '' && AccessTokenHelper::validate($accessPassword, $settings->getCookieDuration())) {
+        if ($ipAccessStatus !== IpHelper::ACCESS_DENIED && $accessPassword !== '' && $this->_hasValidAccessCookie($settings, $accessPassword)) {
             return;
         }
 
-        // Check if the requested URL is explicitly unprotected. If yes, allow the request.
-        if ($settings->getUnprotectedUrls()) {
-            if ($this->_matchesUrlRules($currentPath, $settings->getUnprotectedUrls()) === self::URL_RULE_MATCH) {
-                return;
-            }
+        if (!$this->_isProtectedPath($currentPath, $settings)) {
+            return;
         }
 
-        // Check to see if we're watching only specific URLs. By default, protect everything though
-        if ($settings->getProtectedUrls()) {
-            if ($this->_matchesUrlRules($currentPath, $settings->getProtectedUrls(), true) === self::URL_RULE_NO_MATCH) {
-                return;
-            }
+        // When static caching is enabled, show the prompt at the protected URL itself, rather than redirecting
+        // and storing the URL in the session, so it can be cached for visitors without the access cookie
+        if ($settings->getEnableStaticCaching() && $request->getIsSiteRequest() && $request->getIsGet() && !$request->getIsActionRequest()) {
+            /* @var DefaultController $controller */
+            $controller = $this->createControllerByID('default');
+            $response = $controller->renderPrompt(ReturnUrlHelper::sanitize($request->getUrl()));
+            Craft::$app->end(0, $response);
+
+            return;
         }
 
         if ($request->getIsSiteRequest()) {
@@ -173,6 +189,52 @@ class KnockKnock extends Plugin
         Craft::$app->getResponse()->setNoCacheHeaders();
         Craft::$app->getResponse()->redirect(UrlHelper::siteUrl($settings->getLoginPath()));
         Craft::$app->end();
+    }
+
+    private function _hasValidAccessCookie(Settings $settings, string $accessPassword): bool
+    {
+        if ($settings->getEnableStaticCaching()) {
+            return AccessTokenHelper::validateStatic($accessPassword, $settings->getStaticCacheCookieName());
+        }
+
+        return AccessTokenHelper::validate($accessPassword, $settings->getCookieDuration());
+    }
+
+    private function _isProtectedPath(string $currentPath, Settings $settings): bool
+    {
+        // Check if the requested URL is explicitly unprotected. If yes, allow the request.
+        if ($settings->getUnprotectedUrls()) {
+            if ($this->_matchesUrlRules($currentPath, $settings->getUnprotectedUrls()) === self::URL_RULE_MATCH) {
+                return false;
+            }
+        }
+
+        // Check to see if we're watching only specific URLs. By default, protect everything though
+        if ($settings->getProtectedUrls()) {
+            if ($this->_matchesUrlRules($currentPath, $settings->getProtectedUrls(), true) === self::URL_RULE_NO_MATCH) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Prevents a protected page from being statically cached, when it’s being served to a visitor who hasn’t
+     * entered the password (e.g. a logged-in user or an allowed IP). Otherwise, it would be cached for all
+     * visitors without the access cookie.
+     */
+    private function _preventStaticCaching(Settings $settings): void
+    {
+        if (!$settings->getEnableStaticCaching()) {
+            return;
+        }
+
+        $currentPath = trim(Craft::$app->getRequest()->getPathInfo(), '/');
+
+        if ($this->_isProtectedPath($currentPath, $settings)) {
+            Craft::$app->getResponse()->setNoCacheHeaders();
+        }
     }
 
     private function _matchesUrlRules(string $currentPath, array $rules, bool $caseInsensitive = false): int

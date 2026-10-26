@@ -32,6 +32,15 @@ class ReturnUrlHelper
         Craft::$app->getSession()->remove(self::_sessionKey());
     }
 
+    /**
+     * Returns the given URL if it’s a safe, root-relative return URL, or the site’s base path otherwise,
+     * without involving the session.
+     */
+    public static function sanitize(?string $url): string
+    {
+        return is_string($url) ? self::_normalize($url) : self::_fallbackUrl();
+    }
+
 
     // Private Methods
     // =========================================================================

@@ -56,6 +56,28 @@
     warning: macros.configWarning('cookieDuration', 'knock-knock'),
 }) }}
 
+{{ forms.booleanMenuField({
+    label: 'Enable Static Caching' | t('knock-knock'),
+    instructions: 'Whether the password prompt and protected pages should be statically cacheable, using an access cookie that your static cache (e.g. Craft Cloud) includes in its cache keys. Only enable this once your cache rules include the cookie.' | t('knock-knock'),
+    id: 'enableStaticCaching',
+    name: 'enableStaticCaching',
+    includeEnvVars: true,
+    value: settings.getEnableStaticCaching(false),
+    errors: settings.getErrors('enableStaticCaching'),
+    warning: macros.configWarning('enableStaticCaching', 'knock-knock'),
+}) }}
+
+{{ forms.textField({
+    label: 'Static Cache Cookie Name' | t('knock-knock'),
+    instructions: 'The name of the access cookie to set when static caching is enabled, which your cache rules should include.' | t('knock-knock'),
+    id: 'staticCacheCookieName',
+    name: 'staticCacheCookieName',
+    placeholder: 'knockKnockAccess',
+    value: settings.staticCacheCookieName,
+    errors: settings.getErrors('staticCacheCookieName'),
+    warning: macros.configWarning('staticCacheCookieName', 'knock-knock'),
+}) }}
+
 {{ forms.autosuggestField({
     label: 'Template' | t('knock-knock'),
     instructions: 'Select a custom template to be shown as the password protected page. Leave empty for the default.' | t('knock-knock'),

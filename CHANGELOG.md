@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Added the `enableStaticCaching` and `staticCacheCookieName` settings, which allow the password prompt and protected pages to be statically cached (e.g. by Craft Cloud), using an access cookie that’s included in the cache keys.
+
 ## 3.0.15 - 2026-10-22
 
 ### Changed

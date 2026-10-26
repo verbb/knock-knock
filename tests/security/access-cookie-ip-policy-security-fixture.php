@@ -12,6 +12,11 @@ namespace craft\base {
         public function init(): void
         {
         }
+
+        public function createControllerByID(string $id): object
+        {
+            return new \FakePromptController();
+        }
     }
 }
 
@@ -87,6 +92,16 @@ namespace verbb\knockknock\helpers {
 
             return self::$valid;
         }
+
+        public static bool $staticValid = false;
+        public static int $staticValidationCalls = 0;
+
+        public static function validateStatic(string $password, string $cookieName): bool
+        {
+            self::$staticValidationCalls++;
+
+            return $cookieName === 'knockKnockAccess' && self::$staticValid;
+        }
     }
 
     class IpHelper
@@ -116,6 +131,11 @@ namespace verbb\knockknock\helpers {
         {
             self::$storeCalls++;
         }
+
+        public static function sanitize(?string $url): string
+        {
+            return is_string($url) && str_starts_with($url, '/') && !str_starts_with($url, '//') ? $url : '/';
+        }
     }
 }
 
@@ -124,6 +144,7 @@ namespace verbb\knockknock\models {
     {
         public array $protectedUrls = [];
         public array $unprotectedUrls = [];
+        public bool $enableStaticCaching = false;
 
         public function getAllowIps(): array
         {
@@ -143,6 +164,16 @@ namespace verbb\knockknock\models {
         public function getEnableCpProtection(): bool
         {
             return false;
+        }
+
+        public function getEnableStaticCaching(): bool
+        {
+            return $this->enableStaticCaching;
+        }
+
+        public function getStaticCacheCookieName(): string
+        {
+            return 'knockKnockAccess';
         }
 
         public function getEnabled(): bool
@@ -191,16 +222,18 @@ namespace {
     final class FakeApplication
     {
         public int $endCalls = 0;
+        public mixed $endResponse = null;
         public FakeResponse $response;
 
-        public function __construct(private readonly FakeRequest $request)
+        public function __construct(private readonly FakeRequest $request, private readonly mixed $identity = null)
         {
             $this->response = new FakeResponse();
         }
 
-        public function end(): void
+        public function end(int $status = 0, mixed $response = null): void
         {
             $this->endCalls++;
+            $this->endResponse = $response;
         }
 
         public function getConfig(): object
@@ -250,10 +283,14 @@ namespace {
 
         public function getUser(): object
         {
-            return new class {
+            return new class($this->identity) {
+                public function __construct(private readonly mixed $identity)
+                {
+                }
+
                 public function getIdentity(): mixed
                 {
-                    return null;
+                    return $this->identity;
                 }
             };
         }
@@ -273,8 +310,16 @@ namespace {
 
     final class FakeRequest
     {
-        public function __construct(private readonly string $path)
+        public function __construct(
+            private readonly string $path,
+            private readonly bool $isGet = true,
+            private readonly ?string $token = null,
+        ) {
+        }
+
+        public function getIsGet(): bool
         {
+            return $this->isGet;
         }
 
         public function getIsActionRequest(): bool
@@ -314,7 +359,7 @@ namespace {
 
         public function getToken(): mixed
         {
-            return null;
+            return $this->token;
         }
 
         public function getUrl(): string
@@ -348,20 +393,36 @@ namespace {
         }
     }
 
-    function runGate(int $accessStatus, string $path = 'members', array $unprotectedUrls = [], array $protectedUrls = []): array
+    final class FakePromptController
+    {
+        public static array $prompts = [];
+
+        public function renderPrompt(string $redirect): string
+        {
+            self::$prompts[] = $redirect;
+
+            return "prompt:$redirect";
+        }
+    }
+
+    function runGate(int $accessStatus, string $path = 'members', array $unprotectedUrls = [], array $protectedUrls = [], array $options = []): array
     {
         $settings = new Settings();
         $settings->unprotectedUrls = $unprotectedUrls;
         $settings->protectedUrls = $protectedUrls;
-        $request = new FakeRequest($path);
-        $application = new FakeApplication($request);
+        $settings->enableStaticCaching = $options['static'] ?? false;
+        $request = new FakeRequest($path, $options['get'] ?? true, $options['token'] ?? null);
+        $application = new FakeApplication($request, $options['user'] ?? null);
 
         Craft::$app = $application;
         KnockKnock::$plugin = new FakePlugin($settings);
         IpHelper::$accessStatus = $accessStatus;
-        AccessTokenHelper::$valid = true;
+        AccessTokenHelper::$valid = $options['valid'] ?? true;
         AccessTokenHelper::$validationCalls = 0;
+        AccessTokenHelper::$staticValid = $options['staticValid'] ?? false;
+        AccessTokenHelper::$staticValidationCalls = 0;
         ReturnUrlHelper::$storeCalls = 0;
+        FakePromptController::$prompts = [];
 
         $plugin = new KnockKnock();
         $testAccess = new ReflectionMethod(KnockKnock::class, '_testAccess');
@@ -406,6 +467,59 @@ namespace {
         [$application] = runGate(IpHelper::ACCESS_DENIED, $accountPath . '#section');
         assertSame(1, $application->endCalls, 'A literal path suffix must not become an account-route exemption.');
     }
+
+    // Static caching mode
+    // -------------------------------------------------------------------------
+
+    $static = ['static' => true];
+
+    [$application, $validationCalls, $storeCalls] = runGate(IpHelper::ACCESS_NEUTRAL, 'members', [], [], $static);
+    assertSame(['/members'], FakePromptController::$prompts, 'Static caching must show the prompt at the protected URL.');
+    assertSame('prompt:/members', $application->endResponse, 'Static caching must end the request with the prompt response.');
+    assertSame(null, $application->response->redirect, 'Static caching must not redirect to the login path.');
+    assertSame(0, $storeCalls, 'Static caching must not store the return URL in the session.');
+    assertSame(0, $application->response->noCacheCalls, 'The gate must leave the prompt cacheable for visitors without the access cookie.');
+    assertSame(0, $validationCalls, 'Static caching must not accept the default access cookie.');
+    assertSame(1, AccessTokenHelper::$staticValidationCalls, 'Static caching must check the static access cookie.');
+
+    [$application] = runGate(IpHelper::ACCESS_NEUTRAL, 'members', [], [], $static + ['staticValid' => true]);
+    assertSame(0, $application->endCalls, 'A valid static access cookie must grant access.');
+    assertSame(0, $application->response->noCacheCalls, 'Pages accessed with the static access cookie must remain cacheable.');
+
+    [$application] = runGate(IpHelper::ACCESS_DENIED, 'members', [], [], $static + ['staticValid' => true]);
+    assertSame(0, AccessTokenHelper::$staticValidationCalls, 'A denied IP must not be granted access by a static access cookie.');
+    assertSame(['/members'], FakePromptController::$prompts, 'A denied IP must still be shown the prompt.');
+
+    [$application] = runGate(IpHelper::ACCESS_ALLOWED, 'members', [], [], $static);
+    assertSame(0, $application->endCalls, 'An allowed IP must retain its gate bypass.');
+    assertSame(1, $application->response->noCacheCalls, 'A protected page served to an allowed IP must not be cached for visitors without the access cookie.');
+
+    [$application] = runGate(IpHelper::ACCESS_ALLOWED, 'public', ['public'], [], $static);
+    assertSame(0, $application->response->noCacheCalls, 'An unprotected page served to an allowed IP may be cached.');
+
+    [$application] = runGate(IpHelper::ACCESS_NEUTRAL, 'members', [], [], $static + ['user' => new stdClass()]);
+    assertSame(0, $application->endCalls, 'Logged-in users must retain their gate bypass.');
+    assertSame(1, $application->response->noCacheCalls, 'A protected page served to a logged-in user must not be cached for visitors without the access cookie.');
+
+    [$application] = runGate(IpHelper::ACCESS_NEUTRAL, 'members', [], [], ['user' => new stdClass()]);
+    assertSame(0, $application->response->noCacheCalls, 'Without static caching, logged-in users’ responses must be left alone.');
+
+    [$application] = runGate(IpHelper::ACCESS_NEUTRAL, 'members', [], [], $static + ['token' => 'preview-token']);
+    assertSame(0, $application->endCalls, 'Token requests must retain their gate bypass.');
+    assertSame(1, $application->response->noCacheCalls, 'A protected page served for a token must not be cached for visitors without the access cookie.');
+
+    [$application, , $storeCalls] = runGate(IpHelper::ACCESS_NEUTRAL, 'members', [], [], $static + ['get' => false]);
+    assertSame([], FakePromptController::$prompts, 'Non-GET requests must not be shown an in-place prompt.');
+    assertSame(1, $storeCalls, 'Non-GET requests must use the existing redirect flow.');
+    assertSame(1, $application->response->noCacheCalls, 'The redirect to the login path must not be cached.');
+
+    [$application] = runGate(IpHelper::ACCESS_NEUTRAL, 'public', ['public'], [], $static);
+    assertSame(0, $application->endCalls, 'Unprotected URLs must remain public with static caching.');
+
+    [$application] = runGate(IpHelper::ACCESS_NEUTRAL, 'members', [], [], ['valid' => false]);
+    assertSame(1, $application->endCalls, 'Without static caching, visitors without a valid access cookie must reach the gate.');
+    assertSame([], FakePromptController::$prompts, 'Without static caching, the prompt must not be shown in place.');
+    assertSame(1, $application->response->noCacheCalls, 'Without static caching, the gate must keep sending no-cache headers.');
 
     echo "Knock Knock access-cookie IP policy security fixture passed.\n";
 }

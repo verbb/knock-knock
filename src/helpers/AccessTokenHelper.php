@@ -11,6 +11,8 @@ class AccessTokenHelper
     private const COOKIE_NAME_PREFIX = 'siteAccessToken-';
     private const TOKEN_PURPOSE = 'knock-knock.site-access';
     private const TOKEN_VERSION = 'v1';
+    private const STATIC_TOKEN_PURPOSE = 'knock-knock.static-site-access';
+    private const STATIC_TOKEN_VERSION = 's1';
 
 
     // Static Methods
@@ -61,6 +63,45 @@ class AccessTokenHelper
             self::_buildToken($password, $issuedAt, $issuedDuration),
             $cookie->value,
         );
+    }
+
+    /**
+     * Returns the access token used when static caching is enabled.
+     *
+     * Every visitor who enters the password gets the same token, so that a static cache can share responses
+     * between them, by including the cookie in its cache key. The token is derived from the password and
+     * Craft’s security key, so it can’t be guessed without the password.
+     */
+    public static function createStatic(string $password): string
+    {
+        $payload = implode("\0", [
+            self::STATIC_TOKEN_PURPOSE,
+            self::STATIC_TOKEN_VERSION,
+            self::_getSiteUid(),
+            $password,
+        ]);
+        $securityKey = Craft::$app->getConfig()->getGeneral()->securityKey;
+
+        return implode('.', [self::STATIC_TOKEN_VERSION, hash_hmac('sha256', $payload, $securityKey)]);
+    }
+
+    public static function validateStatic(string $password, string $cookieName): bool
+    {
+        $cookie = Craft::$app->getRequest()->getCookies()->get($cookieName);
+
+        if (!$cookie || !is_string($cookie->value)) {
+            return false;
+        }
+
+        return Craft::$app->getSecurity()->compareString(self::createStatic($password), $cookie->value);
+    }
+
+    /**
+     * Returns whether the request includes a cookie by the given name, whether or not its value is valid.
+     */
+    public static function hasCookie(string $cookieName): bool
+    {
+        return isset($_COOKIE[$cookieName]);
     }
 
     private static function _buildToken(string $password, int $issuedAt, int $duration): string
