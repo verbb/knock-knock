@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.0.16 - 2026-10-28
 
 ### Added
 - Added the `enableStaticCaching` and `staticCacheCookieName` settings, which allow the password prompt and protected pages to be statically cached (e.g. by Craft Cloud), using an access cookie that’s included in the cache keys. ([#86](https://github.com/verbb/knock-knock/pull/86))
