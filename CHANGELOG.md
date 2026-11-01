@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.0.17 - 2026-11-01
 
 ### Fixed
 - Fixed an error on the password prompt when the Invalid Login Window Duration setting was empty or invalid. It now falls back to the default of one hour.
