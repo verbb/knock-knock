@@ -14,6 +14,9 @@ use craft\helpers\Db;
 
 use yii\base\Component;
 use yii\base\Exception;
+use yii\base\InvalidArgumentException;
+
+use DateInterval;
 
 class Logins extends Component
 {
@@ -54,6 +57,7 @@ class Logins extends Component
     {
         if ($runValidation && !$login->validate()) {
             KnockKnock::info('Login not saved due to validation error.');
+
             return false;
         }
 
@@ -88,7 +92,7 @@ class Logins extends Component
             return true;
         }
 
-        $interval = DateTimeHelper::toDateInterval($settings->invalidLoginWindowDuration);
+        $interval = $this->_getInvalidLoginWindow($settings);
         $start = DateTimeHelper::currentUTCDateTime()->sub($interval);
         $end = DateTimeHelper::currentUTCDateTime();
 
@@ -97,6 +101,7 @@ class Logins extends Component
             ->where(['ipAddress' => $ipAddress])
             ->andWhere(['between', 'dateCreated', Db::prepareDateForDb($start), Db::prepareDateForDb($end)])
             ->count();
+
         return $loginAttempts >= $settings->maxInvalidLogins;
     }
 
@@ -131,12 +136,24 @@ class Logins extends Component
         return $loginRecord;
     }
 
+    private function _getInvalidLoginWindow(Settings $settings): DateInterval
+    {
+        try {
+            $interval = DateTimeHelper::toDateInterval($settings->invalidLoginWindowDuration);
+        } catch (InvalidArgumentException) {
+            $interval = false;
+        }
+
+        // The setting is free text, so fall back to its default when it's empty or invalid
+        return $interval ?: DateTimeHelper::toDateInterval((new Settings())->invalidLoginWindowDuration);
+    }
+
     private function _pruneLoginRecords(): void
     {
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
-        $interval = DateTimeHelper::toDateInterval($settings->invalidLoginWindowDuration);
+        $interval = $this->_getInvalidLoginWindow($settings);
         $cutoff = DateTimeHelper::currentUTCDateTime()->sub($interval);
 
         LoginRecord::deleteAll(['<', 'dateCreated', Db::prepareDateForDb($cutoff)]);
