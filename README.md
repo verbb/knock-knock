@@ -12,21 +12,24 @@ Visitors enter one project password before accessing protected pages. Successful
 - Leave selected endpoints available when integrations or public pages need them.
 - Allow trusted networks through without the password screen.
 - Use project-owned templates or responses for the gate.
-- Keep access behaviour explicit alongside the rest of the site configuration.
 - Use environment variables for the password and enabled state across deployments.
 - Optionally allow the gate and protected pages to be statically cached, such as on Craft Cloud.
 
 ## Documentation
+
 Visit the [Knock Knock Plugin page](https://verbb.io/craft-plugins/knock-knock) for all documentation, guides, pricing and developer resources.
 
 ## Credit & Thanks
+
 Based on [KnockKnock](https://github.com/dgrigg/knockknock) for Craft 2.
 
 ## Support
-Get in touch with us via the [Knock Knock Support page](https://verbb.io/craft-plugins/knock-knock/support) or by [creating a Github issue](https://github.com/verbb/knock-knock/issues)
+
+Get in touch with us via the [Knock Knock Support page](https://verbb.io/craft-plugins/knock-knock/support) or by [creating a GitHub issue](https://github.com/verbb/knock-knock/issues).
 
 ## Sponsor
-Knock Knock is licensed under the MIT license, meaning it will always be free and open source - we love free stuff! If you'd like to show your support to the plugin regardless, [Sponsor](https://github.com/sponsors/verbb) development.
+
+Knock Knock is licensed under the MIT license, so it will always be free and open source. If you'd like to support it anyway, you can [sponsor its development](https://github.com/sponsors/verbb).
 
 <h2></h2>
 

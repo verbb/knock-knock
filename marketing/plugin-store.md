@@ -9,5 +9,5 @@ Visitors enter one project password before accessing protected pages. Successful
 - Leave selected endpoints available when integrations or public pages need them.
 - Allow trusted networks through without the password screen.
 - Use project-owned templates or responses for the gate.
-- Keep access behaviour explicit alongside the rest of the site configuration.
 - Use environment variables for the password and enabled state across deployments.
+- Optionally allow the gate and protected pages to be statically cached, such as on Craft Cloud.
