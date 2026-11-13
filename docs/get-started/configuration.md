@@ -12,7 +12,7 @@ return [
 ];
 ```
 
-All other settings keep their defaults. Add any further settings you want to change to the same array. The options below explain the available settings and their defaults.
+All other settings keep their defaults. Add any further settings you want to change to the same array. The options below explain the available settings and their defaults. You can also manage many of these settings in the control panel under **Settings → Knock Knock**.
 
 ## Configuration Options
 
@@ -185,37 +185,23 @@ A list of specific request paths to protect. For exact paths, query strings and 
 A list of specific request paths to leave unprotected. For exact paths, query strings and fragments are ignored, and paths are compared case-sensitively without leading or trailing slashes. An absolute entry must belong to the current site; its scheme and host are then removed before matching. A rule is recognised as a regular expression when its path contains `(` before any unencoded `?` or `#`. Once recognised, the entire expression is preserved, including `?` and `#`, and must match the complete path case-insensitively. For example, `/some-channel/(.*)` matches `/some-channel/news`, but not `/private/some-channel/news`.
 :::
 
+## Multi-Site Configuration
 
-### Multi-Site Configuration
-The above will set the values globally, for all sites. These global values will override each setting for each site, so they'll always be the same. If you want to set these values per-site, do not include them at the top level. For example:
+A setting given at the top level of the file applies to every site and overrides the same setting in `siteSettings`. To use different values for each site, leave those settings out of the top level and set them under `siteSettings`, keyed by site handle. For example:
 
 ```php
 <?php
 
 return [
-    '*' => [
-        // Don't do this for multi-site specific settings
-        'enabled' => true,
-        'password' => 'superSecretPassword',
-
-        // Instead, do this:
-        'siteSettings' => [
-            'siteHandle' => [
-                'enabled' => true,
-                'password' => 'superSecretPassword',
-            ],
-            'anotherSiteHandle' => [
-                'enabled' => true,
-                'password' => 'anotherSecretPassword',
-            ],
-        ]
+    'siteSettings' => [
+        'siteHandle' => [
+            'enabled' => true,
+            'password' => 'superSecretPassword',
+        ],
+        'anotherSiteHandle' => [
+            'enabled' => true,
+            'password' => 'anotherSecretPassword',
+        ],
     ],
 ];
 ```
-
-If you keep the top level `enabled`, `password`, etc settings, they'll override your settings for each site.
-
-Access is remembered independently for each site. Visitors must pass each site's gate separately, even when multiple sites use the same global password.
-
-## Control Panel
-You can also manage configuration settings through the Control Panel by visiting Settings → Knock Knock.
