@@ -164,8 +164,9 @@ class KnockKnock extends Plugin
         $accessPassword = $settings->getPassword();
 
         if ($ipAccessStatus !== IpHelper::ACCESS_DENIED && $accessPassword !== '' && $this->_hasValidAccessCookie($settings, $accessPassword)) {
-            // Only the opt-in static cookie can safely distinguish protected cached responses.
-            if (!$settings->getEnableStaticCaching()) {
+            // Only the opt-in static cookie can safely distinguish protected cached responses, and only at
+            // paths a static cache rule can be relied on to key on the cookie.
+            if (!$settings->getEnableStaticCaching() || !$this->_isCanonicalPath($currentPath)) {
                 $this->_preventStaticCaching($settings);
             }
 
@@ -207,6 +208,11 @@ class KnockKnock extends Plugin
 
     private function _isProtectedPath(string $currentPath, Settings $settings): bool
     {
+        // Craft can serve a protected page at a path that no rule would match, so keep those paths gated
+        if (!$this->_isCanonicalPath($currentPath)) {
+            return true;
+        }
+
         // Check if the requested URL is explicitly unprotected. If yes, allow the request.
         if ($settings->getUnprotectedUrls()) {
             if ($this->_matchesUrlRules($currentPath, $settings->getUnprotectedUrls()) === self::URL_RULE_MATCH) {
@@ -217,6 +223,27 @@ class KnockKnock extends Plugin
         // Check to see if we're watching only specific URLs. By default, protect everything though
         if ($settings->getProtectedUrls()) {
             if ($this->_matchesUrlRules($currentPath, $settings->getProtectedUrls(), true) === self::URL_RULE_NO_MATCH) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns whether URL rules can evaluate the decoded request path exactly as Craft will route it.
+     *
+     * Template routing resolves `.` and `..` segments and backslashes, and URL rules accept a trailing
+     * newline, so these paths can render a page whose own path a rule protects.
+     */
+    private function _isCanonicalPath(string $path): bool
+    {
+        if (preg_match('/[\\x00-\\x1F\\x7F\\\\]/', $path)) {
+            return false;
+        }
+
+        foreach (explode('/', $path) as $segment) {
+            if ($segment === '.' || $segment === '..') {
                 return false;
             }
         }

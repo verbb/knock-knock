@@ -239,7 +239,22 @@ namespace {
     assertSame(1, $match('mémbers/article#section', ['members/(.*)#section'], true), 'Canonical URI punctuation must survive decoding.');
     Craft::$app->matchedElement = false;
 
+    $isCanonicalPath = new ReflectionMethod(KnockKnock::class, '_isCanonicalPath');
+    $canonical = fn(string $path): bool => $isCanonicalPath->invoke($plugin, $path);
+
+    assertSame(true, $canonical(''), 'The homepage path must be canonical.');
+    assertSame(true, $canonical('members/secret'), 'Ordinary paths must be canonical.');
+    assertSame(true, $canonical('members/v1.2/notes...txt'), 'Dots inside a segment must remain canonical.');
+    assertSame(true, $canonical('somé channel/news'), 'Decoded spaces and non-ASCII characters must remain canonical.');
+    assertSame(false, $canonical('blog/../members/secret'), 'A parent segment must not be evaluated as a different path.');
+    assertSame(false, $canonical('..'), 'A bare parent segment must not be evaluated as the homepage.');
+    assertSame(false, $canonical('blog/./members'), 'A current-directory segment must not be evaluated as written.');
+    assertSame(false, $canonical('members\\secret'), 'Backslashes must not be evaluated as written.');
+    assertSame(false, $canonical("members/dashboard\n"), 'A trailing newline must not be evaluated as written.');
+    assertSame(false, $canonical("members\tsecret"), 'Control characters must not be evaluated as written.');
+
     $source = file_get_contents(dirname(__DIR__, 2) . '/src/KnockKnock.php');
+    assertSame(true, str_contains($source, "if (!\$this->_isCanonicalPath(\$currentPath)) {\n            return true;"), 'Non-canonical paths must stay protected before any URL rule can unprotect them.');
     assertSame(true, str_contains($source, '_matchesUrlRules($currentPath, $settings->getUnprotectedUrls()) === self::URL_RULE_MATCH'), 'Only a valid unprotected match may bypass the gate.');
     assertSame(true, str_contains($source, '_matchesUrlRules($currentPath, $settings->getProtectedUrls(), true) === self::URL_RULE_NO_MATCH'), 'An invalid protected rule must keep the gate enabled.');
 
