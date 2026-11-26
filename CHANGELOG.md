@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Fixed the password prompt still being shown at the login path when protection is disabled. It now returns a 404. ([#67](https://github.com/verbb/knock-knock/issues/67))
+
 ## 3.0.17 - 2026-11-01
 
 ### Fixed

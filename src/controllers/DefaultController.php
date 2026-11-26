@@ -32,6 +32,11 @@ class DefaultController extends Controller
         /* @var Settings $settings */
         $settings = KnockKnock::$plugin->getSettings();
 
+        // Don't show a convincing prompt on a site that isn't protected, such as production
+        if (!$settings->getEnabled()) {
+            throw new NotFoundHttpException();
+        }
+
         return $this->renderPrompt($this->_getRedirect($settings));
     }
 
