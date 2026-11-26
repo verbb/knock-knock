@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Fixed
+- Fixed custom password prompt templates failing to submit with a “Bad Request” error when Craft’s `asyncCsrfInputs` setting is enabled. ([#80](https://github.com/verbb/knock-knock/issues/80))
 - Fixed the password prompt showing the site’s SEOmatic metadata, such as its Open Graph image. The prompt now also tells search engines not to index it. ([#51](https://github.com/verbb/knock-knock/issues/51))
 - Fixed the password prompt still being shown at the login path when protection is disabled. It now returns a 404. ([#67](https://github.com/verbb/knock-knock/issues/67))
 

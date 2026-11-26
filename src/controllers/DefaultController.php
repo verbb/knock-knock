@@ -179,6 +179,11 @@ class DefaultController extends Controller
             AccessTokenHelper::hasCookie($settings->getStaticCacheCookieName())
         ) {
             $this->response->setNoCacheHeaders();
+
+            // An uncached prompt can include its CSRF token directly. Otherwise, with `asyncCsrfInputs`
+            // enabled, a custom template that's just a form has no `</body>` for Craft to add its token
+            // script to, so the form can never be submitted.
+            Craft::$app->getConfig()->getGeneral()->asyncCsrfInputs = false;
         }
 
         $this->_preventIndexing();
