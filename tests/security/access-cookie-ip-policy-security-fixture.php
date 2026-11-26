@@ -368,6 +368,23 @@ namespace {
         {
             return '/' . $this->path;
         }
+
+        public function getHeaders(): FakeHeaders
+        {
+            return new FakeHeaders($this->options['headers'] ?? []);
+        }
+    }
+
+    final class FakeHeaders
+    {
+        public function __construct(private readonly array $values)
+        {
+        }
+
+        public function get(string $name): ?string
+        {
+            return $this->values[$name] ?? null;
+        }
     }
 
     final class FakeResponse
@@ -579,6 +596,30 @@ namespace {
     assertSame(1, $application->endCalls, 'Without static caching, visitors without a valid access cookie must reach the gate.');
     assertSame([], FakePromptController::$prompts, 'Without static caching, the prompt must not be shown in place.');
     assertSame(1, $application->response->noCacheCalls, 'Without static caching, the gate must keep sending no-cache headers.');
+
+    // Asset requests made while the prompt is open are still challenged, but must not replace the return URL
+    foreach ([
+        ['favicon.ico', []],
+        ['assets/missing.js', ['Accept' => '*/*']],
+        ['members', ['Sec-Fetch-Dest' => 'image', 'Accept' => 'image/avif,image/webp,*/*']],
+        ['members', ['Sec-Fetch-Dest' => 'script']],
+        ['members', ['Accept' => 'image/webp,image/png']],
+    ] as [$assetPath, $headers]) {
+        [$application, , $storeCalls] = runGate(IpHelper::ACCESS_NEUTRAL, $assetPath, [], [], ['valid' => false, 'headers' => $headers]);
+        assertSame(1, $application->endCalls, "An asset request to /$assetPath must still be challenged.");
+        assertSame(0, $storeCalls, "An asset request to /$assetPath must not replace the return URL.");
+    }
+
+    foreach ([
+        ['Sec-Fetch-Dest' => 'document', 'Accept' => 'text/html'],
+        ['Sec-Fetch-Dest' => 'iframe'],
+        ['Accept' => 'text/html,application/xhtml+xml'],
+        ['Accept' => '*/*'],
+        [],
+    ] as $headers) {
+        [, , $storeCalls] = runGate(IpHelper::ACCESS_NEUTRAL, 'members', [], [], ['valid' => false, 'headers' => $headers]);
+        assertSame(1, $storeCalls, 'A page navigation must set the return URL. Headers: ' . json_encode($headers));
+    }
 
     echo "Knock Knock access-cookie IP policy security fixture passed.\n";
 }

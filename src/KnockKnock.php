@@ -188,13 +188,34 @@ class KnockKnock extends Plugin
             return;
         }
 
-        if ($request->getIsSiteRequest()) {
+        // Images, scripts and the browser's favicon request can reach Craft while the prompt is open. Only a page
+        // navigation sets where the visitor returns to, so they don't land on an asset after entering the password.
+        if ($request->getIsSiteRequest() && $this->_isPageNavigation()) {
             ReturnUrlHelper::store($request->getUrl());
         }
 
         Craft::$app->getResponse()->setNoCacheHeaders();
         Craft::$app->getResponse()->redirect(UrlHelper::siteUrl($settings->getLoginPath()));
         Craft::$app->end();
+    }
+
+    private function _isPageNavigation(): bool
+    {
+        $request = Craft::$app->getRequest();
+        $destination = $request->getHeaders()->get('Sec-Fetch-Dest');
+
+        // Modern browsers say what a request is for
+        if (is_string($destination) && $destination !== '') {
+            return in_array($destination, ['document', 'iframe', 'frame'], true);
+        }
+
+        if (preg_match('/\.(ico|png|jpe?g|gif|svg|webp|avif|css|js|mjs|map|json|xml|txt|woff2?|ttf|eot|mp4|webm|mp3|pdf)$/i', $request->getPathInfo())) {
+            return false;
+        }
+
+        $accept = $request->getHeaders()->get('Accept');
+
+        return !is_string($accept) || $accept === '' || str_contains($accept, 'text/html') || str_contains($accept, '*/*');
     }
 
     private function _hasValidAccessCookie(Settings $settings, string $accessPassword): bool
