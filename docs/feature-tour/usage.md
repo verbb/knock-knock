@@ -67,7 +67,7 @@ cache:
         - knockKnockAccess
 ```
 
-Cloud uses the first rule that matches a URL, so if you have other rules whose patterns could match protected URLs, add the cookie to those rules as well. A pattern of `/` only matches the homepage. Deploy the cache rules before enabling the setting:
+Cloud uses the first rule that matches a URL, so if you have other rules whose patterns could match protected URLs, add the cookie to those rules as well. A pattern of `/` only matches the homepage. Keep the cookie on a catch-all rule like the one above, rather than a rule for each protected section. Craft can serve the same page at more than one URL, such as `/?p=members/secret` or the same path in different letter case, and a rule that only lists your protected paths won't cover those. Deploy the cache rules before enabling the setting:
 
 ```php
 <?php
