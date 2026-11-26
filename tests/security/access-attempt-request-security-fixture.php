@@ -318,6 +318,16 @@ namespace {
             };
         }
 
+        public function getPlugins(): object
+        {
+            return new class {
+                public function getPlugin(string $handle): ?object
+                {
+                    return null;
+                }
+            };
+        }
+
         public function getResponse(): FakeResponse
         {
             return $this->response;
@@ -444,11 +454,13 @@ namespace {
     final class FakeResponse
     {
         public FakeCookies $cookies;
+        public FakeHeaders $headers;
         public int $noCacheCalls = 0;
 
         public function __construct()
         {
             $this->cookies = new FakeCookies();
+            $this->headers = new FakeHeaders();
         }
 
         public function getCookies(): FakeCookies
@@ -459,6 +471,21 @@ namespace {
         public function setNoCacheHeaders(): void
         {
             $this->noCacheCalls++;
+        }
+
+        public function getHeaders(): FakeHeaders
+        {
+            return $this->headers;
+        }
+    }
+
+    final class FakeHeaders
+    {
+        public array $values = [];
+
+        public function set(string $name, string $value): void
+        {
+            $this->values[$name] = $value;
         }
     }
 
@@ -633,6 +660,11 @@ namespace {
     [$controller, $request, $plugin, $logins, $application] = createController(false, [], []);
     $controller->renderPrompt('/members');
     assertSame(1, $application->response->noCacheCalls, 'Without static caching, the prompt must never be cached.');
+    assertSame('noindex, nofollow', $application->response->headers->values['X-Robots-Tag'] ?? null, 'The prompt must not be indexed by search engines.');
+
+    [$controller, $request, $plugin, $logins, $application] = createController(false, [], [], $staticSettings());
+    $controller->renderPrompt('/members');
+    assertSame('noindex, nofollow', $application->response->headers->values['X-Robots-Tag'] ?? null, 'A cacheable static prompt must not be indexed by search engines.');
 
     echo "Knock Knock access-attempt request security fixture passed.\n";
 }
