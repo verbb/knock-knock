@@ -5,6 +5,7 @@
 {% set bodyClass = 'login' %}
 
 {% do view.registerAssetBundle('verbb\\knockknock\\web\\assets\\frontend\\FrontEndAsset') %}
+{% do view.registerMetaTag({ name: 'robots', content: 'noindex, nofollow' }) %}
 
 {% block body %}
 

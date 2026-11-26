@@ -181,6 +181,8 @@ class DefaultController extends Controller
             $this->response->setNoCacheHeaders();
         }
 
+        $this->_preventIndexing();
+
         $view = $this->getView();
         $view->setTemplateMode($view::TEMPLATE_MODE_CP);
 
@@ -200,5 +202,18 @@ class DefaultController extends Controller
         $view->setTemplateMode($view::TEMPLATE_MODE_CP);
 
         return $defaultTemplate;
+    }
+
+    private function _preventIndexing(): void
+    {
+        $this->response->getHeaders()->set('X-Robots-Tag', 'noindex, nofollow');
+
+        // SEOmatic adds the site's metadata to every page, which would expose an unreleased site's
+        // Open Graph image and description on the prompt, and replace the robots header
+        $seomatic = Craft::$app->getPlugins()->getPlugin('seomatic');
+
+        if ($seomatic && property_exists($seomatic, 'settings') && isset($seomatic::$settings->renderEnabled)) {
+            $seomatic::$settings->renderEnabled = false;
+        }
     }
 }
