@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.0.18 - 2026-11-29
 
 ### Fixed
 - Fixed a medium-severity access control vulnerability affecting protected and unprotected URL rules.
